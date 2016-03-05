@@ -31,6 +31,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface {
         $user->setEmail($first_name . "@test.com");
         $user->setUsername($user->getEmail());
         $user->setPlainPassword('test');
+        $user->setEnabled(true);
 
         $this->addReference('user-' . $first_name, $user);
 

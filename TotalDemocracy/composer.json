@@ -33,6 +33,8 @@
         "nesbot/Carbon": "*",
         "friendsofsymfony/rest-bundle": "*",
         "jms/serializer-bundle": "*",
+        "jms/security-extra-bundle": "*",
+        "jms/di-extra-bundle": "*",
         "stof/doctrine-extensions-bundle": "*",
         "doctrine/doctrine-fixtures-bundle": "dev-master"
 

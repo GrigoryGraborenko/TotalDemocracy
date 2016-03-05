@@ -1,0 +1,13 @@
+{% extends "::base.html.twig" %}
+
+{% block content %}
+
+    <h1>VOTE</h1>
+
+    {% for doc in docs %}
+        <h3>{{ doc.name }}</h3>
+        <p>{{ doc.text }}</p>
+    {% endfor %}
+
+{% endblock %}
+

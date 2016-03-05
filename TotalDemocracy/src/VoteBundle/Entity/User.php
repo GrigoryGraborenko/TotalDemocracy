@@ -37,6 +37,12 @@ class User extends BaseUser {
     protected $date_created;
 
     /**
+     * User constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+    }
+    /**
      * @return mixed
      */
     public function getId() {

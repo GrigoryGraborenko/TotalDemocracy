@@ -7,7 +7,7 @@
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
     </head>
     <body style="padding-top: 50px;">
 
@@ -29,6 +29,7 @@
                         {% endif %}
                         {#<li {% if location == 'home' %}class="active"{% endif %}><a href="{{ path("homepage") }}">Home</a></li>#}
                         <li {% if location == 'vote' %}class="active"{% endif %}><a href="{{ path("vote") }}">Vote</a></li>
+                        <li {% if location == 'verify' %}class="active"{% endif %}><a href="{{ path("verify") }}">Verify</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
 

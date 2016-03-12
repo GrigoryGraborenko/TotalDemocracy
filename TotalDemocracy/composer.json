@@ -36,7 +36,8 @@
         "jms/security-extra-bundle": "*",
         "jms/di-extra-bundle": "*",
         "stof/doctrine-extensions-bundle": "*",
-        "doctrine/doctrine-fixtures-bundle": "dev-master"
+        "doctrine/doctrine-fixtures-bundle": "dev-master",
+        "guzzlehttp/guzzle": "~6.0"
 
     },
     "require-dev": {

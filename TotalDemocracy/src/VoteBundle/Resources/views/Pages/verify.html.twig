@@ -1,0 +1,72 @@
+{% extends "::base.html.twig" %}
+
+{% block content %}
+
+    <h1>Verify</h1>
+
+    {% if image is defined %}
+        <form action="{{ path("finish_verify") }}" method="post">
+            <p>
+                <label>Given Names</label><input type="text" id="names-input" name="names">
+            </p>
+            <p>
+                <label>Surname</label><input type="text" id="surname-input" name="surname">
+            </p>
+            <p>
+                <label>Postcode</label><input type="text" id="postcode-input" name="postcode">
+            </p>
+            <p>
+                {#<label>Suburb</label><select id="suburb-code-input"></select>#}
+                <label>Suburb</label><input type="text" id="suburb-input" name="suburb">
+            </p>
+            <p>
+                <label>Street</label><input type="text" id="street-input" name="street">
+            </p>
+            <p>
+                <img src="{{ image }}">
+                <label>Verification Code</label><input type="text" id="verify-input" name="verify">
+            </p>
+            <button type="submit">Verify</button>
+        </form>
+    {% else %}
+        <p>No Image</p>
+    {% endif %}
+    {% if message is defined %}
+        <h2>{{ message }}</h2>
+    {% endif %}
+
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+
+//            $("#post-code-input").input(function() {
+//                var post = $(this).val();
+//                console.log(post);
+//                if()
+//            });
+
+            return;
+/*
+            $.ajax({
+                //url: "https://oevf.aec.gov.au/"
+                url: "http://www.google.com"
+                ,method: 'GET'
+                ,crossDomain: true
+//                ,dataType:"jsonp"
+                ,beforeSend: function (request) {
+                    request.setRequestHeader("Access-Control-Allow-Origin", "All Clients");
+                }
+                ,headers: {
+                    'Access-Control-Allow-Origin':'All Clients'
+                }
+            }).done(function(data, textStatus, jqxhr) {
+                console.log(data);
+            });
+*/
+            //console.log("bah");
+        });
+    </script>
+{% endblock %}

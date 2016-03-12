@@ -10,8 +10,10 @@ use Symfony\Component\HttpFoundation\Request;
  * TODO FIXES:
  * Send a confirm email
  * Make sure that entering password is client-side tested
- * Actually store verified data
  * Ensure auto-complete works
+ * Remove old images
+ * Ensure you don't have duplicate emails, or duplicate voters
+ * Ensure voters can't change their names easily
  *
  * TODO:
  * do g_initial data JS stuff, it's pretty useful

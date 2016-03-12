@@ -7,20 +7,20 @@
     {% if image is defined %}
         <form action="{{ path("finish_verify") }}" method="post">
             <p>
-                <label>Given Names</label><input type="text" id="names-input" name="names">
+                <label>Given Names</label><input type="text" id="names-input" name="names" value="{{ names }}">
             </p>
             <p>
-                <label>Surname</label><input type="text" id="surname-input" name="surname">
+                <label>Surname</label><input type="text" id="surname-input" name="surname" value="{{ surname }}">
             </p>
             <p>
-                <label>Postcode</label><input type="text" id="postcode-input" name="postcode">
+                <label>Postcode</label><input type="text" id="postcode-input" name="postcode" value="{{ postcode }}">
             </p>
             <p>
                 {#<label>Suburb</label><select id="suburb-code-input"></select>#}
                 <label>Suburb</label><input type="text" id="suburb-input" name="suburb">
             </p>
             <p>
-                <label>Street</label><input type="text" id="street-input" name="street">
+                <label>Street</label><input type="text" id="street-input" name="street" value="{{ street }}">
             </p>
             <p>
                 <img src="{{ image }}">

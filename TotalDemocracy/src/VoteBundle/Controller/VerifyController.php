@@ -5,7 +5,6 @@ namespace VoteBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
 
 use JMS\DiExtraBundle\Annotation as DI;
@@ -14,6 +13,8 @@ use GuzzleHttp\Client as HttpClient;
 use Carbon\Carbon;
 
 use Symfony\Component\DomCrawler\Crawler;
+
+use VoteBundle\Exception\ErrorRedirectException;
 
 /**
  * Class VerifyController
@@ -24,16 +25,40 @@ class VerifyController extends FOSRestController {
     /** @DI\Inject("doctrine.orm.entity_manager") */
     private $em;
 
+    private function getPotentialUser() {
+        $user = $this->getUser();
+
+        if($user === NULL) {
+            $session = $this->get("session");
+            if(!$session->has("new_user_id")) {
+                throw new ErrorRedirectException("homepage", "No user available");
+            }
+            $user_id = $session->get("new_user_id");
+            $user = $this->em->getRepository('VoteBundle:User')->find($user_id);
+        }
+        if($user === NULL) {
+            throw new ErrorRedirectException("homepage", "No user available");
+        }
+
+        return $user;
+    }
+
     /**
      * @Route("/verify", name="verify")
      * @Method("GET");
      */
     public function indexAction(Request $request) {
 
+        $user = $this->getPotentialUser();
+
         $base_url = "https://oevf.aec.gov.au/";
-        $view = new View();
-        $view->setTemplate("VoteBundle:Pages:verify.html.twig");
-        $output = array();
+        $output = array(
+            "names" => $user->getGivenNames()
+            ,"surname" => $user->getSurname()
+            ,"postcode" => $user->getPostcode()
+            ,"suburb" => $user->getSuburb()
+            ,"street" => $user->getStreet()
+        );
 
         $client = new HttpClient([
             'verify' => false
@@ -81,8 +106,7 @@ class VerifyController extends FOSRestController {
         $session->set('verify.VCID', $crawler->filter('#LBD_VCID_c_verifyenrolment_ctl00_contentplaceholderbody_captchaverificationcode')->attr("value"));
         $session->set('verify.cookie', $cookie);
 
-        $view->setTemplateData($output);
-        return $this->handleView($view);
+        return $this->render("VoteBundle:Pages:verify.html.twig", $output);
     }
 
     /**
@@ -91,8 +115,8 @@ class VerifyController extends FOSRestController {
      */
     public function finishVerification(Request $request) {
 
+        $user = $this->getPotentialUser();
         $input = $request->request->all();
-        $view = new View();
 
         if( (!array_key_exists("names", $input)) ||
             (!array_key_exists("surname", $input)) ||
@@ -101,9 +125,7 @@ class VerifyController extends FOSRestController {
             (!array_key_exists("street", $input)) ||
             (!array_key_exists("verify", $input))) {
 
-            $view->setTemplate("VoteBundle:Pages:verify.html.twig");
-            $view->setTemplateData(array("error" => "Incorrect Arguments"));
-            return $this->handleView($view);
+            throw new ErrorRedirectException("verify", "Incorrect arguments");
         }
 
         $client = new HttpClient([
@@ -153,39 +175,33 @@ class VerifyController extends FOSRestController {
         $crawler = new Crawler($response->getBody()->getContents());
 
         $success_nodes = $crawler->filter('#ctl00_pageHeadingH1');
-        if($success_nodes->count() > 0) {
-            $view->setTemplate("VoteBundle:Pages:verify_success.html.twig");
+        if(($success_nodes->count() > 0) && ($success_nodes->html() === "You are enrolled to vote")) {
 
-            $names_found = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelGivenNamesMatched')->html();
-            $surname_found = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelSurnameMatched')->html();
-            $address_found = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelAddress')->html();
+//            $names_found = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelGivenNamesMatched')->html();
+//            $surname_found = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelSurnameMatched')->html();
+//            $address_found = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelAddress')->html();
 
             $federal_electorate = $crawler->filter('#ctl00_ContentPlaceHolderBody_linkProfile')->html();
             $state_district = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelStateDistrict2')->html();
             $council = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGA2')->html();
             $council_ward = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGAWard2')->html();
 
-
-            $session = $this->get("session");
-            if($session->has("new_user_id")) {
-                $session->get("new_user_id");
-            }
-
+            $user->setGivenNames($input['names']);
+            $user->setSurname($input['surname']);
+            $user->setPostcode($input['postcode']);
+            $user->setSuburb($input['suburb']);
+            $user->setStreet($input['street']);
+            $user->setWhenVerified(Carbon::now("UTC"));
+            $this->em->flush();
 
             $output = array(
-                "message" => "SUCCESS $names_found, $surname_found, $address_found, $federal_electorate, $state_district, $council, $council_ward"
+                "message" => "SUCCESS $federal_electorate, $state_district, $council, $council_ward"
             );
 
         } else {
-            $view->setTemplate("VoteBundle:Pages:verify.html.twig");
-            $output = array(
-                "message" => "ERROR"
-                ,"error" => "Unknown Error"
-            );
+            throw new ErrorRedirectException("verify", "Unknown Error");
         }
 
-        $output['location'] = "verify";
-        $view->setTemplateData($output);
-        return $this->handleView($view);
+        return $this->render("VoteBundle:Pages:verify.html.twig", $output);
     }
 }

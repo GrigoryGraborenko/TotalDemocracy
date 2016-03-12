@@ -37,6 +37,36 @@ class User extends BaseUser {
     protected $date_created;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $givenNames;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $surname;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $postcode;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $suburb;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $street;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $whenVerified;
+
+    /**
      * User constructor.
      */
     public function __construct() {
@@ -50,17 +80,94 @@ class User extends BaseUser {
     }
 
     /**
-     * @param mixed $id
+     * @return mixed
      */
-    public function setId($id) {
-        $this->id = $id;
+    public function getDateCreated() {
+        return $this->date_created;
     }
 
     /**
      * @return mixed
      */
-    public function getDateCreated() {
-        return $this->date_created;
+    public function getGivenNames() {
+        return $this->givenNames;
+    }
+
+    /**
+     * @param mixed $givenNames
+     */
+    public function setGivenNames($givenNames) {
+        $this->givenNames = $givenNames;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSurname() {
+        return $this->surname;
+    }
+
+    /**
+     * @param mixed $surname
+     */
+    public function setSurname($surname) {
+        $this->surname = $surname;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPostcode() {
+        return $this->postcode;
+    }
+
+    /**
+     * @param mixed $postcode
+     */
+    public function setPostcode($postcode) {
+        $this->postcode = $postcode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSuburb() {
+        return $this->suburb;
+    }
+
+    /**
+     * @param mixed $suburb
+     */
+    public function setSuburb($suburb) {
+        $this->suburb = $suburb;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStreet() {
+        return $this->street;
+    }
+
+    /**
+     * @param mixed $street
+     */
+    public function setStreet($street) {
+        $this->street = $street;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWhenVerified() {
+        return $this->whenVerified;
+    }
+
+    /**
+     * @param mixed $whenVerified
+     */
+    public function setWhenVerified($whenVerified) {
+        $this->whenVerified = $whenVerified;
     }
 
 }

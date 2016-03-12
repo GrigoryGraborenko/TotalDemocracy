@@ -84,10 +84,10 @@ fos_user:
     user_class: VoteBundle\Entity\User
     registration:
         confirmation:
-            enabled:    false # disabled during development
+            enabled:    true # disabled during development
     from_email:
-        address:        noreply@totaldemocracy.org
-        sender_name:    Total Democracy
+        address:        noreply@test.org
+        sender_name:    TestServer
 
 monolog:
   handlers:

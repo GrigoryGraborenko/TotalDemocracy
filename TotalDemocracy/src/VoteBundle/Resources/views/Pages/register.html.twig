@@ -1,0 +1,19 @@
+{% extends "::base.html.twig" %}
+
+{% block content %}
+
+    <h1>REGISTER</h1>
+
+    <form action="{{ path("signup_email") }}" method="post">
+        <input type="text" name="email">
+        {% if app.session.flashbag.has('email-error') %}
+            <h4>
+                {% for error in app.session.flashbag.get('email-error') %}
+                    {{ error }}
+                {% endfor %}
+            </h4>
+        {% endif %}
+        <button type="submit">Register</button>
+    </form>
+
+{% endblock %}

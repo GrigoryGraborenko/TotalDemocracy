@@ -4,7 +4,9 @@ parameters:
 #    parameter_name: value
 
 services:
-#    service_name:
-#        class: AppBundle\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
-
+    core_exception_listener:
+        class: VoteBundle\Listener\CoreExceptionListener
+        arguments: ["@logger", "@router", "@twig", "@session"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+            - { name: monolog.logger, channel: app }

@@ -1,0 +1,26 @@
+{% extends "::base.html.twig" %}
+
+{% block content %}
+
+    <h1>REGISTER FINISH</h1>
+
+    <form action="{{ path("signup_confirm", { "email": email, "confirm_token": token }) }}" method="post">
+        <p>
+            <label>Password: </label><input type="text" name="password">
+        </p>
+        <p>
+            <label>Re-enter your password: </label><input type="text">
+        </p>
+
+        {% if app.session.flashbag.has('confirm-error') %}
+            <h4>
+                {% for error in app.session.flashbag.get('confirm-error') %}
+                    {{ error }}
+                {% endfor %}
+            </h4>
+        {% endif %}
+
+        <button type="submit">Finish Registration</button>
+    </form>
+
+{% endblock %}

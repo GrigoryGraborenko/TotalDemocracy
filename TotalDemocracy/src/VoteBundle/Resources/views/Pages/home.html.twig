@@ -3,5 +3,14 @@
 {% block content %}
 
     <h1>Hi there</h1>
+
+    {% if app.session.flashbag.has('error-redirect') %}
+        <h4>
+            {% for error in app.session.flashbag.get('error-redirect') %}
+                {{ error }}
+            {% endfor %}
+        </h4>
+    {% endif %}
+
 {% endblock %}
 

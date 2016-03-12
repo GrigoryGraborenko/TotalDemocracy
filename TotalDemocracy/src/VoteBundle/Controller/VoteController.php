@@ -27,8 +27,7 @@ class VoteController extends FOSRestController {
         $docs = $doc_repo->findAll();
 
         $output = array(
-            "location" => "vote"
-            ,"docs" => $docs
+            "docs" => $docs
         );
 
         return $this->render('VoteBundle:Pages:vote.html.twig', $output);

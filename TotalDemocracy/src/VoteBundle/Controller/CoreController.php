@@ -7,10 +7,20 @@ use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 
 /*
+ * TODO FIXES:
+ * Send a confirm email
+ * Make sure that entering password is client-side tested
+ * Actually store verified data
+ * Ensure auto-complete works
+ *
  * TODO:
- * do initial data stuff, it's pretty useful
- * try and render over the server-side stuff with client side shit
+ * do g_initial data JS stuff, it's pretty useful
  * Allow voting
+ *
+ * rego: enter an email. progress. verify. need to confirm email before you can be valid.
+ *
+ {% set filter = app.session.get('filter') %}
+{% set account-filter = filter['accounts'] %}*
  */
 
 /**
@@ -24,6 +34,6 @@ class CoreController extends FOSRestController {
      */
     public function indexAction(Request $request) {
 
-        return $this->render('VoteBundle:Pages:home.html.twig', array("location" => "home"));
+        return $this->render('VoteBundle:Pages:home.html.twig', array());
     }
 }

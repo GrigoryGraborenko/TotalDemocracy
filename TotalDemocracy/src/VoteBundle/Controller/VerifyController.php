@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use JMS\DiExtraBundle\Annotation as DI;
 
 use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Middleware;
 use Carbon\Carbon;
 
 use Symfony\Component\DomCrawler\Crawler;
@@ -32,12 +31,9 @@ class VerifyController extends FOSRestController {
     public function indexAction(Request $request) {
 
         $base_url = "https://oevf.aec.gov.au/";
-//        $bag = $this->get('session')->getFlashBag();
         $view = new View();
         $view->setTemplate("VoteBundle:Pages:verify.html.twig");
-        $output = array(
-            "location" => "verify"
-        );
+        $output = array();
 
         $client = new HttpClient([
             'verify' => false
@@ -85,16 +81,6 @@ class VerifyController extends FOSRestController {
         $session->set('verify.VCID', $crawler->filter('#LBD_VCID_c_verifyenrolment_ctl00_contentplaceholderbody_captchaverificationcode')->attr("value"));
         $session->set('verify.cookie', $cookie);
 
-//        $details = array(
-//            "view_state" => $crawler->filter('#__VIEWSTATE')->attr("value")
-//            ,"view_state_generator" => $crawler->filter('#__VIEWSTATEGENERATOR')->attr("value")
-//            ,"event_validation" => $crawler->filter('#__EVENTVALIDATION')->attr("value")
-//            ,"VCID" => $crawler->filter('#LBD_VCID_c_verifyenrolment_ctl00_contentplaceholderbody_captchaverificationcode')->attr("value")
-//            ,"cookie" => $cookie
-//        );
-
-//        $bag->set("verify_details", $details);
-
         $view->setTemplateData($output);
         return $this->handleView($view);
     }
@@ -119,11 +105,6 @@ class VerifyController extends FOSRestController {
             $view->setTemplateData(array("error" => "Incorrect Arguments"));
             return $this->handleView($view);
         }
-
-//        $view->setTemplate("VoteBundle:Pages:verify_success.html.twig");
-//        $view->setTemplateData(array("message" => json_encode($input)));
-//        return $this->handleView($view);
-
 
         $client = new HttpClient([
             'verify' => false
@@ -161,7 +142,6 @@ class VerifyController extends FOSRestController {
                 ,"Cache-Control" => "max-age=0"
                 ,"Connection" => "keep-alive"
                 ,"Cookie" => $session->get('verify.cookie')
-//                ,"Content-Length" => $len
                 ,"Host" => "oevf.aec.gov.au"
                 ,"Origin" => "https://oevf.aec.gov.au"
                 ,"Referer" => "https://oevf.aec.gov.au/"
@@ -184,6 +164,13 @@ class VerifyController extends FOSRestController {
             $state_district = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelStateDistrict2')->html();
             $council = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGA2')->html();
             $council_ward = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGAWard2')->html();
+
+
+            $session = $this->get("session");
+            if($session->has("new_user_id")) {
+                $session->get("new_user_id");
+            }
+
 
             $output = array(
                 "message" => "SUCCESS $names_found, $surname_found, $address_found, $federal_electorate, $state_district, $council, $council_ward"

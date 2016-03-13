@@ -190,11 +190,11 @@ class VerifyController extends FOSRestController {
             $council = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGA2')->html();
             $council_ward = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGAWard2')->html();
 
-            $user->setGivenNames($input['names']);
-            $user->setSurname($input['surname']);
+            $user->setGivenNames(ucwords(strtolower($input['names'])));
+            $user->setSurname(ucwords(strtolower($input['surname'])));
             $user->setPostcode($input['postcode']);
-            $user->setSuburb($input['suburb']);
-            $user->setStreet($input['street']);
+            $user->setSuburb(strtoupper($input['suburb']));
+            $user->setStreet(strtoupper($input['street']));
             $user->setWhenVerified(Carbon::now("UTC"));
             $this->em->flush();
 
@@ -203,14 +203,19 @@ class VerifyController extends FOSRestController {
             }
 
             $output = array(
-                "message" => "SUCCESS $federal_electorate, $state_district, $council, $council_ward"
+                "is_user_enabled" => $user->isEnabled()
+                ,"federal" => $federal_electorate
+                ,"state" => $state_district
+                ,"council" => $council
+                ,"ward" => $council_ward
             );
-
+        } else if(($success_nodes->count() > 0) && ($success_nodes->html() === "Please contact the AEC on 13 23 26 for assistance")) {
+            throw new ErrorRedirectException("verify", "Could not find you on the electoral role. Try with/without your middle name, or a previous address.");
         } else {
-            throw new ErrorRedirectException("verify", "Unknown Error");
+            throw new ErrorRedirectException("verify", "Verification code is incorrect.");
         }
 
-        return $this->render("VoteBundle:Pages:verify.html.twig", $output);
+        return $this->render("VoteBundle:Pages:verify_success.html.twig", $output);
     }
 
     /**

@@ -16,17 +16,27 @@
                 <label>Postcode</label><input type="text" id="postcode-input" name="postcode" value="{{ postcode }}">
             </p>
             <p>
-                <label>Suburb</label><select id="suburb-select" name="suburb"></select>
-                {#<label>Suburb</label><input type="text" id="suburb-input" >#}
+                <label>Suburb/Locality</label><select id="suburb-select" name="suburb" disabled>
+                    <option>- None Selected -</option>
+                </select>
             </p>
             <p>
-                <label>Street</label><input type="text" id="street-input" name="street" value="{{ street }}">
+                <label>Street</label><input type="text" id="street-input" name="street" value="{{ street }}" disabled>
             </p>
             <p>
                 <img src="{{ image }}">
                 <label>Verification Code</label><input type="text" id="verify-input" name="verify">
             </p>
-            <button type="submit">Verify</button>
+
+            <h4 id="error-text" class="color-red">
+                {% if app.session.flashbag.has('error-redirect') %}
+                    {% for error in app.session.flashbag.get('error-redirect') %}
+                        {{ error }}
+                    {% endfor %}
+                {% endif %}
+            </h4>
+
+            <button type="submit" id="verify-submit" class="btn btn-success">Verify</button>
         </form>
     {% else %}
         <p>No Image</p>
@@ -44,14 +54,17 @@
 
             var $postcode_input = $("#postcode-input");
             var $suburb_select = $("#suburb-select");
-            var $street_select = $("#street-input");
+            var $street_input = $("#street-input");
+            var $error = $("#error-text");
 
+            var acceptable_suburbs = [];
             var acceptable_streets = [];
 
             $postcode_input.on("input", function() {
                 var post = $(this).val();
+                $suburb_select.empty().append('<option value="">- None Selected -</option>').prop("disabled", true);
+                $street_input.prop("disabled", true);
                 if((post.length < 4) || (post.length > 4)) {
-                    $suburb_select.empty().prop("disabled", true);
                     return;
                 }
 
@@ -60,14 +73,14 @@
                     ,method: 'POST'
                     ,dataType:"json"
                     ,data: { "postcode": post }
-                }).done(function(data, textStatus, jqxhr) {
+                }).done(function(data) {
 
-                    $suburb_select.empty();
                     if(data.suburbs.length < 1) {
-                        $suburb_select.empty().prop("disabled", true);
                         return;
                     }
-                    $suburb_select.append('<option value=""></option>').prop("disabled", false);
+                    acceptable_suburbs = data.suburbs;
+                    $suburb_select.prop("disabled", false);
+                    $street_input.prop("disabled", false);
 
                     data.suburbs.forEach(function(sub) {
                         var $op = $('<option value="' + sub + '">' + sub + '</option>');
@@ -81,7 +94,11 @@
                 });
             });
 
-            $street_select.autocomplete({
+            if($postcode_input.val().length === 4) {
+                $postcode_input.trigger("input");
+            }
+
+            $street_input.autocomplete({
                 minLength: 1
                 ,source: function(request, response) {
 
@@ -91,7 +108,9 @@
                         ,dataType:"json"
                         ,data: { "prefix": request.term, "context": ($suburb_select.val() + ";" + $postcode_input.val()) }
                     }).done(function(data) {
-                        acceptable_streets = data.streets;
+                        if(data.streets.length > 0) {
+                            acceptable_streets = data.streets;
+                        }
                         response(data.streets);
                     }).error(function(response) {
                         console.log(response.responseJSON.result);
@@ -100,25 +119,43 @@
                 }
             });
 
-            /*
-            $street_select.on("input", function() {
-                var prefix = $(this).val();
-                if(prefix.length < 1) {
-                    return;
+            // TODO: drop in a jquery form validator
+            $("#verify-submit").click(function() {
+
+                if($("#names-input").val().length < 1) {
+                    $error.html("Enter your given names");
+                    return false;
                 }
-
-                $.ajax({
-                    url: Routing.generate('verify_autocomplete')
-                    ,method: 'POST'
-                    ,dataType:"json"
-                    ,data: { "prefix": prefix, "context": ($suburb_select.val() + ";" + $postcode_input.val()) }
-                }).done(function(data, textStatus, jqxhr) {
-
-                    console.log(data);
-                }).error(function(response) {
-                    console.log(response.responseJSON.result);
-                });
-            });*/
+                if($("#surname-input").val().length < 1) {
+                    $error.html("Enter your surname");
+                    return false;
+                }
+                if($postcode_input.val().length < 1) {
+                    $error.html("Enter your postcode");
+                    return false;
+                }
+                if(acceptable_suburbs.length < 1) {
+                    $error.html("Enter a valid postcode");
+                    return false;
+                }
+                if($("#suburb-select option:selected").prop("value").length < 1) {
+                    $error.html("Select a suburb/locality");
+                    return false;
+                }
+                var street_name = $street_input.val().toUpperCase();
+                if(street_name.length < 1) {
+                    $error.html("Enter your street name");
+                    return false;
+                }
+                if((acceptable_streets.length > 0) && (acceptable_streets.indexOf(street_name) === -1)) {
+                    $error.html("Enter a valid street");
+                    return false;
+                }
+                if($("#verify-input").val().length !== 4) {
+                    $error.html("Enter the four letters/numbers in the image");
+                    return false;
+                }
+            });
 
         });
     </script>

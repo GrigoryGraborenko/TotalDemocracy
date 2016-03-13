@@ -4,6 +4,16 @@
 
     <h1>Verify Success!</h1>
 
-    {{ message }}
+    <p>You are registered in {{ federal }}, {{ state }}, {{ council }}, {{ ward }}</p>
+
+    {% if is_user_enabled %}
+        <p>
+            You can start voting right away.
+            <a href="{{ path("vote") }}"><button class="btn btn-success">Vote</button></a>
+        </p>
+    {% else %}
+        <p>You can start voting once you complete your registration. Please check your email for further instructions.
+        </p>
+    {% endif %}
 
 {% endblock %}

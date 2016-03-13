@@ -6,21 +6,44 @@
 
     <form action="{{ path("signup_confirm", { "email": email, "confirm_token": token }) }}" method="post">
         <p>
-            <label>Password: </label><input type="text" name="password">
+            <label>Password: </label><input type="password" id="password-input" name="password">
         </p>
         <p>
-            <label>Re-enter your password: </label><input type="text">
+            <label>Re-enter your password: </label><input type="password" id="password-repeat-input">
         </p>
 
+        <h4 id="error-text" class="color-red">
         {% if app.session.flashbag.has('confirm-error') %}
-            <h4>
                 {% for error in app.session.flashbag.get('confirm-error') %}
                     {{ error }}
                 {% endfor %}
-            </h4>
         {% endif %}
+        </h4>
 
-        <button type="submit">Finish Registration</button>
+        <button id="finish-submit" class="btn btn-success" type="submit">Finish Registration</button>
     </form>
 
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    $(document).ready(function() {
+
+        var $error = $("#error-text");
+
+        $("#finish-submit").click(function() {
+
+            var pass = $("#password-input").val();
+            var pass_repeat = $("#password-repeat-input").val();
+            if(pass !== pass_repeat) {
+                $error.html("Passwords need to match");
+                return false;
+            }
+            if(pass.length < {{ min_length }}) {
+                $error.html("Password needs to be at least {{ min_length }} characters long");
+                return false;
+            }
+        });
+    });
+</script>
 {% endblock %}

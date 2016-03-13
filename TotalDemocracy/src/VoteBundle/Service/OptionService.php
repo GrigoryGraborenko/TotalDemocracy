@@ -10,13 +10,13 @@ namespace VoteBundle\Service;
 
 use Doctrine\ORM\EntityManager;
 use JMS\DiExtraBundle\Annotation as DI;
+//cannot use DI\Service("vote.option", public=true)
+
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use VoteBundle\Entity\Option;
 
 /**
- * @DI\Service("vote.option", public=true)
- *
  * Class OptionService
  * @package VoteBundle\Service
  *
@@ -44,27 +44,20 @@ class OptionService
 //    const defaultParams = array(
         $this->defaultParams = array(
 
-        "real_money_enable"                                      => array("default" => "true", "type" => "boolean", "label" => "Turns on real money transactions across the whole site. ")
-        ,"paypal"                                                => array("default" => "true", "type" => "boolean", "label" => "Turns on paypal transactions across the whole site. ")
-        ,"stripe"                                                => array("default" => "true", "type" => "boolean", "label" => "Turns on stripe transactions across the whole site. ")
-        ,"check"                                                 => array("default" => "true", "type" => "boolean", "label" => "Turns on check transactions across the whole site. ")
-        ,"wire"                                                  => array("default" => "true", "type" => "boolean", "label" => "Turns on wire transactions across the whole site. ")
+        "register_enable"                                        => array("default" => "true", "type" => "boolean", "label" => "Allows registration. ")
+        ,"verify_enable"                                         => array("default" => "true", "type" => "boolean", "label" => "Allows verification. ")
 
-        ,"core_ajax.milliseconds"                                => array("default" => "8000", "type" => "int", "label" => "Milliseconds between each core AJAX call. ")
-        ,"challenge.social_media_play_multiplier"                => array("default" => "2.0", "type" => "float", "label" => "Multiplies this amount by the play money prize if shared on social media. ")
+        //,"core_ajax.milliseconds"                                => array("default" => "8000", "type" => "int", "label" => "Milliseconds between each core AJAX call. ")
+        ,"password.length.min"                                   => array("default" => "8", "type" => "int", "label" => "Minimum password length. ")
 
-        ,"dispute.types"                                         => array("default" => "no_show,cheating,xyg_error,game_error", "type" => "array", "label" => "The types of disputes possible. ")
         );
     }
 
     /**
-     * Have to inject below in the constructor rather than the above properties due to JMSDiExtraBundle stating
-     * "Note: Injecting into private, or protected properties is only supported on controllers."
-     * @DI\InjectParams({
-     *     "em" = @DI\Inject("doctrine.orm.entity_manager"),
-     *     "container" = @DI\Inject("service_container"),
-     *     "logger" = @DI\Inject("logger")
-     * })
+     * OptionService constructor.
+     * @param $em
+     * @param $container
+     * @param $logger
      */
     public function __construct($em, $container, $logger) {
         $this->em = $em;

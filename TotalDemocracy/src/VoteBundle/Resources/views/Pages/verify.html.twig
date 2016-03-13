@@ -16,8 +16,8 @@
                 <label>Postcode</label><input type="text" id="postcode-input" name="postcode" value="{{ postcode }}">
             </p>
             <p>
-                {#<label>Suburb</label><select id="suburb-code-input"></select>#}
-                <label>Suburb</label><input type="text" id="suburb-input" name="suburb">
+                <label>Suburb</label><select id="suburb-select" name="suburb"></select>
+                {#<label>Suburb</label><input type="text" id="suburb-input" >#}
             </p>
             <p>
                 <label>Street</label><input type="text" id="street-input" name="street" value="{{ street }}">
@@ -42,31 +42,84 @@
     <script>
         $(document).ready(function() {
 
-//            $("#post-code-input").input(function() {
-//                var post = $(this).val();
-//                console.log(post);
-//                if()
-//            });
+            var $postcode_input = $("#postcode-input");
+            var $suburb_select = $("#suburb-select");
+            var $street_select = $("#street-input");
 
-            return;
-/*
-            $.ajax({
-                //url: "https://oevf.aec.gov.au/"
-                url: "http://www.google.com"
-                ,method: 'GET'
-                ,crossDomain: true
-//                ,dataType:"jsonp"
-                ,beforeSend: function (request) {
-                    request.setRequestHeader("Access-Control-Allow-Origin", "All Clients");
+            var acceptable_streets = [];
+
+            $postcode_input.on("input", function() {
+                var post = $(this).val();
+                if((post.length < 4) || (post.length > 4)) {
+                    $suburb_select.empty().prop("disabled", true);
+                    return;
                 }
-                ,headers: {
-                    'Access-Control-Allow-Origin':'All Clients'
-                }
-            }).done(function(data, textStatus, jqxhr) {
-                console.log(data);
+
+                $.ajax({
+                    url: Routing.generate('verify_autocomplete')
+                    ,method: 'POST'
+                    ,dataType:"json"
+                    ,data: { "postcode": post }
+                }).done(function(data, textStatus, jqxhr) {
+
+                    $suburb_select.empty();
+                    if(data.suburbs.length < 1) {
+                        $suburb_select.empty().prop("disabled", true);
+                        return;
+                    }
+                    $suburb_select.append('<option value=""></option>').prop("disabled", false);
+
+                    data.suburbs.forEach(function(sub) {
+                        var $op = $('<option value="' + sub + '">' + sub + '</option>');
+                        $suburb_select.append($op);
+                    });
+                    if(data.suburbs.length === 1) {
+                        $suburb_select.val(data.suburbs[0]);
+                    }
+                }).error(function(response) {
+                    console.log(response.responseJSON.result);
+                });
             });
-*/
-            //console.log("bah");
+
+            $street_select.autocomplete({
+                minLength: 1
+                ,source: function(request, response) {
+
+                    $.ajax({
+                        url: Routing.generate('verify_autocomplete')
+                        ,method: 'POST'
+                        ,dataType:"json"
+                        ,data: { "prefix": request.term, "context": ($suburb_select.val() + ";" + $postcode_input.val()) }
+                    }).done(function(data) {
+                        acceptable_streets = data.streets;
+                        response(data.streets);
+                    }).error(function(response) {
+                        console.log(response.responseJSON.result);
+                    });
+
+                }
+            });
+
+            /*
+            $street_select.on("input", function() {
+                var prefix = $(this).val();
+                if(prefix.length < 1) {
+                    return;
+                }
+
+                $.ajax({
+                    url: Routing.generate('verify_autocomplete')
+                    ,method: 'POST'
+                    ,dataType:"json"
+                    ,data: { "prefix": prefix, "context": ($suburb_select.val() + ";" + $postcode_input.val()) }
+                }).done(function(data, textStatus, jqxhr) {
+
+                    console.log(data);
+                }).error(function(response) {
+                    console.log(response.responseJSON.result);
+                });
+            });*/
+
         });
     </script>
 {% endblock %}

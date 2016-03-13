@@ -10,3 +10,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
             - { name: monolog.logger, channel: app }
+
+    vote.option:
+        class: VoteBundle\Service\OptionService
+        arguments: ["@doctrine.orm.entity_manager", "@service_container", "@logger"]

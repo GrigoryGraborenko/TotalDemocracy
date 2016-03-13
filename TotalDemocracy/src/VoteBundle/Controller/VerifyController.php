@@ -14,6 +14,7 @@ use Carbon\Carbon;
 
 use Symfony\Component\DomCrawler\Crawler;
 
+use VoteBundle\Exception\BadRequestException;
 use VoteBundle\Exception\ErrorRedirectException;
 
 /**
@@ -25,6 +26,8 @@ class VerifyController extends FOSRestController {
     /** @DI\Inject("doctrine.orm.entity_manager") */
     private $em;
 
+    private $verifySSL = false;
+
     private function getPotentialUser() {
         $user = $this->getUser();
 
@@ -35,9 +38,10 @@ class VerifyController extends FOSRestController {
             }
             $user_id = $session->get("new_user_id");
             $user = $this->em->getRepository('VoteBundle:User')->find($user_id);
-        }
-        if($user === NULL) {
-            throw new ErrorRedirectException("homepage", "No user available");
+            if($user === NULL) {
+                $session->remove("new_user_id");
+                throw new ErrorRedirectException("homepage", "No user available");
+            }
         }
 
         return $user;
@@ -61,7 +65,7 @@ class VerifyController extends FOSRestController {
         );
 
         $client = new HttpClient([
-            'verify' => false
+            'verify' => $this->verifySSL
         ]);
 
         $response = $client->request("GET", $base_url, [
@@ -129,7 +133,7 @@ class VerifyController extends FOSRestController {
         }
 
         $client = new HttpClient([
-            'verify' => false
+            'verify' => $this->verifySSL
         ]);
 
         $session = $this->get('session');
@@ -194,6 +198,10 @@ class VerifyController extends FOSRestController {
             $user->setWhenVerified(Carbon::now("UTC"));
             $this->em->flush();
 
+            if($session->has("new_user_id")) {
+                $session->remove("new_user_id");
+            }
+
             $output = array(
                 "message" => "SUCCESS $federal_electorate, $state_district, $council, $council_ward"
             );
@@ -204,4 +212,57 @@ class VerifyController extends FOSRestController {
 
         return $this->render("VoteBundle:Pages:verify.html.twig", $output);
     }
+
+    /**
+     * @Route("/verify-autocomplete", name="verify_autocomplete", options={"expose"=true})
+     * @Method("POST");
+     */
+    public function getAutoCompleteAction(Request $request) {
+
+        $input = $request->request->all();
+
+        if(array_key_exists("postcode", $input)) {
+            $url = 'https://oevf.aec.gov.au/VerifyEnrolment.aspx/GetDropDownContents';
+            $send_data = [
+                "category" => "postcode"
+                ,"knownCategoryValues" => $input['postcode']
+            ];
+            $is_postcode = true;
+        } else if(array_key_exists("prefix", $input) && array_key_exists("context", $input)) {
+            $url = 'https://oevf.aec.gov.au/VerifyEnrolment.aspx/GetStreetAutoCompleteList';
+            $send_data = [
+                "contextKey" => $input['context']
+                ,"count" => 50
+                ,"prefixText" => $input['prefix']
+            ];
+            $is_postcode = false;
+        } else {
+            throw new BadRequestException("Incorrect Parameters");
+        }
+
+        $client = new HttpClient([
+            'verify' => $this->verifySSL
+        ]);
+
+        $response = $client->request('POST', $url, [ 'json' => $send_data ]);
+
+        $suburbs = array();
+        $json_response = json_decode($response->getBody()->getContents(), true);
+
+        if($is_postcode) {
+            foreach ($json_response['d'] as $item) {
+                if (strlen($item['value']) > 0) {
+                    $suburbs[] = array($item['value']);
+                }
+            }
+            $output = array("suburbs" => $suburbs);
+        } else {
+            $output = array("streets" => $json_response['d']);
+        }
+
+        $view = $this->view($output, 200);
+        $view->setFormat('json');
+        return $this->handleView($view);
+    }
+
 }

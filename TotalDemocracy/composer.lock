@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3d2250a32b673f6a8559b2b849ae698f",
-    "content-hash": "76cdbf51fc7127f19b9b3a889b67b341",
+    "hash": "240888cb4e33002a87479f59d76a91f3",
+    "content-hash": "10fb8d9a786cb6a1c55b622d928325fe",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1077,12 +1077,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfSymfony/FOSUserBundle.git",
-                "reference": "88f84f631ee7859c069cf98b475c679e90b16b22"
+                "reference": "16b04c49af05dd3fb381e4abe04f0e5e231ac76d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSUserBundle/zipball/88f84f631ee7859c069cf98b475c679e90b16b22",
-                "reference": "88f84f631ee7859c069cf98b475c679e90b16b22",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSUserBundle/zipball/16b04c49af05dd3fb381e4abe04f0e5e231ac76d",
+                "reference": "16b04c49af05dd3fb381e4abe04f0e5e231ac76d",
                 "shasum": ""
             },
             "require": {
@@ -1138,7 +1138,7 @@
             "keywords": [
                 "User management"
             ],
-            "time": "2016-03-04 13:20:42"
+            "time": "2016-03-08 11:05:28"
         },
         {
             "name": "gedmo/doctrine-extensions",
@@ -1960,6 +1960,83 @@
             "time": "2015-11-10 12:26:42"
         },
         {
+            "name": "kriswallsmith/assetic",
+            "version": "v1.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kriswallsmith/assetic.git",
+                "reference": "9928f7c4ad98b234e3559d1049abd13387f86db5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kriswallsmith/assetic/zipball/9928f7c4ad98b234e3559d1049abd13387f86db5",
+                "reference": "9928f7c4ad98b234e3559d1049abd13387f86db5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.1",
+                "symfony/process": "~2.1|~3.0"
+            },
+            "conflict": {
+                "twig/twig": "<1.23"
+            },
+            "require-dev": {
+                "cssmin/cssmin": "3.0.1",
+                "joliclic/javascript-packer": "1.1",
+                "kamicane/packager": "1.0",
+                "leafo/lessphp": "^0.3.7",
+                "leafo/scssphp": "~0.1",
+                "mrclay/minify": "~2.2",
+                "patchwork/jsqueeze": "~1.0|~2.0",
+                "phpunit/phpunit": "~4.8",
+                "psr/log": "~1.0",
+                "ptachoire/cssembed": "~1.0",
+                "symfony/phpunit-bridge": "~2.7|~3.0",
+                "twig/twig": "~1.8|~2.0"
+            },
+            "suggest": {
+                "leafo/lessphp": "Assetic provides the integration with the lessphp LESS compiler",
+                "leafo/scssphp": "Assetic provides the integration with the scssphp SCSS compiler",
+                "leafo/scssphp-compass": "Assetic provides the integration with the SCSS compass plugin",
+                "patchwork/jsqueeze": "Assetic provides the integration with the JSqueeze JavaScript compressor",
+                "ptachoire/cssembed": "Assetic provides the integration with phpcssembed to embed data uris",
+                "twig/twig": "Assetic provides the integration with the Twig templating engine"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Assetic": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kris Wallsmith",
+                    "email": "kris.wallsmith@gmail.com",
+                    "homepage": "http://kriswallsmith.net/"
+                }
+            ],
+            "description": "Asset Management for PHP",
+            "homepage": "https://github.com/kriswallsmith/assetic",
+            "keywords": [
+                "assets",
+                "compression",
+                "minification"
+            ],
+            "time": "2015-11-12 13:51:40"
+        },
+        {
             "name": "monolog/monolog",
             "version": "1.18.0",
             "source": {
@@ -2086,16 +2163,16 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v1.2.1",
+            "version": "v1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "f078eba3bcf140fd69b5fcc3ea5ac809abf729dc"
+                "reference": "b3313b618f4edd76523572531d5d7e22fe747430"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/f078eba3bcf140fd69b5fcc3ea5ac809abf729dc",
-                "reference": "f078eba3bcf140fd69b5fcc3ea5ac809abf729dc",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/b3313b618f4edd76523572531d5d7e22fe747430",
+                "reference": "b3313b618f4edd76523572531d5d7e22fe747430",
                 "shasum": ""
             },
             "require": {
@@ -2130,7 +2207,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2016-02-29 17:25:04"
+            "time": "2016-03-11 19:54:08"
         },
         {
             "name": "phpcollection/phpcollection",
@@ -2592,6 +2669,76 @@
             "time": "2015-06-06 14:19:39"
         },
         {
+            "name": "symfony/assetic-bundle",
+            "version": "v2.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/assetic-bundle.git",
+                "reference": "aa5b4f8b712f38745928fa845ddb73300bb2af6d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/assetic-bundle/zipball/aa5b4f8b712f38745928fa845ddb73300bb2af6d",
+                "reference": "aa5b4f8b712f38745928fa845ddb73300bb2af6d",
+                "shasum": ""
+            },
+            "require": {
+                "kriswallsmith/assetic": "~1.3",
+                "php": ">=5.3.0",
+                "symfony/console": "~2.3|~3.0",
+                "symfony/dependency-injection": "~2.3|~3.0",
+                "symfony/framework-bundle": "~2.3|~3.0",
+                "symfony/yaml": "~2.3|~3.0"
+            },
+            "conflict": {
+                "kriswallsmith/spork": "<=0.2",
+                "twig/twig": "<1.20"
+            },
+            "require-dev": {
+                "kriswallsmith/spork": "~0.3",
+                "patchwork/jsqueeze": "~1.0",
+                "symfony/class-loader": "~2.3|~3.0",
+                "symfony/css-selector": "~2.3|~3.0",
+                "symfony/dom-crawler": "~2.3|~3.0",
+                "symfony/phpunit-bridge": "~2.7|~3.0",
+                "symfony/twig-bundle": "~2.3|~3.0"
+            },
+            "suggest": {
+                "kriswallsmith/spork": "to be able to dump assets in parallel",
+                "symfony/twig-bundle": "to use the Twig integration"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.7-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Bundle\\AsseticBundle\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kris Wallsmith",
+                    "email": "kris.wallsmith@gmail.com",
+                    "homepage": "http://kriswallsmith.net/"
+                }
+            ],
+            "description": "Integrates Assetic into Symfony2",
+            "homepage": "https://github.com/symfony/AsseticBundle",
+            "keywords": [
+                "assets",
+                "compression",
+                "minification"
+            ],
+            "time": "2015-12-28 13:12:39"
+        },
+        {
             "name": "symfony/monolog-bundle",
             "version": "v2.9.0",
             "source": {
@@ -2652,21 +2799,24 @@
         },
         {
             "name": "symfony/polyfill-intl-icu",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-icu.git",
-                "reference": "66b0bb4abda229bc073eff6bbc8f2685bdaac165"
+                "reference": "8328069d9f5322f0e7b3c3518485acfdc94c3942"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-icu/zipball/66b0bb4abda229bc073eff6bbc8f2685bdaac165",
-                "reference": "66b0bb4abda229bc073eff6bbc8f2685bdaac165",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-icu/zipball/8328069d9f5322f0e7b3c3518485acfdc94c3942",
+                "reference": "8328069d9f5322f0e7b3c3518485acfdc94c3942",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3",
                 "symfony/intl": "~2.3|~3.0"
+            },
+            "suggest": {
+                "ext-intl": "For best performance"
             },
             "type": "library",
             "extra": {
@@ -2703,11 +2853,11 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-01-20 09:13:37"
+            "time": "2016-02-26 16:18:12"
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
@@ -2766,7 +2916,7 @@
         },
         {
             "name": "symfony/polyfill-php56",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php56.git",
@@ -2822,16 +2972,16 @@
         },
         {
             "name": "symfony/polyfill-php70",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php70.git",
-                "reference": "8428ceddbbaf102f2906769a8ef2438220c5cb95"
+                "reference": "386c1be9cad3ab531425211919e78c37971be4ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php70/zipball/8428ceddbbaf102f2906769a8ef2438220c5cb95",
-                "reference": "8428ceddbbaf102f2906769a8ef2438220c5cb95",
+                "url": "https://api.github.com/repos/symfony/polyfill-php70/zipball/386c1be9cad3ab531425211919e78c37971be4ce",
+                "reference": "386c1be9cad3ab531425211919e78c37971be4ce",
                 "shasum": ""
             },
             "require": {
@@ -2877,11 +3027,11 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-01-25 08:44:42"
+            "time": "2016-01-28 22:42:02"
         },
         {
             "name": "symfony/polyfill-util",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-util.git",

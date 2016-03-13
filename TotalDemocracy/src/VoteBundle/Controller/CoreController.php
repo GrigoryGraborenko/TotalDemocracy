@@ -8,16 +8,20 @@ use Symfony\Component\HttpFoundation\Request;
 
 /*
  * TODO FIXES:
- * Send a confirm email
  * Make sure that entering password is client-side tested
- * Ensure auto-complete works
+ * Error messages on verification
+ * Send a confirm email
  * Remove old images
  * Ensure you don't have duplicate emails, or duplicate voters
  * Ensure voters can't change their names easily
+ * Add local councils, electorates etc as you find them
+ * Optional telephone, DOB and "want to volunteer"
+ * Make sure that rego and verify both can be switched off for maintenance
  *
  * TODO:
  * do g_initial data JS stuff, it's pretty useful
  * Allow voting
+ * Migrations
  *
  * rego: enter an email. progress. verify. need to confirm email before you can be valid.
  *

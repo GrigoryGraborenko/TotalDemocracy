@@ -101,3 +101,9 @@ monolog:
       level: error
       path:  %kernel.logs_dir%/%kernel.environment%_php.log
       channels: php
+
+assetic:
+    assets:
+        stylesheets:
+            inputs:
+                - '@VoteBundle/Resources/css/main.css'

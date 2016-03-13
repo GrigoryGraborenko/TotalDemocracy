@@ -101,8 +101,9 @@ class RegisterController extends FOSRestController {
         if($user !== NULL) {
             throw new ErrorRedirectException('homepage', "Cannot register twice");
         }
+        $min_length = $this->get("vote.option")->getInteger("password.length.min");
 
-        return $this->render('VoteBundle:Pages:register_finish.html.twig', array("email" => $email, "token" => $confirm_token));
+        return $this->render('VoteBundle:Pages:register_finish.html.twig', array("email" => $email, "token" => $confirm_token, "min_length" => $min_length));
     }
 
     /**
@@ -124,7 +125,7 @@ class RegisterController extends FOSRestController {
         $password = $input['password'];
         $url_params = array("email" => $email, "confirm_token" => $confirm_token);
 
-        $min_password_len = 5;
+        $min_password_len = $this->get("vote.option")->getInteger("password.length.min");
         if(strlen($password) < $min_password_len) {
             throw new ErrorRedirectException('signup_finish', "Password is too short, needs to be at least $min_password_len characters long", "confirm-error", $url_params);
         }

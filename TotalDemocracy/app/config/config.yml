@@ -67,6 +67,9 @@ swiftmailer:
     host:      "%mailer_host%"
     username:  "%mailer_user%"
     password:  "%mailer_password%"
+    encryption: tls
+    port: 587
+    auth_mode:  login
     spool:     { type: memory }
 
 #Gedmo extensions

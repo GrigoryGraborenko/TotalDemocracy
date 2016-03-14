@@ -32,10 +32,11 @@
                 </div>
                 <div id="navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
+                        {% if app.user is null %}
+                            <li {% if app.request.attributes.get('_route') == 'signup' %}class="active"{% endif %}><a href="{{ path("signup") }}">Register</a></li>
+                        {% endif %}
                         {% if app.session.get('new_user_id') or app.user is not null %}
                             <li {% if app.request.attributes.get('_route') == 'verify' %}class="active"{% endif %}><a href="{{ path("verify") }}">Verify</a></li>
-                        {% else %}
-                            <li {% if app.request.attributes.get('_route') == 'signup' %}class="active"{% endif %}><a href="{{ path("signup") }}">Register</a></li>
                         {% endif %}
                         <li {% if app.request.attributes.get('_route') == 'vote' %}class="active"{% endif %}><a href="{{ path("vote") }}">Vote</a></li>
                     </ul>

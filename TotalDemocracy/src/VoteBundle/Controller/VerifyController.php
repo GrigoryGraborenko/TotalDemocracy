@@ -262,9 +262,10 @@ class VerifyController extends FOSRestController {
 
             $this->em->flush();
 
-            if($session->has("new_user_id")) {
-                $session->remove("new_user_id");
-            }
+            // don't remove after verification so that new users can see all the domains they can vote in
+//            if($session->has("new_user_id")) {
+//                $session->remove("new_user_id");
+//            }
 
             $output = array(
                 "is_user_enabled" => $user->isEnabled()

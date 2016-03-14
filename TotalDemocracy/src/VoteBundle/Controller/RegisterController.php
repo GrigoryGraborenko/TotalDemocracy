@@ -33,6 +33,11 @@ class RegisterController extends FOSRestController {
      */
     public function indexAction(Request $request) {
 
+        $session = $this->get("session");
+        if($session->has("new_user_id")) {
+            $session->remove("new_user_id");
+        }
+
         $user = $this->getUser();
         if($user !== NULL) {
             throw new ErrorRedirectException('homepage', "Cannot register twice");
@@ -146,10 +151,47 @@ class RegisterController extends FOSRestController {
         return new RedirectResponse($this->generateUrl('homepage'));
     }
 
+    /**
+     * @param $email
+     * @param $confirm_token
+     * @throws ErrorRedirectException
+     */
     private function sendRegistrationEmail($email, $confirm_token) {
 
-        $this->get("logger")->info("EMAIL: $email with $confirm_token => localhost/signup-finish/$email/$confirm_token ");
+        $url_params = array("email" => $email, "confirm_token" => $confirm_token);
 
+        $register_url = $this->getParameter("url_base") . $this->generateUrl("signup_finish", $url_params);
+
+        $paragraphs = array(
+            "Thank you for signing up with People Decide. You're almost ready to vote."
+            ,"<a href=\"$register_url\">Click here to finish registration</a>"
+        );
+
+        // send email
+        $mailer = $this->container->get('mailer');
+        $templating = $this->container->get('templating');
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Registration Confirmation')
+            ->setFrom('noreply@peopledecide.org')
+            ->setTo($email)
+            ->setBody(
+                $templating->render(
+                    'Emails/simple_email.html.twig',
+                    array(
+                        'header' => "Welcome to the voting platform"
+                        ,'paragraphs' => $paragraphs
+                    )
+                ),
+                'text/html'
+            );
+
+        $num_recipients = $mailer->send($message);
+        if($num_recipients <= 0) {
+            throw new ErrorRedirectException('signup_finish', 'Could not send email', "confirm-error", $url_params);
+        }
+
+        $this->get("logger")->info("Registration email sent to $email with URL: $register_url ");
     }
 
 }

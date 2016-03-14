@@ -37,7 +37,20 @@ class VoteController extends FOSRestController {
 
         $user = $this->getUser();
         $domains = array();
-        if($user) {
+        if($user === NULL) {
+            $session = $this->get("session");
+            if($session->has("new_user_id")) {
+                $user_id = $session->get("new_user_id");
+                $this->get("logger")->info("USER ID $user_id");
+                $temp_user = $this->em->getRepository('VoteBundle:User')->find($user_id);
+                if(($temp_user !== NULL) && ($temp_user->getWhenVerified() !== NULL)) {
+                    foreach($temp_user->getElectorates() as $electorate) {
+                        $domains[] = $electorate->getDomain();
+                    }
+                }
+            }
+        } else {
+
             if($user->getWhenVerified() === NULL) {
                 $output['cannot_vote_message'] = '<a href="' . $this->generateUrl("verify") . '">Verify</a> on the electoral role to vote';
             } else {

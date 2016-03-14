@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
  * Make sure that rego and verify both can be switched off for maintenance
  * Rate limit new email registrations
  * Rate limit re-votes
+ * Load up email with social links
  *
  * TODO:
  * do g_initial data JS stuff, it's pretty useful

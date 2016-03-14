@@ -24,19 +24,18 @@ class LoadDomainData extends AbstractFixture implements OrderedFixtureInterface 
      */
     public function load(ObjectManager $manager) {
 
-        $this->createDomain($manager, 'federal', 'Australia', array("Griffith"));
-        $this->createDomain($manager, 'state', 'Queensland', array("South Brisbane"));
-        $this->createDomain($manager, 'state', 'New South Wales');
-        $this->createDomain($manager, 'state', 'Victoria');
-        $this->createDomain($manager, 'state', 'Australian Capital Territory');
-        $this->createDomain($manager, 'state', 'Northern Territory');
-        $this->createDomain($manager, 'state', 'South Australia');
-        $this->createDomain($manager, 'state', 'Western Australia');
-        $this->createDomain($manager, 'state', 'Tasmania');
-        $this->createDomain($manager, 'local', 'Brisbane City Council', array("Central Ward", "Coorparoo"));
+        $this->createDomain($manager, 'federal', 'Australia', NULL, array("Banks"));
+        $this->createDomain($manager, 'state', 'Queensland', "QLD", array("Albert"));
+        $this->createDomain($manager, 'state', 'New South Wales', "NSW");
+        $this->createDomain($manager, 'state', 'Victoria', "VIC");
+        $this->createDomain($manager, 'state', 'Australian Capital Territory', "ACT");
+        $this->createDomain($manager, 'state', 'Northern Territory', "NT");
+        $this->createDomain($manager, 'state', 'South Australia', "SA");
+        $this->createDomain($manager, 'state', 'Western Australia', "WA");
+        $this->createDomain($manager, 'state', 'Tasmania', "TAS");
+        $this->createDomain($manager, 'local', 'BRISBANE CITY', NULL, array("Central Ward"));
 
         $manager->flush();
-
     }
 
     /**
@@ -46,9 +45,9 @@ class LoadDomainData extends AbstractFixture implements OrderedFixtureInterface 
      * @param array $electorates
      * @return Domain
      */
-    private function createDomain($manager, $level, $name, $electorates = array()) {
+    private function createDomain($manager, $level, $name, $short_name = NULL, $electorates = array()) {
 
-        $domain = new Domain($level, $name);
+        $domain = new Domain($level, $name, $short_name);
         $this->addReference('domain-' . $level . '-' . strtolower(str_replace(' ', '-', $name)), $domain);
         $manager->persist($domain);
         $manager->flush();

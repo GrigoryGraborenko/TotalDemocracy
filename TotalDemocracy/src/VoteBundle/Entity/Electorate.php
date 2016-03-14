@@ -51,6 +51,11 @@ class Electorate {
     protected $name;
 
     /**
+     * @ORM\ManyToMany(targetEntity="VoteBundle\Entity\User", mappedBy="electorates")
+     */
+    private $users;
+
+    /**
      * Electorate constructor.
      * @param $domain
      * @param $name
@@ -86,6 +91,34 @@ class Electorate {
      */
     public function setDomain($domain) {
         $this->domain = $domain;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name) {
+        $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUsers() {
+        return $this->users;
+    }
+
+    /**
+     * @param mixed $users
+     */
+    public function setUsers($users) {
+        $this->users = $users;
     }
 
 }

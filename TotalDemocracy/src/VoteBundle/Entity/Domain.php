@@ -52,13 +52,20 @@ class Domain {
     protected $name;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Expose
+     */
+    protected $shortName;
+
+    /**
      * Domain constructor.
      * @param $level
      * @param $name
      */
-    public function __construct($level, $name) {
+    public function __construct($level, $name, $short_name = NULL) {
         $this->level = $level;
         $this->name = $name;
+        $this->shortName = $short_name;
     }
 
     /**
@@ -101,6 +108,20 @@ class Domain {
      */
     public function setName($name) {
         $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getShortName() {
+        return $this->shortName;
+    }
+
+    /**
+     * @param mixed $shortName
+     */
+    public function setShortName($shortName) {
+        $this->shortName = $shortName;
     }
 
 }

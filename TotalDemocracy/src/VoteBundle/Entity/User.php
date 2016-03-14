@@ -67,6 +67,12 @@ class User extends BaseUser {
     protected $whenVerified;
 
     /**
+     * @ORM\ManyToMany(targetEntity="VoteBundle\Entity\Electorate", inversedBy="users")
+     * @ORM\JoinTable(name="user_electorate")
+     */
+    private $electorates;
+
+    /**
      * User constructor.
      */
     public function __construct() {
@@ -168,6 +174,34 @@ class User extends BaseUser {
      */
     public function setWhenVerified($whenVerified) {
         $this->whenVerified = $whenVerified;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getElectorates() {
+        return $this->electorates;
+    }
+
+    /**
+     * @param mixed $electorates
+     */
+    public function setElectorates($electorates) {
+        $this->electorates = $electorates;
+    }
+
+    /**
+     * @param $electorate
+     */
+    public function addElectorate($electorate) {
+        $this->electorates[] = $electorate;
+    }
+
+    /**
+     *
+     */
+    public function clearAllElectorates() {
+        $this->electorates->clear();
     }
 
 }

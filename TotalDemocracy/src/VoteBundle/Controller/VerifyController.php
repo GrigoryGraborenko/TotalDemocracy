@@ -8,14 +8,15 @@ use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 
 use JMS\DiExtraBundle\Annotation as DI;
-
 use GuzzleHttp\Client as HttpClient;
 use Carbon\Carbon;
-
 use Symfony\Component\DomCrawler\Crawler;
 
 use VoteBundle\Exception\BadRequestException;
 use VoteBundle\Exception\ErrorRedirectException;
+
+use VoteBundle\Entity\Electorate;
+use VoteBundle\Entity\Domain;
 
 /**
  * Class VerifyController
@@ -25,6 +26,9 @@ class VerifyController extends FOSRestController {
 
     /** @DI\Inject("doctrine.orm.entity_manager") */
     private $em;
+
+    /** @DI\Inject("logger") */
+    private $logger;
 
     private $verifySSL = false;
 
@@ -206,12 +210,56 @@ class VerifyController extends FOSRestController {
             $council = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGA2')->html();
             $council_ward = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGAWard2')->html();
 
+            $state_abb = substr($input['suburb'], strpos($input['suburb'], "(") + 1, -1);
+
             $user->setGivenNames(ucwords(strtolower($input['names'])));
             $user->setSurname(ucwords(strtolower($input['surname'])));
             $user->setPostcode($input['postcode']);
             $user->setSuburb(strtoupper($input['suburb']));
             $user->setStreet(strtoupper($input['street']));
             $user->setWhenVerified(Carbon::now("UTC"));
+
+            $domain_repo = $this->em->getRepository('VoteBundle:Domain');
+            $elect_repo = $this->em->getRepository('VoteBundle:Electorate');
+
+            $fed_domain = $domain_repo->findOneBy(array("level" => "federal"));
+            $state_domain = $domain_repo->findOneBy(array("level" => "state", "shortName" => $state_abb));
+            if(($fed_domain === NULL) || ($state_domain === NULL)) {
+                throw new ErrorRedirectException("verify", "Could not find federal or state domain - please contact support");
+            }
+
+            $user->clearAllElectorates();
+
+            $fed_elect = $elect_repo->findOneBy(array("domain" => $fed_domain, "name" => $federal_electorate));
+            if($fed_elect === NULL) {
+                $this->logger->info("Creating new federal electorate: $federal_electorate");
+                $fed_elect = new Electorate($fed_domain, $federal_electorate);
+                $this->em->persist($fed_elect);
+            }
+            $user->addElectorate($fed_elect);
+
+            $state_elect = $elect_repo->findOneBy(array("domain" => $state_domain, "name" => $state_district));
+            if($state_elect === NULL) {
+                $this->logger->info("Creating new $state_abb state electorate: $state_district");
+                $state_elect = new Electorate($state_domain, $state_district);
+                $this->em->persist($state_elect);
+            }
+            $user->addElectorate($state_elect);
+
+            $local_domain = $domain_repo->findOneBy(array("level" => "local", "name" => $council));
+            if($local_domain === NULL) {
+                $this->logger->info("Creating new local domain: $council");
+                $local_domain = new Domain("local", $council);
+                $this->em->persist($local_domain);
+            }
+            $local_elect = $elect_repo->findOneBy(array("domain" => $local_domain, "name" => $council_ward));
+            if($local_elect === NULL) {
+                $this->logger->info("Creating new $council local electorate: $council_ward");
+                $local_elect = new Electorate($local_domain, $council_ward);
+                $this->em->persist($local_elect);
+            }
+            $user->addElectorate($local_elect);
+
             $this->em->flush();
 
             if($session->has("new_user_id")) {

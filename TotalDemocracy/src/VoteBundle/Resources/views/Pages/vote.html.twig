@@ -5,7 +5,13 @@
     <h1>VOTE</h1>
 
     {% if can_vote %}
-        {#<p>Can vote</p>#}
+        <p>Can vote in:
+            <ul>
+                {% for electorate in user.electorates %}
+                    <li>{{ electorate.name }}</li>
+                {% endfor %}
+            </ul>
+        </p>
     {% else %}
         <p class="color-red">{{ cannot_vote_message | raw }}</p>
     {% endif %}
@@ -13,6 +19,7 @@
     {% for doc in doc_list %}
         <div>
             <h3>{{ doc.doc.name }}</h3>
+            <h6>{{ doc.doc.domain.name }}</h6>
             <p>{{ doc.doc.text }}</p>
             {% if can_vote %}
                 {#{% if doc.vote is null %}#}

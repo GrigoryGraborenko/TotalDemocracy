@@ -25,7 +25,8 @@ class LoadDocumentData extends AbstractFixture implements OrderedFixtureInterfac
 
         $manager->persist($this->createDocument('domain-federal-australia', "Prison Abolition Act", "Immediately shut down all prisons and punish with community service."));
         $manager->persist($this->createDocument('domain-state-queensland', "Heritage Protection Bill", "Heavy fines for demolition companies that knock down heritage listed buildings."));
-        $manager->persist($this->createDocument('domain-local-brisbane-city-council', "Bike Path", "Build a bike path around the city."));
+        $manager->persist($this->createDocument('domain-state-new-south-wales', "Sydney Bill", "More Sydney."));
+        $manager->persist($this->createDocument('domain-local-brisbane-city', "Bike Path", "Build a bike path around the city."));
 
         $manager->flush();
 

@@ -55,6 +55,18 @@ class UserDocumentVote {
     protected $isSupporter;
 
     /**
+     * UserDocumentVote constructor.
+     * @param $user
+     * @param $document
+     * @param $isSupporter
+     */
+    public function __construct($user, $document, $isSupporter) {
+        $this->user = $user;
+        $this->document = $document;
+        $this->isSupporter = $isSupporter;
+    }
+
+    /**
      * @return mixed
      */
     public function getId() {

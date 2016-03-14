@@ -8,14 +8,16 @@ use Symfony\Component\HttpFoundation\Request;
 
 /*
  * TODO FIXES:
- * Ensure you don't have duplicate emails, or duplicate voters
  * Send a confirm email
+ * Domains for users
+ * Only can vote in that domain
  * Remove old images
  * Ensure voters can't change their names easily?
  * Add local councils, electorates etc as you find them
  * Optional telephone, DOB and "want to volunteer"
  * Make sure that rego and verify both can be switched off for maintenance
  * Rate limit new email registrations
+ * Rate limit re-votes
  *
  * TODO:
  * do g_initial data JS stuff, it's pretty useful

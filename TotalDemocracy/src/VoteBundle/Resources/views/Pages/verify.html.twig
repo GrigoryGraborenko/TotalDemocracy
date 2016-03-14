@@ -7,7 +7,7 @@
     {% if image is defined %}
         <form action="{{ path("finish_verify") }}" method="post">
             <p>
-                <label>Given Names</label><input type="text" id="names-input" name="names" value="{{ names }}">
+                <label>Given Names</label><input type="text" id="names-input" name="names" value="{{ givenNames }}">
             </p>
             <p>
                 <label>Surname</label><input type="text" id="surname-input" name="surname" value="{{ surname }}">

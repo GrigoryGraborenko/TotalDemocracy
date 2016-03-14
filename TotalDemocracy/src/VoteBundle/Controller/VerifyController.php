@@ -57,7 +57,7 @@ class VerifyController extends FOSRestController {
 
         $base_url = "https://oevf.aec.gov.au/";
         $output = array(
-            "names" => $user->getGivenNames()
+            "givenNames" => $user->getGivenNames()
             ,"surname" => $user->getSurname()
             ,"postcode" => $user->getPostcode()
             ,"suburb" => $user->getSuburb()
@@ -130,6 +130,22 @@ class VerifyController extends FOSRestController {
             (!array_key_exists("verify", $input))) {
 
             throw new ErrorRedirectException("verify", "Incorrect arguments");
+        }
+
+        $other_user = $this->em->getRepository('VoteBundle:User')->findOneBy(array(
+            "givenNames" => ucwords(strtolower($input['names']))
+            ,"surname" => ucwords(strtolower($input['surname']))
+            ,"postcode" => strtoupper($input['postcode'])
+            ,"suburb" => strtoupper($input['suburb'])
+            ,"street" => strtoupper($input['street'])
+        ));
+        if($other_user !== NULL) {
+
+            if($other_user->getId() !== $user->getId()) {
+                throw new ErrorRedirectException("verify", "Another user has already verified with these details. If this was you, try your other email addresses.");
+            }
+            // TODO: check rate limiting, change of name?
+
         }
 
         $client = new HttpClient([
@@ -209,7 +225,7 @@ class VerifyController extends FOSRestController {
                 ,"council" => $council
                 ,"ward" => $council_ward
             );
-        } else if(($success_nodes->count() > 0) && ($success_nodes->html() === "Please contact the AEC on 13 23 26 for assistance")) {
+        } else if(($success_nodes->count() > 0) && (($success_nodes->html() === "Please contact the AEC on 13 23 26 for assistance") || ($success_nodes->html() === "Your enrolment could not be confirmed. Please check the information you have entered"))) {
             throw new ErrorRedirectException("verify", "Could not find you on the electoral role. Try with/without your middle name, or a previous address.");
         } else {
             throw new ErrorRedirectException("verify", "Verification code is incorrect.");

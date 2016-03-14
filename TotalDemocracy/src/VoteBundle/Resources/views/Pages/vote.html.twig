@@ -4,10 +4,56 @@
 
     <h1>VOTE</h1>
 
-    {% for doc in docs %}
-        <h3>{{ doc.name }}</h3>
-        <p>{{ doc.text }}</p>
+    {% if can_vote %}
+        {#<p>Can vote</p>#}
+    {% else %}
+        <p class="color-red">{{ cannot_vote_message | raw }}</p>
+    {% endif %}
+
+    {% for doc in doc_list %}
+        <div>
+            <h3>{{ doc.doc.name }}</h3>
+            <p>{{ doc.doc.text }}</p>
+            {% if can_vote %}
+                {#{% if doc.vote is null %}#}
+                    <button class="btn btn-success vote-on" data-id="{{ doc.doc.id }}" data-vote="true" {% if doc.yes_vote %}disabled{% endif %}>Yes</button>
+                    <button class="btn btn-danger vote-on" data-id="{{ doc.doc.id }}" data-vote="false" {% if doc.no_vote %}disabled{% endif %}>No</button>
+                {#{% else %}#}
+                    {#<p>{{ doc.vote.isSupporter ? "Yes" : "No" }}</p>#}
+                {#{% endif %}#}
+            {% endif %}
+        </div>
     {% endfor %}
 
 {% endblock %}
 
+{% block javascripts %}
+<script>
+    $(document).ready(function() {
+        $('.vote-on').click(function() {
+
+            var $button = $(this);
+            var $both_buttons = $button.parent().find("button");
+
+            $both_buttons.prop("disabled", false);
+            $button.prop("disabled", true);
+
+            var data = $button.data();
+            $.ajax({
+                url: Routing.generate('vote_on')
+                ,method: 'POST'
+                ,dataType: "json"
+                ,data: data
+            }).done(function(data) {
+
+                console.log(data);
+
+            }).error(function(response) {
+
+                console.log(response.responseJSON.result);
+
+            });
+        });
+    });
+</script>
+{% endblock %}

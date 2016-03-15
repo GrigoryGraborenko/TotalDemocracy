@@ -8,8 +8,8 @@ use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 
 use JMS\DiExtraBundle\Annotation as DI;
-use GuzzleHttp\Client as HttpClient;
 use Carbon\Carbon;
+use GuzzleHttp\Client as HttpClient;
 use Symfony\Component\DomCrawler\Crawler;
 
 use VoteBundle\Exception\BadRequestException;

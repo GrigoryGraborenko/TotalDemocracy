@@ -8,20 +8,24 @@ use Symfony\Component\HttpFoundation\Request;
 
 /*
  * TODO FIXES:
- * Send a confirm email
  * Add DOB for verification
+ * Some way to log out of "new user" mode
+ * Abstain vote
+ * Optional telephone and "want to volunteer"
  * Preserve wrong data between errors
+ * Show all, even stuff you can't vote on, if you choose
  * Remove old images
  * Ensure voters can't change their names easily?
- * Optional telephone and "want to volunteer"
  * Make sure that rego and verify both can be switched off for maintenance
  * Rate limit new email registrations
  * Rate limit re-votes
  * Load up email with social links
+ * Report bug button on all pages
  *
  * TODO:
  * do g_initial data JS stuff, it's pretty useful
  * Migrations
+ * Scrape!
  */
 
 /**

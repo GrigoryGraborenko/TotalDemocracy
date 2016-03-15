@@ -37,23 +37,42 @@ class Document {
     protected $whenCreated;
 
     /**
+     * The domain the document applies in
+     *
+     * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Domain")
+     * @ORM\JoinColumn(name="domain_id", referencedColumnName="id", nullable=false)
+     */
+    protected $domain;
+
+    /**
      * @ORM\Column(type="string")
      * @Expose
      */
     protected $name;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Expose
+     */
+    protected $externalID;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Expose
+     */
+    protected $externalURL;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Expose
+     */
+    protected $customData;
+
+    /**
      * @ORM\Column(type="string")
      * @Expose
      */
     protected $text;
-
-    /**
-     * The domain the document applies in
-     *
-     * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Domain")
-     */
-    protected $domain;
 
     /**
      * Document constructor.
@@ -107,6 +126,48 @@ class Document {
      */
     public function setName($name) {
         $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExternalID() {
+        return $this->externalID;
+    }
+
+    /**
+     * @param mixed $externalID
+     */
+    public function setExternalID($externalID) {
+        $this->externalID = $externalID;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExternalURL() {
+        return $this->externalURL;
+    }
+
+    /**
+     * @param mixed $externalURL
+     */
+    public function setExternalURL($externalURL) {
+        $this->externalURL = $externalURL;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCustomData() {
+        return $this->customData;
+    }
+
+    /**
+     * @param mixed $customData
+     */
+    public function setCustomData($customData) {
+        $this->customData = $customData;
     }
 
     /**

@@ -19,7 +19,7 @@
     {% for doc in doc_list %}
         <div>
             <h3>{{ doc.doc.name }}</h3>
-            <h6>{{ doc.doc.domain.name }}</h6>
+            <h6>{{ doc.doc.domain.name }}{% if doc.doc.externalURL is not null %} - <a href="{{ doc.doc.externalURL }}">View details</a>{% endif %}</h6>
             <p>{{ doc.doc.text }}</p>
             {% if can_vote %}
                 {#{% if doc.vote is null %}#}

@@ -62,9 +62,44 @@ class User extends BaseUser {
     protected $street;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $streetNumber;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $DOB;
+
+    /**
      * @ORM\Column(type="datetime", nullable=true)
      */
     protected $whenVerified;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $phone;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $homePostcode;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $homeSuburb;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $homeStreet;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $homeStreetNumber;
 
     /**
      * @ORM\ManyToMany(targetEntity="VoteBundle\Entity\Electorate", inversedBy="users")
@@ -73,10 +108,22 @@ class User extends BaseUser {
     private $electorates;
 
     /**
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    protected $isVolunteer;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    protected $isMember;
+
+    /**
      * User constructor.
      */
     public function __construct() {
         parent::__construct();
+        $this->isVolunteer = false;
+        $this->isMember = false;
     }
     /**
      * @return mixed
@@ -165,6 +212,34 @@ class User extends BaseUser {
     /**
      * @return mixed
      */
+    public function getStreetNumber() {
+        return $this->streetNumber;
+    }
+
+    /**
+     * @param mixed $streetNumber
+     */
+    public function setStreetNumber($streetNumber) {
+        $this->streetNumber = $streetNumber;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDOB() {
+        return $this->DOB;
+    }
+
+    /**
+     * @param mixed $DOB
+     */
+    public function setDOB($DOB) {
+        $this->DOB = $DOB;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getWhenVerified() {
         return $this->whenVerified;
     }
@@ -174,6 +249,76 @@ class User extends BaseUser {
      */
     public function setWhenVerified($whenVerified) {
         $this->whenVerified = $whenVerified;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPhone() {
+        return $this->phone;
+    }
+
+    /**
+     * @param mixed $phone
+     */
+    public function setPhone($phone) {
+        $this->phone = $phone;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHomePostcode() {
+        return $this->homePostcode;
+    }
+
+    /**
+     * @param mixed $homePostcode
+     */
+    public function setHomePostcode($homePostcode) {
+        $this->homePostcode = $homePostcode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHomeSuburb() {
+        return $this->homeSuburb;
+    }
+
+    /**
+     * @param mixed $homeSuburb
+     */
+    public function setHomeSuburb($homeSuburb) {
+        $this->homeSuburb = $homeSuburb;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHomeStreet() {
+        return $this->homeStreet;
+    }
+
+    /**
+     * @param mixed $homeStreet
+     */
+    public function setHomeStreet($homeStreet) {
+        $this->homeStreet = $homeStreet;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHomeStreetNumber() {
+        return $this->homeStreetNumber;
+    }
+
+    /**
+     * @param mixed $homeStreetNumber
+     */
+    public function setHomeStreetNumber($homeStreetNumber) {
+        $this->homeStreetNumber = $homeStreetNumber;
     }
 
     /**
@@ -202,6 +347,34 @@ class User extends BaseUser {
      */
     public function clearAllElectorates() {
         $this->electorates->clear();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsVolunteer() {
+        return $this->isVolunteer;
+    }
+
+    /**
+     * @param mixed $isVolunteer
+     */
+    public function setIsVolunteer($isVolunteer) {
+        $this->isVolunteer = $isVolunteer;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsMember() {
+        return $this->isMember;
+    }
+
+    /**
+     * @param mixed $isMember
+     */
+    public function setIsMember($isMember) {
+        $this->isMember = $isMember;
     }
 
 }

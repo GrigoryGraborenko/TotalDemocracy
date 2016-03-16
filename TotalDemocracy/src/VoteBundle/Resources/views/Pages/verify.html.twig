@@ -21,10 +21,36 @@
                 </select>
             </p>
             <p>
-                <label>Street</label><input type="text" id="street-input" name="street" value="{{ street }}" disabled>
+                <label>Street Number</label><input type="text" class="street-inputs" id="street-number-input" name="streetNumber" value="{{ streetNumber }}" disabled>
+            </p>
+            <p>
+                <label>Street</label><input type="text" class="street-inputs" id="street-input" name="street" value="{{ street }}" disabled>
+            </p>
+            <p>
+                <label>Date of Birth:</label>
+                <select id="dob-date" name="dobDate">
+                    <option value=""></option>
+                    {% for i in 1..31 %}
+                        <option value="{{ i }}" {% if dobDate is defined and dobDate == i %}selected{% endif %}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <select id="dob-month" name="dobMonth">
+                    <option value=""></option>
+                    {% for i in 1..12 %}
+                        <option value="{{ i }}" {% if dobMonth is defined and dobMonth == i %}selected{% endif %}>{{ month_names[i - 1] }}</option>
+                    {% endfor %}
+                </select>
+                <select id="dob-year" name="dobYear">
+                    <option value=""></option>
+                    {% for year in years %}
+                        <option value="{{ year }}" {% if dobYear is defined and dobYear == year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
             </p>
             <p>
                 <img src="{{ image }}">
+            </p>
+            <p>
                 <label>Verification Code</label><input type="text" id="verify-input" name="verify">
             </p>
 
@@ -55,6 +81,7 @@
             var $postcode_input = $("#postcode-input");
             var $suburb_select = $("#suburb-select");
             var $street_input = $("#street-input");
+            var $all_street_inputs = $(".street-inputs");
             var $error = $("#error-text");
 
             var acceptable_suburbs = [];
@@ -63,7 +90,7 @@
             $postcode_input.on("input", function() {
                 var post = $(this).val();
                 $suburb_select.empty().append('<option value="">- None Selected -</option>').prop("disabled", true);
-                $street_input.prop("disabled", true);
+                $all_street_inputs.prop("disabled", true);
                 if((post.length < 4) || (post.length > 4)) {
                     return;
                 }
@@ -80,7 +107,7 @@
                     }
                     acceptable_suburbs = data.suburbs;
                     $suburb_select.prop("disabled", false);
-                    $street_input.prop("disabled", false);
+                    $all_street_inputs.prop("disabled", false);
 
                     data.suburbs.forEach(function(sub) {
                         var $op = $('<option value="' + sub + '">' + sub + '</option>');
@@ -140,6 +167,17 @@
                 }
                 if($("#suburb-select option:selected").prop("value").length < 1) {
                     $error.html("Select a suburb/locality");
+                    return false;
+                }
+                if($("#street-number-input").val().length < 1) {
+                    $error.html("Enter a street number");
+                    return false;
+                }
+                if( ($("#dob-date option:selected").prop("value").length < 1) ||
+                    ($("#dob-month option:selected").prop("value").length < 1) ||
+                    ($("#dob-year option:selected").prop("value").length < 1)
+                ) {
+                    $error.html("Enter a valid birth date");
                     return false;
                 }
                 var street_name = $street_input.val().toUpperCase();

@@ -132,20 +132,36 @@ EOT
 
 //            $details_node = $crawler->filter("#lblDetails")->children();
 
-            $texts = $crawler->filter("#lblDetails")->filterXPath('//text()')->extract(['_text']);
-            $is_impact = strpos($texts[4], "Impact") !== false;
+            $detail_texts = $crawler->filter("#lblDetails")->filterXPath('//text()')->extract(['_text']);
+            $is_impact = strpos($detail_texts[4], "Impact") !== false;
 
             if(!$is_impact) {
                 continue;
             }
+            $people_texts = $crawler->filter("#lblPeople")->filterXPath('//text()')->extract(['_text']);
+            $properties_texts = $crawler->filter("#lblProperties")->filterXPath('//text()')->extract(['_text']);
 
-            $activity = trim($texts[2]);
+            $activity = trim($detail_texts[2]);
+            $applicant = trim($people_texts[0]);
+            $properties = array();
+            foreach($properties_texts as $property) {
+                $trimmed = trim($property);
+                if(strlen($trimmed) <= 0) {
+                    continue;
+                }
+                $properties[] = $trimmed;
+            }
+            $properties = implode(", ", $properties);
 
 //            $this->logger->info($app_id);
-//            $this->logger->info(json_encode($texts));
+//            $this->logger->info(json_encode($detail_texts));
+//            $this->logger->info(json_encode($people_texts));
+//            $this->logger->info(json_encode($properties_texts));
 //            $this->logger->info($crawler->filter("#lblDetails")->first()->html());
 
-            $document = new Document($domain, $activity, "fill");
+            $text = "Applicant: $applicant. Properties: $properties";
+
+            $document = new Document($domain, $activity, $text);
             $document->setExternalID($app_id);
             $document->setExternalURL($url);
 

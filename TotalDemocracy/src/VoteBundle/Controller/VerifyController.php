@@ -66,7 +66,20 @@ class VerifyController extends FOSRestController {
             ,"postcode" => $user->getPostcode()
             ,"suburb" => $user->getSuburb()
             ,"street" => $user->getStreet()
+            ,"streetNumber" => $user->getStreetNumber()
+            ,"month_names" => ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            ,"years" => array()
         );
+        $curr_year = Carbon::now("UTC")->year;
+        for($i = ($curr_year - 16); $i > ($curr_year - 120); $i--) {
+            $output['years'][] = $i;
+        }
+        if($user->getDOB()) {
+            $dob = Carbon::instance($user->getDOB());
+            $output["dobDate"] = $dob->day;
+            $output["dobMonth"] = $dob->month;
+            $output["dobYear"] = $dob->year;
+        }
 
         $client = new HttpClient([
             'verify' => $this->verifySSL
@@ -131,9 +144,22 @@ class VerifyController extends FOSRestController {
             (!array_key_exists("postcode", $input)) ||
             (!array_key_exists("suburb", $input)) ||
             (!array_key_exists("street", $input)) ||
-            (!array_key_exists("verify", $input))) {
+            (!array_key_exists("verify", $input)) ||
+
+            (!array_key_exists("streetNumber", $input)) ||
+            (!array_key_exists("dobDate", $input)) ||
+            (!array_key_exists("dobMonth", $input)) ||
+            (!array_key_exists("dobYear", $input))) {
 
             throw new ErrorRedirectException("verify", "Incorrect arguments");
+        }
+        if( (strlen($input["dobDate"]) <= 0) ||
+            (strlen($input["dobMonth"]) <= 0) ||
+            (strlen($input["dobYear"]) <= 0)) {
+            throw new ErrorRedirectException("verify", "Please enter date of birth");
+        }
+        if((strlen($input["streetNumber"]) <= 0)) {
+            throw new ErrorRedirectException("verify", "Please enter your street number");
         }
 
         $other_user = $this->em->getRepository('VoteBundle:User')->findOneBy(array(
@@ -218,6 +244,8 @@ class VerifyController extends FOSRestController {
             $user->setSuburb(strtoupper($input['suburb']));
             $user->setStreet(strtoupper($input['street']));
             $user->setWhenVerified(Carbon::now("UTC"));
+            $user->setStreetNumber($input['streetNumber']);
+            $user->setDOB(Carbon::createFromDate($input['dobYear'], $input['dobMonth'], $input['dobDate'], "UTC")->startOfDay());
 
             $domain_repo = $this->em->getRepository('VoteBundle:Domain');
             $elect_repo = $this->em->getRepository('VoteBundle:Electorate');

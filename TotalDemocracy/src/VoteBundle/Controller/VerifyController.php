@@ -67,7 +67,7 @@ class VerifyController extends FOSRestController {
             ,"suburb" => $user->getSuburb()
             ,"street" => $user->getStreet()
             ,"streetNumber" => $user->getStreetNumber()
-            ,"month_names" => ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            ,"month_names" => array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
             ,"years" => array()
         );
         $curr_year = Carbon::now("UTC")->year;
@@ -81,12 +81,12 @@ class VerifyController extends FOSRestController {
             $output["dobYear"] = $dob->year;
         }
 
-        $client = new HttpClient([
+        $client = new HttpClient(array(
             'verify' => $this->verifySSL
-        ]);
+        ));
 
-        $response = $client->request("GET", $base_url, [
-            'headers' => [
+        $response = $client->request("GET", $base_url, array(
+            'headers' => array(
                 "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
                 ,"Accept-Encoding" => "gzip, deflate"
                 ,"Accept-Language" => "en-US,en;q=0.8"
@@ -94,7 +94,7 @@ class VerifyController extends FOSRestController {
                 ,"Host" => "oevf.aec.gov.au"
                 ,"Upgrade-Insecure-Requests" => "1"
                 ,"User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36"
-        ]]);
+        )));
 
         $cookie = explode(";", $response->getHeader("Set-Cookie")[0])[0];
 
@@ -111,14 +111,14 @@ class VerifyController extends FOSRestController {
         $output['image'] = "/$filename";
 
         $myFile = fopen($filename,"w");
-        $client->request("GET", $image_src,[
+        $client->request("GET", $image_src, array(
             'save_to' => $myFile
-            ,"headers" => [
+            ,"headers" => array(
                 "Host" => "oevf.aec.gov.au"
                 ,"Cookie" => $cookie
                 ,"User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36"
-            ]
-        ]);
+            )
+        ));
 
         $session = $this->get('session');
         $session->set('verify.view_state', $crawler->filter('#__VIEWSTATE')->attr("value"));
@@ -178,14 +178,14 @@ class VerifyController extends FOSRestController {
 
         }
 
-        $client = new HttpClient([
+        $client = new HttpClient(array(
             'verify' => $this->verifySSL
-        ]);
+        ));
 
         $session = $this->get('session');
         $base_url = "https://oevf.aec.gov.au/";
 
-        $form_params = [
+        $form_params = array(
             '__LASTFOCUS' => ''
             ,'ctl00_ContentPlaceHolderBody_ToolkitScriptManager1_HiddenField' => ''
             ,'__EVENTTARGET' => ''
@@ -203,11 +203,11 @@ class VerifyController extends FOSRestController {
             ,'ctl00$ContentPlaceHolderBody$textVerificationCode' => $input['verify']
             ,'ctl00$ContentPlaceHolderBody$buttonVerify' => ' Verify Enrolment '
             ,'hiddenInputToUpdateATBuffer_CommonToolkitScripts' => "0"
-        ];
+        );
 
-        $response = $client->request('POST', $base_url, [
+        $response = $client->request('POST', $base_url, array(
             'form_params' => $form_params
-            ,'headers' => [
+            ,'headers' => array(
                 "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
                 ,"Accept-Encoding" => "gzip, deflate"
                 ,"Accept-Language" => "en-US,en;q=0.8"
@@ -219,8 +219,8 @@ class VerifyController extends FOSRestController {
                 ,"Referer" => "https://oevf.aec.gov.au/"
                 ,"Upgrade-Insecure-Requests" => "1"
                 ,"User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36"
-            ]
-        ]);
+            )
+        ));
 
         $crawler = new Crawler($response->getBody()->getContents());
 
@@ -321,28 +321,28 @@ class VerifyController extends FOSRestController {
 
         if(array_key_exists("postcode", $input)) {
             $url = 'https://oevf.aec.gov.au/VerifyEnrolment.aspx/GetDropDownContents';
-            $send_data = [
+            $send_data = array(
                 "category" => "postcode"
                 ,"knownCategoryValues" => $input['postcode']
-            ];
+            );
             $is_postcode = true;
         } else if(array_key_exists("prefix", $input) && array_key_exists("context", $input)) {
             $url = 'https://oevf.aec.gov.au/VerifyEnrolment.aspx/GetStreetAutoCompleteList';
-            $send_data = [
+            $send_data = array(
                 "contextKey" => $input['context']
                 ,"count" => 50
                 ,"prefixText" => $input['prefix']
-            ];
+            );
             $is_postcode = false;
         } else {
             throw new BadRequestException("Incorrect Parameters");
         }
 
-        $client = new HttpClient([
+        $client = new HttpClient(array(
             'verify' => $this->verifySSL
-        ]);
+        ));
 
-        $response = $client->request('POST', $url, [ 'json' => $send_data ]);
+        $response = $client->request('POST', $url, array( 'json' => $send_data ));
 
         $suburbs = array();
         $json_response = json_decode($response->getBody()->getContents(), true);

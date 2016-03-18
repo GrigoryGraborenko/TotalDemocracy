@@ -41,7 +41,7 @@ class LoadDocumentData extends AbstractFixture implements OrderedFixtureInterfac
     private function createDocument($domain_ref, $name, $text) {
 
         $domain = $this->getReference($domain_ref);
-        $doc = new Document($domain, $name, $text);
+        $doc = new Document($domain, "bill", $name, $text);
         return $doc;
     }
 

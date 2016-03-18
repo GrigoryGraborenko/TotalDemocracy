@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
  * Extra "home" address, mandatory for volunteers, pre-filled
  * Some way to log out of "new user" mode
  * Abstain vote?
- * Type for document
  * Preserve wrong data between errors
  * Show all, even stuff you can't vote on, if you choose
  * Remove old images

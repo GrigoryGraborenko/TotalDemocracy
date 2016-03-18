@@ -5,6 +5,19 @@
     <h1>REGISTER FINISH</h1>
 
     <form action="{{ path("signup_confirm", { "email": email, "confirm_token": token }) }}" method="post">
+
+        <p>
+            <label>Phone number: </label><input type="text" id="phone-input" name="phone">
+        </p>
+        <p>
+            <input type="radio" class="role-volunteer-input" name="volunteer" value="true"> I would like to volunteer
+            <input type="radio" class="role-volunteer-input" name="volunteer" value="false" checked> No thanks
+        </p>
+        <p>
+            <input type="radio" class="role-member-input" name="member" value="true"> I would like to be a member
+            <input type="radio" class="role-member-input" name="member" value="false" checked> No thanks
+        </p>
+
         <p>
             <label>Password: </label><input type="password" id="password-input" name="password">
         </p>

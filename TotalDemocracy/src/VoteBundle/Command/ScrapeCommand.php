@@ -88,13 +88,13 @@ EOT
         $doc_repo = $this->em->getRepository('VoteBundle:Document');
         $domain = $this->em->getRepository('VoteBundle:Domain')->findOneBy(array("name" => "BRISBANE CITY"));;
 
-        $client = new HttpClient([
+        $client = new HttpClient(array(
             'verify' => false
-        ]);
+        ));
 
         // TODO: return to this week
-        $timeframe = "thismonth";
-//        $timeframe = "thisweek";
+//        $timeframe = "thismonth";
+        $timeframe = "thisweek";
         $response = $client->request("GET", "https://pdonline.brisbane.qld.gov.au/masterviewUI/modules/ApplicationMaster/default.aspx?page=found&1=$timeframe&6=F");
         $crawler = new Crawler($response->getBody()->getContents());
 
@@ -103,11 +103,11 @@ EOT
         foreach($crawler->filter('.rgNumPart a') as $link) {
             $page_url = str_replace("javascript:__doPostBack('", "", str_replace("','')", "", $link->getAttribute("href")));
 
-            $response = $client->request("POST", "https://pdonline.brisbane.qld.gov.au/masterviewUI/modules/ApplicationMaster/default.aspx?page=found&1=$timeframe&6=F", [
-                "form_params" => [
+            $response = $client->request("POST", "https://pdonline.brisbane.qld.gov.au/masterviewUI/modules/ApplicationMaster/default.aspx?page=found&1=$timeframe&6=F", array(
+                "form_params" => array(
                     "__EVENTTARGET" => $page_url
-                ]
-            ]);
+                )
+            ));
             $sub_crawler = new Crawler($response->getBody()->getContents());
             foreach($sub_crawler->filter('.rgMasterTable tbody a') as $sub_link) {
                 $url = $sub_link->getAttribute("href");
@@ -161,7 +161,7 @@ EOT
 
             $text = "Applicant: $applicant. Properties: $properties";
 
-            $document = new Document($domain, $activity, $text);
+            $document = new Document($domain, "application", $activity, $text);
             $document->setExternalID($app_id);
             $document->setExternalURL($url);
 

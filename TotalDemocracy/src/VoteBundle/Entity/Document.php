@@ -48,6 +48,12 @@ class Document {
      * @ORM\Column(type="string")
      * @Expose
      */
+    protected $type;
+
+    /**
+     * @ORM\Column(type="string")
+     * @Expose
+     */
     protected $name;
 
     /**
@@ -80,8 +86,9 @@ class Document {
      * @param $text
      * @param $domain
      */
-    public function __construct($domain, $name, $text) {
+    public function __construct($domain, $type, $name, $text) {
         $this->domain = $domain;
+        $this->type = $type;
         $this->name = $name;
         $this->text = $text;
     }
@@ -112,6 +119,20 @@ class Document {
      */
     public function setDomain($domain) {
         $this->domain = $domain;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getType() {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type) {
+        $this->type = $type;
     }
 
     /**

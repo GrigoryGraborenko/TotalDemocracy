@@ -106,6 +106,12 @@ class RegisterController extends FOSRestController {
         if($user !== NULL) {
             throw new ErrorRedirectException('homepage', "Cannot register twice");
         }
+
+        $new_user = $this->em->getRepository('VoteBundle:User')->findOneBy(array("emailCanonical" => $email, "confirmationToken" => $confirm_token, "enabled" => false));
+        if($new_user === NULL) {
+            throw new ErrorRedirectException('homepage', "Email or confirmation token is incorrect");
+        }
+
         $min_length = $this->get("vote.option")->getInteger("password.length.min");
 
         return $this->render('VoteBundle:Pages:register_finish.html.twig', array("email" => $email, "token" => $confirm_token, "min_length" => $min_length));
@@ -123,16 +129,28 @@ class RegisterController extends FOSRestController {
         }
 
         $input = $request->request->all();
-        if(!array_key_exists("password", $input)) {
-            throw new ErrorRedirectException('homepage', "Password not specified");
+        if( (!array_key_exists("password", $input)) ||
+            (!array_key_exists("phone", $input)) ||
+            (!array_key_exists("volunteer", $input)) ||
+            (!array_key_exists("member", $input))
+            ) {
+            throw new ErrorRedirectException('homepage', "Incorrect parameters specified");
         }
 
         $password = $input['password'];
+        $phone = $input['phone'];
+        $is_volunteer = $input['volunteer'] === "true";
+        $is_member = $input['member'] === "true";
         $url_params = array("email" => $email, "confirm_token" => $confirm_token);
+
+//throw new ErrorRedirectException('signup_finish', "DATA: " . json_encode($input), "confirm-error", $url_params);
 
         $min_password_len = $this->get("vote.option")->getInteger("password.length.min");
         if(strlen($password) < $min_password_len) {
             throw new ErrorRedirectException('signup_finish', "Password is too short, needs to be at least $min_password_len characters long", "confirm-error", $url_params);
+        }
+        if(strlen($phone) < 5) {
+            throw new ErrorRedirectException('signup_finish', "Phone number is too short", "confirm-error", $url_params);
         }
 
         $new_user = $this->em->getRepository('VoteBundle:User')->findOneBy(array("emailCanonical" => $email, "confirmationToken" => $confirm_token, "enabled" => false));
@@ -143,6 +161,9 @@ class RegisterController extends FOSRestController {
         $new_user->setPlainPassword($password);
         $new_user->setEnabled(true);
         $new_user->setConfirmationToken(NULL);
+        $new_user->setPhone($phone);
+        $new_user->setIsVolunteer($is_volunteer);
+        $new_user->setIsMember($is_member);
         $this->em->flush();
 
         $token = new UsernamePasswordToken($new_user, null, 'main', $new_user->getRoles());

@@ -13,20 +13,6 @@
                 <label>Surname</label><input type="text" id="surname-input" name="surname" value="{{ surname }}">
             </p>
             <p>
-                <label>Postcode</label><input type="text" id="postcode-input" name="postcode" value="{{ postcode }}">
-            </p>
-            <p>
-                <label>Suburb/Locality</label><select id="suburb-select" name="suburb" disabled>
-                    <option>- None Selected -</option>
-                </select>
-            </p>
-            <p>
-                <label>Street Number</label><input type="text" class="street-inputs" id="street-number-input" name="streetNumber" value="{{ streetNumber }}" disabled>
-            </p>
-            <p>
-                <label>Street</label><input type="text" class="street-inputs" id="street-input" name="street" value="{{ street }}" disabled>
-            </p>
-            <p>
                 <label>Date of Birth:</label>
                 <select id="dob-date" name="dobDate">
                     <option value=""></option>
@@ -46,6 +32,20 @@
                         <option value="{{ year }}" {% if dobYear is defined and dobYear == year %}selected{% endif %}>{{ year }}</option>
                     {% endfor %}
                 </select>
+            </p>
+            <p>
+                <label>Postcode</label><input type="text" id="postcode-input" name="postcode" value="{{ postcode }}">
+            </p>
+            <p>
+                <label>Suburb/Locality</label><select id="suburb-select" name="suburb" disabled>
+                    <option>- None Selected -</option>
+                </select>
+            </p>
+            <p>
+                <label>Street Number</label><input type="text" class="street-inputs" id="street-number-input" name="streetNumber" value="{{ streetNumber }}" disabled>
+            </p>
+            <p>
+                <label>Street</label><input type="text" class="street-inputs" id="street-input" name="street" value="{{ street }}" disabled>
             </p>
             <p>
                 <img src="{{ image }}">
@@ -75,7 +75,11 @@
 {% endblock %}
 
 {% block javascripts %}
+    {% javascripts '@address_autocomplete' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
     <script>
+
         $(document).ready(function() {
 
             var $postcode_input = $("#postcode-input");
@@ -84,67 +88,7 @@
             var $all_street_inputs = $(".street-inputs");
             var $error = $("#error-text");
 
-            var acceptable_suburbs = [];
-            var acceptable_streets = [];
-
-            $postcode_input.on("input", function() {
-                var post = $(this).val();
-                $suburb_select.empty().append('<option value="">- None Selected -</option>').prop("disabled", true);
-                $all_street_inputs.prop("disabled", true);
-                if((post.length < 4) || (post.length > 4)) {
-                    return;
-                }
-
-                $.ajax({
-                    url: Routing.generate('verify_autocomplete')
-                    ,method: 'POST'
-                    ,dataType:"json"
-                    ,data: { "postcode": post }
-                }).done(function(data) {
-
-                    if(data.suburbs.length < 1) {
-                        return;
-                    }
-                    acceptable_suburbs = data.suburbs;
-                    $suburb_select.prop("disabled", false);
-                    $all_street_inputs.prop("disabled", false);
-
-                    data.suburbs.forEach(function(sub) {
-                        var $op = $('<option value="' + sub + '">' + sub + '</option>');
-                        $suburb_select.append($op);
-                    });
-                    if(data.suburbs.length === 1) {
-                        $suburb_select.val(data.suburbs[0]);
-                    }
-                }).error(function(response) {
-                    console.log(response.responseJSON.result);
-                });
-            });
-
-            if($postcode_input.val().length === 4) {
-                $postcode_input.trigger("input");
-            }
-
-            $street_input.autocomplete({
-                minLength: 1
-                ,source: function(request, response) {
-
-                    $.ajax({
-                        url: Routing.generate('verify_autocomplete')
-                        ,method: 'POST'
-                        ,dataType:"json"
-                        ,data: { "prefix": request.term, "context": ($suburb_select.val() + ";" + $postcode_input.val()) }
-                    }).done(function(data) {
-                        if(data.streets.length > 0) {
-                            acceptable_streets = data.streets;
-                        }
-                        response(data.streets);
-                    }).error(function(response) {
-                        console.log(response.responseJSON.result);
-                    });
-
-                }
-            });
+            var address_verify = createAddressAutoComplete($postcode_input, $suburb_select, $street_input, $all_street_inputs);
 
             // TODO: drop in a jquery form validator
             $("#verify-submit").click(function() {
@@ -157,36 +101,17 @@
                     $error.html("Enter your surname");
                     return false;
                 }
-                if($postcode_input.val().length < 1) {
-                    $error.html("Enter your postcode");
-                    return false;
-                }
-                if(acceptable_suburbs.length < 1) {
-                    $error.html("Enter a valid postcode");
-                    return false;
-                }
-                if($("#suburb-select option:selected").prop("value").length < 1) {
-                    $error.html("Select a suburb/locality");
-                    return false;
-                }
-                if($("#street-number-input").val().length < 1) {
-                    $error.html("Enter a street number");
-                    return false;
-                }
                 if( ($("#dob-date option:selected").prop("value").length < 1) ||
-                    ($("#dob-month option:selected").prop("value").length < 1) ||
-                    ($("#dob-year option:selected").prop("value").length < 1)
+                        ($("#dob-month option:selected").prop("value").length < 1) ||
+                        ($("#dob-year option:selected").prop("value").length < 1)
                 ) {
                     $error.html("Enter a valid birth date");
                     return false;
                 }
-                var street_name = $street_input.val().toUpperCase();
-                if(street_name.length < 1) {
-                    $error.html("Enter your street name");
-                    return false;
-                }
-                if((acceptable_streets.length > 0) && (acceptable_streets.indexOf(street_name) === -1)) {
-                    $error.html("Enter a valid street");
+
+                var result = address_verify();
+                if(result !== true) {
+                    $error.html(result);
                     return false;
                 }
                 if($("#verify-input").val().length !== 4) {

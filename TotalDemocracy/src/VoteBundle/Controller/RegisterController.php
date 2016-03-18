@@ -102,8 +102,7 @@ class RegisterController extends FOSRestController {
      */
     public function signupFinishAction(Request $request, $email, $confirm_token) {
 
-        $user = $this->getUser();
-        if($user !== NULL) {
+        if($this->getUser() !== NULL) {
             throw new ErrorRedirectException('homepage', "Cannot register twice");
         }
 
@@ -112,9 +111,21 @@ class RegisterController extends FOSRestController {
             throw new ErrorRedirectException('homepage', "Email or confirmation token is incorrect");
         }
 
-        $min_length = $this->get("vote.option")->getInteger("password.length.min");
+        $pass_min_length = $this->get("vote.option")->getInteger("password.length.min");
+        $phone_min_length = $this->get("vote.option")->getInteger("phone.length.min");
+        $output = array(
+            "email" => $email
+            ,"token" => $confirm_token
+            ,"password_min_length" => $pass_min_length
+            ,"phone_min_length" => $phone_min_length
 
-        return $this->render('VoteBundle:Pages:register_finish.html.twig', array("email" => $email, "token" => $confirm_token, "min_length" => $min_length));
+            ,"postcode" => $new_user->getPostcode()
+            ,"suburb" => $new_user->getSuburb()
+            ,"street" => $new_user->getStreet()
+            ,"streetNumber" => $new_user->getStreetNumber()
+        );
+
+        return $this->render('VoteBundle:Pages:register_finish.html.twig', $output);
     }
 
     /**
@@ -128,34 +139,49 @@ class RegisterController extends FOSRestController {
             throw new ErrorRedirectException('homepage', "Cannot register twice");
         }
 
+        $url_params = array("email" => $email, "confirm_token" => $confirm_token);
+
         $input = $request->request->all();
+
         if( (!array_key_exists("password", $input)) ||
-            (!array_key_exists("phone", $input)) ||
-            (!array_key_exists("volunteer", $input)) ||
-            (!array_key_exists("member", $input))
+            (!array_key_exists("phone", $input))
             ) {
             throw new ErrorRedirectException('homepage', "Incorrect parameters specified");
         }
 
         $password = $input['password'];
         $phone = $input['phone'];
-        $is_volunteer = $input['volunteer'] === "true";
-        $is_member = $input['member'] === "true";
-        $url_params = array("email" => $email, "confirm_token" => $confirm_token);
-
-//throw new ErrorRedirectException('signup_finish', "DATA: " . json_encode($input), "confirm-error", $url_params);
+        $is_volunteer = array_key_exists('volunteer', $input);
+        $is_member = array_key_exists('member', $input);
 
         $min_password_len = $this->get("vote.option")->getInteger("password.length.min");
+        $phone_min_length = $this->get("vote.option")->getInteger("phone.length.min");
         if(strlen($password) < $min_password_len) {
             throw new ErrorRedirectException('signup_finish', "Password is too short, needs to be at least $min_password_len characters long", "confirm-error", $url_params);
         }
-        if(strlen($phone) < 5) {
-            throw new ErrorRedirectException('signup_finish', "Phone number is too short", "confirm-error", $url_params);
+        if(strlen($phone) < $phone_min_length) {
+            throw new ErrorRedirectException('signup_finish', "Phone number is too short, needs to be at least $phone_min_length characters long", "confirm-error", $url_params);
         }
 
         $new_user = $this->em->getRepository('VoteBundle:User')->findOneBy(array("emailCanonical" => $email, "confirmationToken" => $confirm_token, "enabled" => false));
         if($new_user === NULL) {
             throw new ErrorRedirectException('signup_finish', "Email or confirmation token is incorrect", "confirm-error", $url_params);
+        }
+
+        if($is_volunteer) {
+            if( array_key_exists("postcode", $input) &&
+                array_key_exists("suburb", $input) &&
+                array_key_exists("streetNumber", $input) &&
+                array_key_exists("street", $input)) {
+
+                $new_user->setHomePostcode($input["postcode"]);
+                $new_user->setHomeSuburb($input["suburb"]);
+                $new_user->setHomeStreetNumber($input["streetNumber"]);
+                $new_user->setHomeStreet($input["street"]);
+            } else {
+                $this->get("logger")->info(json_encode($url_params));
+                throw new ErrorRedirectException('signup_finish', "If you wish to volunteer, please enter your home address", "confirm-error", $url_params);
+            }
         }
 
         $new_user->setPlainPassword($password);

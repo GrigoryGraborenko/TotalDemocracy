@@ -49,6 +49,7 @@ class OptionService
 
         //,"core_ajax.milliseconds"                                => array("default" => "8000", "type" => "int", "label" => "Milliseconds between each core AJAX call. ")
         ,"password.length.min"                                   => array("default" => "8", "type" => "int", "label" => "Minimum password length. ")
+        ,"phone.length.min"                                      => array("default" => "6", "type" => "int", "label" => "Minimum phone number length. ")
 
         );
     }

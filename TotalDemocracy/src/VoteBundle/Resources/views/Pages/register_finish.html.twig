@@ -7,15 +7,29 @@
     <form action="{{ path("signup_confirm", { "email": email, "confirm_token": token }) }}" method="post">
 
         <p>
+            <input type="checkbox" name="member"> I would like to be a member
+        </p>
+        <p>
+            <input type="checkbox" id="volunteer-checkbox" name="volunteer"> I would like to volunteer
+        </p>
+        <div id="home-address-div" class="collapse">
+            <p>
+                <label>Postcode</label><input type="text" id="postcode-input" name="postcode" value="{{ postcode }}">
+            </p>
+            <p>
+                <label>Suburb/Locality</label><select id="suburb-select" name="suburb" disabled>
+                    <option>- None Selected -</option>
+                </select>
+            </p>
+            <p>
+                <label>Street Number</label><input type="text" class="street-inputs" id="street-number-input" name="streetNumber" value="{{ streetNumber }}" disabled>
+            </p>
+            <p>
+                <label>Street</label><input type="text" class="street-inputs" id="street-input" name="street" value="{{ street }}" disabled>
+            </p>
+        </div>
+        <p>
             <label>Phone number: </label><input type="text" id="phone-input" name="phone">
-        </p>
-        <p>
-            <input type="radio" class="role-volunteer-input" name="volunteer" value="true"> I would like to volunteer
-            <input type="radio" class="role-volunteer-input" name="volunteer" value="false" checked> No thanks
-        </p>
-        <p>
-            <input type="radio" class="role-member-input" name="member" value="true"> I would like to be a member
-            <input type="radio" class="role-member-input" name="member" value="false" checked> No thanks
         </p>
 
         <p>
@@ -39,24 +53,55 @@
 {% endblock %}
 
 {% block javascripts %}
-<script>
-    $(document).ready(function() {
 
-        var $error = $("#error-text");
+    {% javascripts '@address_autocomplete' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+    <script>
+        $(document).ready(function() {
 
-        $("#finish-submit").click(function() {
+            var $postcode_input = $("#postcode-input");
+            var $suburb_select = $("#suburb-select");
+            var $street_input = $("#street-input");
+            var $all_street_inputs = $(".street-inputs");
+            var $phone_input = $("#phone-input");
+            var $error = $("#error-text");
+            var $home_address_div = $("#home-address-div");
 
-            var pass = $("#password-input").val();
-            var pass_repeat = $("#password-repeat-input").val();
-            if(pass !== pass_repeat) {
-                $error.html("Passwords need to match");
-                return false;
-            }
-            if(pass.length < {{ min_length }}) {
-                $error.html("Password needs to be at least {{ min_length }} characters long");
-                return false;
-            }
+            var address_verify = createAddressAutoComplete($postcode_input, $suburb_select, $street_input, $all_street_inputs);
+
+            var is_volunteer = false;
+            $("#volunteer-checkbox").change(function() {
+                is_volunteer = this.checked;
+                $home_address_div.collapse(is_volunteer ? "show" : "hide");
+            });
+
+            $("#finish-submit").click(function() {
+
+                if(is_volunteer) {
+                    var result = address_verify();
+                    if (result !== true) {
+                        $error.html(result);
+                        return false;
+                    }
+                }
+
+                if($phone_input.val().length < {{ phone_min_length }}) {
+                    $error.html("Phone number needs to be at least {{ phone_min_length }} digits long");
+                    return false;
+                }
+
+                var pass = $("#password-input").val();
+                var pass_repeat = $("#password-repeat-input").val();
+                if(pass !== pass_repeat) {
+                    $error.html("Passwords need to match");
+                    return false;
+                }
+                if(pass.length < {{ password_min_length }}) {
+                    $error.html("Password needs to be at least {{ password_min_length }} characters long");
+                    return false;
+                }
+            });
         });
-    });
-</script>
+    </script>
 {% endblock %}

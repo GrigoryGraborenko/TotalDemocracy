@@ -110,3 +110,6 @@ assetic:
         stylesheets:
             inputs:
                 - '@VoteBundle/Resources/css/main.css'
+        address_autocomplete:
+            inputs:
+                - '@VoteBundle/Resources/js/address_autocomplete.js'

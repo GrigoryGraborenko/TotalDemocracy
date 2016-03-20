@@ -8,13 +8,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 /*
  * TODO FIXES:
- * Mandatory telephone on confirm and "want to volunteer"
- * Extra "home" address, mandatory for volunteers, pre-filled
- * Some way to log out of "new user" mode
- * Abstain vote?
- * Preserve wrong data between errors
- * Show all, even stuff you can't vote on, if you choose
  * Remove old images
+ * Preserve wrong data between errors
+ * Some way to log out of "new user" mode
+ * Show all, even stuff you can't vote on, if you choose
+ * Abstain vote?
+ * Close vote
  * Ensure voters can't change their names easily?
  * Report bug button on all pages
  * Make sure that rego and verify both can be switched off for maintenance
@@ -24,6 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  * Flag users if imported from nationbuilder
  * Add concept of "user verified but mismatch"
  * Better verified page, with proper info from users
+ * Checkbox for "live here"
  *
  * TODO:
  * do g_initial data JS stuff, it's pretty useful

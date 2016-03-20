@@ -85,6 +85,9 @@ EOT
 
         $this->log("Processing Brisbane City Council...");
 
+//        $this->BCCResults();
+//        return;
+
         $doc_repo = $this->em->getRepository('VoteBundle:Document');
         $domain = $this->em->getRepository('VoteBundle:Domain')->findOneBy(array("name" => "BRISBANE CITY"));;
 
@@ -172,6 +175,96 @@ EOT
         $this->em->flush();
 
         $this->log("Finished, created $found_num new documents.");
+
+    }
+
+    /**
+     * Gets the mayoral electoral results per booth
+     */
+    private function BCCResults() {
+
+        $client = new HttpClient(array(
+            'verify' => false
+        ));
+
+        $character_mask = " \t\n\r\0\x0B\xa0\xc2";
+
+        $booths = array();
+        $candidates = array();
+
+        for($booth_num = 1; $booth_num <= 26; $booth_num++) {
+            $response = $client->request("GET", "http://results.ecq.qld.gov.au/elections/local/LG2016/BrisbaneCityCouncil/results/mayoral/booth$booth_num.html");
+            $crawler = new Crawler($response->getBody()->getContents());
+
+            $ward_name = $crawler->filter("title")->html();
+            $ward_name = substr($ward_name, 60, -16);
+
+            $table = $crawler->filter(".election-info-table .resultTableBorder")->eq(1);
+
+            $rows = $table->filter("tr");
+            $rows_count = $rows->count();
+
+            if($booth_num === 1) {
+                $headers = $rows->eq(1)->filter("td");
+                $header_count = $headers->count();
+
+                for ($headnum = 2; $headnum < ($header_count - 4); $headnum++) {
+                    $candidate_texts = $headers->eq($headnum)->filterXPath('//div/text()')->extract(['_text']);
+
+                    $candidate_surname = str_replace(",", "", trim($candidate_texts[0], $character_mask));
+                    $candidate_fname = trim($candidate_texts[1], $character_mask);
+                    $candidate_party = NULL;
+                    $heading = "$candidate_fname $candidate_surname";
+                    if(count($candidate_texts) > 2) {
+                        $candidate_party = trim($candidate_texts[2], $character_mask);
+                        $heading .= " [$candidate_party]";
+                    }
+                    $candidates[] = array("heading" => $heading, "name" => $candidate_fname, "surname" => $candidate_surname, "party" => $candidate_party, "offset" => (count($candidates) * 2 + 2));
+                }
+                $candidates[] = array("heading" => "Informal Votes", "name" => "Informal", "surname" => "Vote", "party" => NULL, "offset" => (count($candidates) * 2 + 3));
+            }
+
+            $num_candidates = count($candidates);
+
+            for($rownum = 4; $rownum < ($rows_count - 12); $rownum++) {
+                $cols = $rows->eq($rownum)->filter("td");
+
+                $booth = trim($cols->eq(1)->filterXPath('//text()')->extract(['_text'])[0]);
+
+                $booth_info = array("ward" => $ward_name, "name" => $booth, "votes" => array());
+                for($res_num = 0; $res_num < $num_candidates; $res_num++) {
+                    $cand = &$candidates[$res_num];
+                    $votes = $cols->eq($cand['offset'])->html();
+                    $booth_info['votes'][$cand['name']] = intval(trim($votes));
+                }
+                $booths[] = $booth_info;
+            }
+
+        }
+
+        $rows = array(array("WARD", "BOOTH"));
+        foreach($candidates as $candidate) {
+            $rows[0][] = $candidate['heading'];
+        }
+        foreach($booths as $booth) {
+            $row = array($booth['ward'], $booth['name']);
+            $cand_ind = 0;
+            foreach($booth['votes'] as $name => $vote) {
+                if($candidates[$cand_ind]['name'] === $name) {
+                    $row[] = $vote;
+                }
+                $cand_ind++;
+            }
+            $rows[] = $row;
+        }
+
+        $file = fopen("election_results.csv", "w");
+        foreach($rows as $row) {
+            $str = implode(',', $row) . "\r\n";
+            fwrite($file, $str);
+            //$this->log($str);
+        }
+        fclose($file);
 
     }
 

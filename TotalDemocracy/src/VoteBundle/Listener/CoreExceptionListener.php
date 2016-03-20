@@ -41,7 +41,7 @@ class CoreExceptionListener {
         // You get the exception object from the received event
         $exception = $event->getException();
 
-        $this->logger->error("CORE EXCEPTION LISTENER");
+        $this->logger->error("CORE EXCEPTION LISTENER - " . get_class($exception));
 
         // If it's not one of the exceptions we care about, rethrow
         if ($exception instanceof BadRequestException) {
@@ -49,7 +49,8 @@ class CoreExceptionListener {
         } elseif ($exception instanceof ErrorRedirectException) {
             $event->setResponse($this->getErrorRedirectResponse($exception));
         } else {
-             throw $exception;
+            $this->logger->error($exception->getMessage() . " => " . $exception->getFile() . ", line " . $exception->getLine());
+            throw $exception;
         }
     }
 

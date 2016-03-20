@@ -83,7 +83,7 @@ class RegisterController extends FOSRestController {
         $user = $userManager->createUser();
         $user->setEmail($email);
         $user->setUsername($email);
-        $user->setPlainPassword(com_create_guid());
+        $user->setPlainPassword($this->getGUID());
         $user->setConfirmationToken($this->get('fos_user.util.token_generator')->generateToken());
 
         $this->em->persist($user);
@@ -239,6 +239,24 @@ class RegisterController extends FOSRestController {
         }
 
         $this->get("logger")->info("Registration email sent to $email with URL: $register_url ");
+    }
+
+    function getGUID() {
+        if (function_exists('com_create_guid')){
+            return com_create_guid();
+        }else{
+            mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
+            $charid = strtoupper(md5(uniqid(rand(), true)));
+            $hyphen = chr(45);// "-"
+            $uuid = chr(123)// "{"
+                .substr($charid, 0, 8).$hyphen
+                .substr($charid, 8, 4).$hyphen
+                .substr($charid,12, 4).$hyphen
+                .substr($charid,16, 4).$hyphen
+                .substr($charid,20,12)
+                .chr(125);// "}"
+            return $uuid;
+        }
     }
 
 }

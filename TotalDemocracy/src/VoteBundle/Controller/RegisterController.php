@@ -224,7 +224,7 @@ class RegisterController extends FOSRestController {
             ->setTo($email)
             ->setBody(
                 $templating->render(
-                    'Emails/simple_email.html.twig',
+                    'emails/simple_email.html.twig',
                     array(
                         'header' => "Welcome to the voting platform"
                         ,'paragraphs' => $paragraphs

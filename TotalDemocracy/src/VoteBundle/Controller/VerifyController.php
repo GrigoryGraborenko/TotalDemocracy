@@ -96,6 +96,10 @@ class VerifyController extends FOSRestController {
                 ,"User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36"
         )));
 
+        if($response->getStatusCode() !== 200) {
+            throw new ErrorRedirectException("homepage", "Cannot load verification page");
+        }
+
         $cookie = explode(";", $response->getHeader("Set-Cookie")[0])[0];
 
         $crawler = new Crawler($response->getBody()->getContents());
@@ -119,6 +123,8 @@ class VerifyController extends FOSRestController {
                 ,"User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36"
             )
         ));
+
+        // TODO: test for get failure of image, and the verification finish as well.
 
         $session = $this->get('session');
         $session->set('verify.view_state', $crawler->filter('#__VIEWSTATE')->attr("value"));

@@ -2,18 +2,35 @@
 
 {% block content %}
 
-    <h1>REGISTER</h1>
+    <h1>Register for People Decide</h1>
 
-    <form action="{{ path("signup_email") }}" method="post">
-        <input type="text" name="email">
-        {% if app.session.flashbag.has('email-error') %}
-            <h4>
-                {% for error in app.session.flashbag.get('email-error') %}
-                    {{ error }}
-                {% endfor %}
-            </h4>
-        {% endif %}
-        <button type="submit">Register</button>
-    </form>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form class="form-horizontal" action="{{ path("signup_email") }}" method="post">
+
+                <div class="form-group">
+                    <label class="col-sm-1 control-label" for="email-input">Email</label>
+                    <div class="col-sm-3">
+                        <input class="form-control" type="text" id="email-input" name="email" placeholder="example@email.com">
+                    </div>
+                </div>
+                {##}
+                {% if app.session.flashbag.has('email-error') %}
+                    <h4>
+                        {% for error in app.session.flashbag.get('email-error') %}
+                            {{ error }}
+                        {% endfor %}
+                    </h4>
+                {% endif %}
+
+                <div class="form-group">
+                    <div class="col-sm-offset-1 col-sm-3">
+                        <button class="btn btn-success" type="submit">Register</button>
+                    </div>
+                </div>
+                {#<button class="btn btn-success" type="submit">Register</button>#}
+            </form>
+        </div>
+    </div>
 
 {% endblock %}

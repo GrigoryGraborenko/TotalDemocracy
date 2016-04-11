@@ -85,7 +85,8 @@ EOT
 
         $this->log("Processing Brisbane City Council...");
 
-//        $this->BCCResults();
+//        $this->container->get("vote.pdf")->processElectoralPDF('C:\0805 Coorparoo.pdf', $this->output);
+//        $this->container->get("vote.pdf")->processElectoralPDF('C:\qld15_73_mr.pdf', $this->output);
 //        return;
 
         $doc_repo = $this->em->getRepository('VoteBundle:Document');

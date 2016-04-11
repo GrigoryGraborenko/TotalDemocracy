@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "240888cb4e33002a87479f59d76a91f3",
-    "content-hash": "10fb8d9a786cb6a1c55b622d928325fe",
+    "hash": "777202ab11080d1502f3330c51659eed",
+    "content-hash": "f71bd1d9031fcdd1348719940d25a9a2",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1221,16 +1221,16 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "6.1.1",
+            "version": "6.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "c6851d6e48f63b69357cbfa55bca116448140e0c"
+                "reference": "d094e337976dff9d8e2424e8485872194e768662"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/c6851d6e48f63b69357cbfa55bca116448140e0c",
-                "reference": "c6851d6e48f63b69357cbfa55bca116448140e0c",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/d094e337976dff9d8e2424e8485872194e768662",
+                "reference": "d094e337976dff9d8e2424e8485872194e768662",
                 "shasum": ""
             },
             "require": {
@@ -1246,7 +1246,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "6.1-dev"
+                    "dev-master": "6.2-dev"
                 }
             },
             "autoload": {
@@ -1279,7 +1279,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2015-11-23 00:47:50"
+            "time": "2016-03-21 20:02:09"
         },
         {
             "name": "guzzlehttp/promises",
@@ -2038,16 +2038,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.18.1",
+            "version": "1.18.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "a5f2734e8c16f3aa21b3da09715d10e15b4d2d45"
+                "reference": "064b38c16790249488e7a8b987acf1c9d7383c09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/a5f2734e8c16f3aa21b3da09715d10e15b4d2d45",
-                "reference": "a5f2734e8c16f3aa21b3da09715d10e15b4d2d45",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/064b38c16790249488e7a8b987acf1c9d7383c09",
+                "reference": "064b38c16790249488e7a8b987acf1c9d7383c09",
                 "shasum": ""
             },
             "require": {
@@ -2062,13 +2062,13 @@
                 "doctrine/couchdb": "~1.0@dev",
                 "graylog2/gelf-php": "~1.0",
                 "jakub-onderka/php-parallel-lint": "0.9",
+                "php-amqplib/php-amqplib": "~2.4",
                 "php-console/php-console": "^3.1.3",
                 "phpunit/phpunit": "~4.5",
                 "phpunit/phpunit-mock-objects": "2.3.0",
                 "raven/raven": "^0.13",
                 "ruflin/elastica": ">=0.90 <3.0",
-                "swiftmailer/swiftmailer": "~5.3",
-                "videlalvaro/php-amqplib": "~2.4"
+                "swiftmailer/swiftmailer": "~5.3"
             },
             "suggest": {
                 "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
@@ -2077,11 +2077,11 @@
                 "ext-mongo": "Allow sending log messages to a MongoDB server",
                 "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
                 "mongodb/mongodb": "Allow sending log messages to a MongoDB server via PHP Driver",
+                "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
                 "php-console/php-console": "Allow sending log messages to Google Chrome",
                 "raven/raven": "Allow sending log messages to a Sentry server",
                 "rollbar/rollbar": "Allow sending log messages to Rollbar",
-                "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
-                "videlalvaro/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib"
+                "ruflin/elastica": "Allow sending log messages to an Elastic Search server"
             },
             "type": "library",
             "extra": {
@@ -2112,7 +2112,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-03-13 16:08:35"
+            "time": "2016-04-02 13:12:58"
         },
         {
             "name": "nesbot/carbon",
@@ -2450,16 +2450,16 @@
         },
         {
             "name": "sensio/framework-extra-bundle",
-            "version": "v3.0.14",
+            "version": "v3.0.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensiolabs/SensioFrameworkExtraBundle.git",
-                "reference": "cccf975c565ccd835bddc30a8fea5cdfe3357bf1"
+                "reference": "507a15f56fa7699f6cc8c2c7de4080b19ce22546"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sensiolabs/SensioFrameworkExtraBundle/zipball/cccf975c565ccd835bddc30a8fea5cdfe3357bf1",
-                "reference": "cccf975c565ccd835bddc30a8fea5cdfe3357bf1",
+                "url": "https://api.github.com/repos/sensiolabs/SensioFrameworkExtraBundle/zipball/507a15f56fa7699f6cc8c2c7de4080b19ce22546",
+                "reference": "507a15f56fa7699f6cc8c2c7de4080b19ce22546",
                 "shasum": ""
             },
             "require": {
@@ -2508,7 +2508,7 @@
                 "annotations",
                 "controllers"
             ],
-            "time": "2016-03-01 10:50:07"
+            "time": "2016-03-25 17:08:27"
         },
         {
             "name": "sensiolabs/security-checker",
@@ -2553,6 +2553,49 @@
             ],
             "description": "A security checker for your composer.lock",
             "time": "2015-11-07 08:07:40"
+        },
+        {
+            "name": "smalot/pdfparser",
+            "version": "v0.9.25",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smalot/pdfparser.git",
+                "reference": "31590f7938a22f1c7fc4fb292611e3742a62ebaa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smalot/pdfparser/zipball/31590f7938a22f1c7fc4fb292611e3742a62ebaa",
+                "reference": "31590f7938a22f1c7fc4fb292611e3742a62ebaa",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "tecnickcom/tcpdf": ">=6.0.050"
+            },
+            "require-dev": {
+                "atoum/atoum": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Smalot\\PdfParser\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastien MALOT",
+                    "email": "sebastien@malot.fr",
+                    "homepage": "http://www.malot.fr",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Pdf parser library. Can read and extract information from pdf file.",
+            "homepage": "http://www.pdfparser.org",
+            "time": "2015-09-18 08:29:33"
         },
         {
             "name": "stof/doctrine-extensions-bundle",
@@ -3202,16 +3245,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v3.0.3",
+            "version": "v3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "09ae53562ce8b7842206efa217ec81442975f055"
+                "reference": "4e17cb2ecb3fd637097ebeb871fc0e2cbdd5e7ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/09ae53562ce8b7842206efa217ec81442975f055",
-                "reference": "09ae53562ce8b7842206efa217ec81442975f055",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/4e17cb2ecb3fd637097ebeb871fc0e2cbdd5e7ff",
+                "reference": "4e17cb2ecb3fd637097ebeb871fc0e2cbdd5e7ff",
                 "shasum": ""
             },
             "require": {
@@ -3294,10 +3337,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
-                    "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
-                    "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
-                    "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
+                    "Symfony\\Bridge\\": "src/Symfony/Bridge/",
                     "Symfony\\Bundle\\": "src/Symfony/Bundle/",
                     "Symfony\\Component\\": "src/Symfony/Component/"
                 },
@@ -3327,7 +3367,70 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2016-02-28 21:33:29"
+            "time": "2016-03-30 10:41:14"
+        },
+        {
+            "name": "tecnickcom/tcpdf",
+            "version": "6.2.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tecnickcom/TCPDF.git",
+                "reference": "2f732eaa91b5665274689b1d40b285a7bacdc37f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/2f732eaa91b5665274689b1d40b285a7bacdc37f",
+                "reference": "2f732eaa91b5665274689b1d40b285a7bacdc37f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "fonts",
+                    "config",
+                    "include",
+                    "tcpdf.php",
+                    "tcpdf_parser.php",
+                    "tcpdf_import.php",
+                    "tcpdf_barcodes_1d.php",
+                    "tcpdf_barcodes_2d.php",
+                    "include/tcpdf_colors.php",
+                    "include/tcpdf_filters.php",
+                    "include/tcpdf_font_data.php",
+                    "include/tcpdf_fonts.php",
+                    "include/tcpdf_images.php",
+                    "include/tcpdf_static.php",
+                    "include/barcodes/datamatrix.php",
+                    "include/barcodes/pdf417.php",
+                    "include/barcodes/qrcode.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPLv3"
+            ],
+            "authors": [
+                {
+                    "name": "Nicola Asuni",
+                    "email": "info@tecnick.com",
+                    "homepage": "http://nicolaasuni.tecnick.com"
+                }
+            ],
+            "description": "TCPDF is a PHP class for generating PDF documents and barcodes.",
+            "homepage": "http://www.tcpdf.org/",
+            "keywords": [
+                "PDFD32000-2008",
+                "TCPDF",
+                "barcodes",
+                "datamatrix",
+                "pdf",
+                "pdf417",
+                "qrcode"
+            ],
+            "time": "2015-09-12 10:08:34"
         },
         {
             "name": "twig/twig",
@@ -3535,16 +3638,16 @@
         },
         {
             "name": "symfony/phpunit-bridge",
-            "version": "v2.8.3",
+            "version": "v2.8.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/phpunit-bridge.git",
-                "reference": "ee8ead4f78e21ed6c873d1cc19e141949d9ed493"
+                "reference": "a967db6a4cd5d276cf849d01b29dba559e149978"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/ee8ead4f78e21ed6c873d1cc19e141949d9ed493",
-                "reference": "ee8ead4f78e21ed6c873d1cc19e141949d9ed493",
+                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/a967db6a4cd5d276cf849d01b29dba559e149978",
+                "reference": "a967db6a4cd5d276cf849d01b29dba559e149978",
                 "shasum": ""
             },
             "require": {
@@ -3586,7 +3689,7 @@
             ],
             "description": "Symfony PHPUnit Bridge",
             "homepage": "https://symfony.com",
-            "time": "2016-01-21 09:24:53"
+            "time": "2016-03-23 13:45:24"
         }
     ],
     "aliases": [],

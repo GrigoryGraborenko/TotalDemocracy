@@ -38,8 +38,9 @@
         "jms/di-extra-bundle": "*",
         "stof/doctrine-extensions-bundle": "*",
         "doctrine/doctrine-fixtures-bundle": "dev-master",
-        "guzzlehttp/guzzle": "~6.0"
+        "guzzlehttp/guzzle": "~6.0",
 
+        "smalot/pdfparser": "*"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

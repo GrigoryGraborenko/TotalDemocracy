@@ -31,6 +31,7 @@ use VoteBundle\Exception\BadRequestException;
  * Checkbox for "live here"
  * when registering you need to put tick box that somone has accepted terms and conditions http://www.karelboele.com/ is more up to date
  * before verify button you need comment "When you click verify you are asking us to submit your details to the Australian Electoral Commission website to verify and save your enrollment details on our system."
+ * what about metadata on electoral roll import?
  *
  * TODO:
  * do g_initial data JS stuff, it's pretty useful

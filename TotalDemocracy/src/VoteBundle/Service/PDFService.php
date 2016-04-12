@@ -45,35 +45,25 @@ class PDFService
         $this->logger = $logger;
     }
 
+    /**
+     * @param $filename
+     * @return array
+     * @throws \Exception
+     */
+    public function processElectoralPDF($filename) {
 
-    public function processElectoralPDF($filename, $temp_logger) {
-
-//        $tst = "....";
-//        $temp_logger->write(intval($tst), true);
-//        if(is_numeric($tst)) {
-//            $temp_logger->write("is number", true);
-//        }
-//        return;
+        $street_types = array("St", "Rd", "Ave", "Tce", "Cres", "Cl", "Pl", "Ln", "Dr", "Ct", "La");
 
         $parser = new \Smalot\PdfParser\Parser();
         $pdf = $parser->parseFile($filename);
 
-        $current_font = new \Smalot\PdfParser\Font($pdf);
-
         $page_list  = $pdf->getPages();
 
-//        $text = $this->getPDFPageText($pages[2]);
-//        $pages = array($page_list[2], $page_list[3]);
-
-        $pages = array_slice($page_list, 2, 1);
-//        $pages = array_slice($page_list, 2);
+        $pages = array_slice($page_list, 2, 2);
 
         $segments = array();
         foreach($pages as $page) {
 
-//            $texts = $page->getText();
-//            $this->logger->info("INFOx: " . $page->getContent());
-            //$texts = $this->getPDFText($page, $current_font, $recursion_stack);
             $texts = $this->getPDFPageText($page, $pdf);
 
             foreach ($texts as $text) {
@@ -84,15 +74,13 @@ class PDFService
                     }
                 }
             }
-
-            $temp_logger->write("read page", true);
-
         }
 
         $index = 0;
         $sub_index = 0;
         $current_entry = NULL;
         $entries = array();
+        $suburbs = array();
 
         foreach($segments as $segment) {
             if($current_entry === NULL) {
@@ -109,30 +97,79 @@ class PDFService
                 }
             } else if($sub_index === 1) {
                 $current_entry['name'] = $segment;
+                $current_entry['surname'] = array();
+                $current_entry['given_names'] = array();
+                $on_surname = true;
+                foreach(explode(" ", $segment) as $chunk) {
+                    if((strtoupper($chunk) === $chunk) && $on_surname) {
+                        $current_entry['surname'][] = $chunk;
+                    } else {
+                        $current_entry['given_names'][] = $chunk;
+                        $on_surname = false;
+                    }
+                }
+                $current_entry['surname'] = implode(" ", $current_entry['surname']);
+                $current_entry['given_names'] = implode(" ", $current_entry['given_names']);
+
                 $sub_index++;
             } else if($sub_index === 2) {
                 $current_entry['address'] = $segment;
+                $current_entry['unit'] = NULL;
+                $current_entry['street_number'] = NULL;
+                $current_entry['street'] = NULL;
+                $current_entry['street_type'] = NULL;
+                $current_entry['suburb'] = NULL;
+                if($segment !== "Address Suppressed") {
+                    $chunks = explode(" ", $segment);
+                    $number = array_shift($chunks);
+                    if(is_numeric($number)) {
+                        $current_entry['street_number'] = intval($number);
+                    } else {
+                        $number = explode("/", $number);
+                        if(count($number) >= 2) {
+                            $current_entry['unit'] = intval($number[0]);
+                            $current_entry['street_number'] = intval($number[1]);
+                        }
+                    }
+                    for($i = 1; $i < count($chunks); $i++) {
+                        if(in_array($chunks[$i], $street_types)) {
+                            break;
+                        }
+                    }
+                    if($i < count($chunks)) { // normal address
+                        $current_entry['street'] = implode(" ", array_slice($chunks, 0, $i));
+                        $current_entry['street_type'] = $chunks[$i];
+                        $current_entry['suburb'] = implode(" ", array_slice($chunks, $i + 1));
+                        if(!in_array($current_entry['suburb'], $suburbs)) {
+                            $suburbs[] = $current_entry['suburb'];
+                        }
+                    } else { // unusual address, assume everything other than suburb name is the "street" name of unknown type
 
+                        $full = implode(" ", $chunks);
+                        foreach($suburbs as $suburb) {
+                            $pos = strpos($full, $suburb);
+                            if($pos !== false) {
+                                $current_entry['suburb'] = substr($full, $pos);
+                                $current_entry['street'] = substr($full, 0, $pos);
+                                $current_entry['street_type'] = "UNKNOWN";
+                                break;
+                            }
+                        }
+
+                        if($current_entry['suburb'] === NULL) {
+                            return ("Street type not found in " . $full);
+                        }
+                    }
+                }
                 $entries[] = $current_entry;
-
                 $current_entry = NULL;
             }
-            //$temp_logger->write(json_encode($segment), true);
         }
 
-        $temp_logger->write("complete, found " . count($entries), true);
-
-        foreach($entries as $entry) {
-            $temp_logger->write(json_encode($entry), true);
-        }
-
-//        $temp_logger->write("===========", true);
-//        foreach($misc as $entry) {
-//            $temp_logger->write(json_encode($entry), true);
-//        }
-
-        //$temp_logger->write(json_encode($text), true);
-        //$temp_logger->write($text, true);
+        return array(
+            "entries" => $entries
+            ,"suburbs" => $suburbs
+        );
     }
 
     /**

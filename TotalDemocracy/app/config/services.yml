@@ -17,3 +17,6 @@ services:
     vote.pdf:
         class: VoteBundle\Service\PDFService
         arguments: ["@doctrine.orm.entity_manager", "@service_container", "@logger"]
+    vote.electoral_roll:
+        class: VoteBundle\Service\ElectoralRollService
+        arguments: ["@doctrine.orm.entity_manager", "@service_container", "@logger"]

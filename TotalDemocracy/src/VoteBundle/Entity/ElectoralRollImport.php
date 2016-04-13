@@ -17,7 +17,7 @@ use JMS\Serializer\Annotation\Expose;
  * An entry from an electoral roll that was imported
  *
  * @ORM\Entity
- * @ORM\Table(name="electoral_roll_import")
+ * @ORM\Table(name="electoral_roll_import", indexes={@ORM\Index(name="import_idx", columns={"valid_date", "surname", "given_names"})})
  */
 class ElectoralRollImport {
 
@@ -37,7 +37,7 @@ class ElectoralRollImport {
     /**
      * @ORM\Column(type="datetime", nullable=false)
      */
-    protected $validDate;
+    protected $valid_date;
 
     /**
      * @ORM\Column(type="string", nullable=false)
@@ -47,7 +47,7 @@ class ElectoralRollImport {
     /**
      * @ORM\Column(type="string", nullable=false)
      */
-    protected $givenNames;
+    protected $given_names;
 
     /**
      * @ORM\Column(type="text", nullable=false)
@@ -97,9 +97,9 @@ class ElectoralRollImport {
      * @param $DOB
      */
     public function __construct($validDate, $surname, $givenNames, $json, $unitNumber = NULL, $streetNumber = NULL, $street = NULL, $streetType = NULL, $suburb = NULL, $DOB = NULL) {
-        $this->validDate = $validDate;
+        $this->valid_date = $validDate;
         $this->surname = $surname;
-        $this->givenNames = $givenNames;
+        $this->given_names = $givenNames;
         $this->json = $json;
         $this->unitNumber = $unitNumber;
         $this->streetNumber = $streetNumber;
@@ -127,14 +127,14 @@ class ElectoralRollImport {
      * @return mixed
      */
     public function getValidDate() {
-        return $this->validDate;
+        return $this->valid_date;
     }
 
     /**
      * @param mixed $validDate
      */
     public function setValidDate($validDate) {
-        $this->validDate = $validDate;
+        $this->valid_date = $validDate;
     }
 
     /**
@@ -155,14 +155,14 @@ class ElectoralRollImport {
      * @return mixed
      */
     public function getGivenNames() {
-        return $this->givenNames;
+        return $this->given_names;
     }
 
     /**
      * @param mixed $givenNames
      */
     public function setGivenNames($givenNames) {
-        $this->givenNames = $givenNames;
+        $this->given_names = $givenNames;
     }
 
     /**

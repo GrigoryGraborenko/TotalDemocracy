@@ -22,9 +22,6 @@ use Symfony\Component\DomCrawler\Crawler;
 
 use VoteBundle\Entity\Document;
 
-// TODO: remove me
-//use VoteBundle\Entity\ElectoralRollImport;
-
 /**
  * Class ScrapeCommand
  * @package VoteBundle\Command
@@ -88,26 +85,12 @@ EOT
 
         $this->log("Processing Brisbane City Council...");
 
-        /*
-        $result = $this->container->get("vote.pdf")->processElectoralPDF('C:\0805 Coorparoo.pdf', $this->output);
+//        $result = $this->container->get("vote.pdf")->processElectoralPDF('C:\0805 Coorparoo.pdf', $this->output);
+//        $result = $this->container->get("vote.pdf")->processElectoralPDF('C:\Electoral\0801 Bracken Ridge.pdf', $this->output);
 //        $result = $this->container->get("vote.pdf")->processElectoralPDF('C:\qld15_73_mr.pdf', $this->output);
-        if(is_string($result)) {
-            $this->log("ERROR: " . $result);
-        } else {
-            $now = Carbon::now("UTC");
-            foreach($result['entries'] as $entry) {
-                $json = array(
-                    "index" => $entry['index']
-                    ,"name" => $entry['name']
-                    ,"address" => $entry['address']
-                );
-                $record = new ElectoralRollImport($now, $entry['surname'], $entry['given_names'], json_encode($json), $entry['unit'], $entry['street_number'], $entry['street'], $entry['street_type'], $entry['suburb']);
-                $this->em->persist($record);
-            }
-            $this->log("SUBURBS: " . json_encode($result['suburbs']), true);
-            $this->em->flush();
-        }
-        return;*/
+
+//        $this->container->get('vote.electoral_roll')->processDirectory("C:\\Electoral\\");
+//        return;
 
         $doc_repo = $this->em->getRepository('VoteBundle:Document');
         $domain = $this->em->getRepository('VoteBundle:Domain')->findOneBy(array("name" => "BRISBANE CITY"));;

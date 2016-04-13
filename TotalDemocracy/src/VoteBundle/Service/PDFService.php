@@ -8,6 +8,7 @@
 
 namespace VoteBundle\Service;
 
+use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
 
 use Smalot\PdfParser;
@@ -52,22 +53,40 @@ class PDFService
      */
     public function processElectoralPDF($filename) {
 
-        $street_types = array("St", "Rd", "Ave", "Tce", "Cres", "Cl", "Pl", "Ln", "Dr", "Ct", "La");
+        $street_types = array("St", "Rd", "Ave", "Tce", "Cres", "Cl", "Pl", "Ln", "Dr", "Ct", "La", "Crct", "Blvd", "Pde", "Way", "Pkwy", "Esp");
 
         $parser = new \Smalot\PdfParser\Parser();
         $pdf = $parser->parseFile($filename);
 
         $page_list  = $pdf->getPages();
 
-        $pages = array_slice($page_list, 2, 2);
+        // get the date that the roll is valid for
+        $cover_texts = explode(" ", $page_list[0]->getText()); // text comes from the PDF library with extra spaces
+        $day_array = array();
+        $month_array = array();
+        $year_array = array();
+        foreach($cover_texts as $text) {
+            if(is_numeric($text)) {
+                if(count($month_array) > 0) {
+                    $year_array[] = $text;
+                } else {
+                    $day_array[] = $text;
+                }
+            } else if(count($day_array) > 0) {
+                $month_array[] = $text;
+            }
+        }
+        $valid_date = implode("", $day_array) . " " . implode("", $month_array) . " " . implode("", $year_array);
+        $valid_date = Carbon::parse($valid_date, "UTC");
 
+        $pages = array_slice($page_list, 2);
         $segments = array();
         foreach($pages as $page) {
 
-            $texts = $this->getPDFPageText($page, $pdf);
+            $texts = $this->getPDFPageText($page, $pdf); // custom re-write of library code
 
             foreach ($texts as $text) {
-                $sections = explode('|', $text);
+                $sections = explode('|', $text); // split by the arbitrary delimiter picked
                 if (count($sections) >= 2) {
                     foreach ($sections as $section) {
                         $segments[] = $section;
@@ -75,6 +94,10 @@ class PDFService
                 }
             }
         }
+
+        unset($parser);
+        unset($pdf);
+        unset($page_list);
 
         $index = 0;
         $sub_index = 0;
@@ -131,12 +154,12 @@ class PDFService
                             $current_entry['street_number'] = intval($number[1]);
                         }
                     }
-                    for($i = 1; $i < count($chunks); $i++) {
+                    for($i = 1; $i < (count($chunks) - 1); $i++) {
                         if(in_array($chunks[$i], $street_types)) {
                             break;
                         }
                     }
-                    if($i < count($chunks)) { // normal address
+                    if($i < (count($chunks) - 1)) { // normal address
                         $current_entry['street'] = implode(" ", array_slice($chunks, 0, $i));
                         $current_entry['street_type'] = $chunks[$i];
                         $current_entry['suburb'] = implode(" ", array_slice($chunks, $i + 1));
@@ -156,8 +179,9 @@ class PDFService
                             }
                         }
 
-                        if($current_entry['suburb'] === NULL) {
-                            return ("Street type not found in " . $full);
+                        if($current_entry['suburb'] === NULL) { // chances are the suburb name was shortened
+                            $current_entry['street'] = $full;
+                            $current_entry['street_type'] = "UNKNOWN";
                         }
                     }
                 }
@@ -169,6 +193,7 @@ class PDFService
         return array(
             "entries" => $entries
             ,"suburbs" => $suburbs
+            ,"valid_date" => $valid_date
         );
     }
 
@@ -236,9 +261,6 @@ class PDFService
 
         //array_push($recursion_stack, $object->getUniqueId());
         array_push($recursion_stack, spl_object_hash($object));
-
-        //$this->logger->info("NUM SEC: " . count($sections));
-        $this->logger->info("INFO: " . $object->getContent());
 
         foreach ($sections as $section) {
 

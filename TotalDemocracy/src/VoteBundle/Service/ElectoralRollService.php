@@ -155,19 +155,19 @@ class ElectoralRollService
                 if($en->getUnitNumber() !== NULL) {
                     $address = $en->getUnitNumber() . "/" . $address;
                 }
+                $title = ($person['sex'] === "F") ? "Ms" : (($person['sex'] === "M") ? "Mr" : "");
 
                 $party_data = array(
-                    ""
+                    $title
                     ,$en->getGivenNames()
                     ,$en->getSurname()
                     ,$person['born_at']
                     ,$person["phone_number"]
                     ,$person["work_phone_number"]
+                    ,"" // fax
                     ,$person["mobile_number"]
-                    ,""
                     ,$person['email']
                     ,$address
-                    ,""
                     ,""
                     ,""
                     ,$person['primary_city']

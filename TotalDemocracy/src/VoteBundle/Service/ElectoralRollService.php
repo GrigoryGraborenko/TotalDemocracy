@@ -45,6 +45,36 @@ class ElectoralRollService
     }
 
     public function processNationBuilder($filename) {
+
+        $handle = fopen($filename, "r");
+        if(!$handle) {
+            return false;
+        }
+        $headers = NULL;
+        $people = array();
+        while(($line = fgets($handle)) !== false) {
+
+            $chunks = explode(",", $line);
+            if($headers === NULL) {
+                $headers = $chunks;
+                continue;
+            }
+            $details = array();
+            $min_len = min(count($headers), count($chunks));
+            for($i = 0; $i < $min_len; $i++) {
+                $details[$headers[$i]] = $chunks[$i];
+            }
+            $people[] = $details;
+        }
+        fclose($handle);
+
+        foreach($people as $person) {
+            $name = $person["first_name"] . " " . $person["middle_name"] . " " . $person["last_name"];
+            $this->logger->info($name);
+        }
+        //$this->logger->info(json_encode($details));
+        // process the line read.
+
         //file_get_contents();
     }
 
@@ -56,14 +86,13 @@ class ElectoralRollService
         $files = scandir($dirname);
 
 //        $files = array('0801 Bracken Ridge.pdf');
-//        $files = array('0803 Central.pdf');
-//        $files = array_slice($files, 3);
+//        $files = array('0819 Paddington.pdf');
 
         foreach($files as $file) {
             if(substr($file, -4) !== ".pdf") {
                 continue;
             }
-            $this->processFile($dirname . $file);
+            $this->processFile($dirname . $file, $file);
         }
 
     }
@@ -71,12 +100,10 @@ class ElectoralRollService
     /**
      * @param $filename
      */
-    public function processFile($filename) {
+    public function processFile($filepath, $filename) {
 
         $this->logger->info("Reading $filename");
-        $result = $this->container->get("vote.pdf")->processElectoralPDF($filename);
-
-        $this->logger->info("Pre Mem: " . number_format(memory_get_usage() / (1024 * 1024), 3) . " mb");
+        $result = $this->container->get("vote.pdf")->processElectoralPDF($filepath);
 
         $roll_repo = $this->em->getRepository('VoteBundle:ElectoralRollImport');
         if(is_string($result)) {
@@ -101,6 +128,7 @@ class ElectoralRollService
                     }
                 }
                 if($found) {
+                    $this->logger->info("Skipped: " . json_encode($entry));
                     continue;
                 }
 
@@ -118,8 +146,6 @@ class ElectoralRollService
             $this->em->clear();
 
             $this->logger->info("Persisted: $persisted");
-
-            $this->logger->info("Post Mem: " . number_format(memory_get_usage() / (1024 * 1024), 3) . " mb");
 
             $this->logger->info("SUBURBS: " . json_encode($result['suburbs']));
         }

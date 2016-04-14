@@ -44,6 +44,10 @@ class ElectoralRollService
         $this->logger = $logger;
     }
 
+    /**
+     * @param $filename
+     * @return bool
+     */
     public function processNationBuilder($filename) {
 
         $handle = fopen($filename, "r");
@@ -52,9 +56,12 @@ class ElectoralRollService
         }
         $headers = NULL;
         $people = array();
+        $scanned = 0;
         while(($line = fgets($handle)) !== false) {
 
-            $chunks = explode(",", $line);
+            //$chunks = explode(",", $line);
+            $chunks = $this->SplitCSVString($line); // handles inline commas
+
             if($headers === NULL) {
                 $headers = $chunks;
                 continue;
@@ -64,18 +71,167 @@ class ElectoralRollService
             for($i = 0; $i < $min_len; $i++) {
                 $details[$headers[$i]] = $chunks[$i];
             }
+            $details["_LINE"] = $line;
+            $scanned++;
+
+            if($details["primary_state"] !== "QLD") {
+                continue;
+            }
+            if( ($details["primary_city"] === "") ||
+                ($details["primary_zip"] === "") ||
+                ($details["email"] === "")
+                ) {
+                continue;
+            }
+            if( ($details["phone_number"] === "") &&
+                ($details["work_phone_number"] === "") &&
+                ($details["mobile_number"] === "")
+            ) {
+                continue;
+            }
+
             $people[] = $details;
         }
         fclose($handle);
 
-        foreach($people as $person) {
-            $name = $person["first_name"] . " " . $person["middle_name"] . " " . $person["last_name"];
-            $this->logger->info($name);
-        }
-        //$this->logger->info(json_encode($details));
-        // process the line read.
+        $this->logger->info("Scanned $scanned people");
+        $this->logger->info("Found " . count($people) . " suitable people");
 
-        //file_get_contents();
+        $roll_repo = $this->em->getRepository('VoteBundle:ElectoralRollImport');
+
+        $matches = array("DIRECT" => array(), 'INDIRECT' => array());
+        foreach($people as $person) {
+
+            $first_name = $person["first_name"];
+            if($person["middle_name"] != "") {
+                $first_name .= " " . $person["middle_name"];
+            }
+            $enrollments = $roll_repo->getBySurnameAndSimilarFirstName($person["last_name"], $first_name);
+            if(count($enrollments) <= 0) {
+                continue;
+            }
+            $found_address = false;
+            foreach($enrollments as $enrolment) {
+                if(($enrolment->getStreetNumber() . " " . $enrolment->getStreet() . " " . $enrolment->getStreetType()) !== $person["primary_address1"]) {
+                    continue;
+                }
+//                if(($enrolment->getUnitNumber() !== NULL) && ($enrolment->getUnitNumber() !== $person["primary_address2"])) {
+//                    continue;
+//                }
+                $found_address = true;
+                $matches['DIRECT'][] = array("person" => $person, "enrollment" => $enrolment);
+                break;
+                //$this->logger->info("Person: " . $enrolment->getSurname() . ", " . $enrolment->getGivenNames() . ": " . $enrolment->getUnitNumber() . "/" . $enrolment->getStreetNumber() . " " . $enrolment->getStreet() . " " . $enrolment->getStreetType() . " " . $enrolment->getSuburb());
+            }
+            if((!$found_address) && (count($enrollments) === 1)) {
+                $matches['INDIRECT'][] = array("person" => $person, "enrollment" => $enrollments[0]);
+            }
+
+            // there is only one person and their address matches
+            // there is only one person and their address does not match
+            // there are multiple people and one address matches
+        }
+
+        $this->logger->info("Directly Matched " . count($matches['DIRECT']) . " people");
+        $this->logger->info("Indirectly Matched " . count($matches['INDIRECT']) . " people");
+
+        foreach($matches as $type => $match_list) {
+
+            $file_original = fopen("$type-original.csv", 'w');
+            $file_party = fopen("$type-party.csv", 'w');
+
+            fwrite($file_original, implode(",", $headers));
+
+            fwrite($file_party, implode(",", array("Title", "First Name", "Surname", "Date of Birth", "Phone Number Home", "Phone Number Work", "Fax Number", "Mobile Number", "Email", "Address Line 1", "Address Line 2", "Address Line 3", "Suburb", "State", "Postcode")) . "\n");
+
+            foreach($match_list as $match) {
+                $person = $match['person'];
+                $en = $match['enrollment'];
+//                $en_str = $en->getSurname() . ", " . $en->getGivenNames() . ": " . $en->getUnitNumber() . "/" . $en->getStreetNumber() . " " . $en->getStreet() . " " . $en->getStreetType() . " " . $en->getSuburb();
+
+                fwrite($file_original, $person['_LINE']);
+
+                $address = $en->getStreetNumber() . " " . $en->getStreet() . " " . $en->getStreetType();
+                if($en->getUnitNumber() !== NULL) {
+                    $address = $en->getUnitNumber() . "/" . $address;
+                }
+
+                $party_data = array(
+                    ""
+                    ,$en->getGivenNames()
+                    ,$en->getSurname()
+                    ,$person['born_at']
+                    ,$person["phone_number"]
+                    ,$person["work_phone_number"]
+                    ,$person["mobile_number"]
+                    ,""
+                    ,$person['email']
+                    ,$address
+                    ,""
+                    ,""
+                    ,""
+                    ,$person['primary_city']
+                    ,$person['primary_state']
+                    ,$person['primary_zip']
+                );
+
+                fwrite($file_party, implode(",", $party_data) . "\n");
+
+//                $this->logger->info("$type: [" . $en_str . "] " . $person["first_name"] . " " . $person["middle_name"] . " " . $person["last_name"] . ", " . $person["primary_address2"] . "/" . $person["primary_address1"] . ', ' . $person["primary_city"] . ', ' . $person["primary_zip"]);
+            }
+        }
+    }
+
+    /**
+     * @param $str
+     * @return array
+     */
+    public function SplitCSVString($str) {
+
+        $len = strlen($str);
+        if($len == 0) {
+            return array();
+        }
+
+        $res = array();
+        $curr = '';
+        $lev = 0;
+        $escape = false;
+        for($i = 0; $i < $len; $i++) {
+            $c = $str[$i];
+            if($c === '\\') {
+                $escape = true;
+            } else if($c === '"') {
+                if($escape) {
+                    $curr .= $c;
+                } else {
+                    $lev++;
+                    if($lev > 2) {
+                        $lev = 1;
+                        $curr .= $c;
+                    }
+                }
+                $escape = false;
+            } else if($c === ',') {
+                if($lev == 1) {
+                    $curr .= $c;
+                } else {
+                    $res[] = $curr;
+                    $curr = '';
+                    $lev = 0;
+                }
+                $escape = false;
+            } else {
+                $curr .= $c;
+                if($lev == 2) {
+                    $lev = 0;
+                }
+                $escape = false;
+            }
+        }
+        $res[] = $curr;
+
+        return $res;
     }
 
     /**
@@ -84,9 +240,6 @@ class ElectoralRollService
     public function processDirectory($dirname) {
 
         $files = scandir($dirname);
-
-//        $files = array('0801 Bracken Ridge.pdf');
-//        $files = array('0819 Paddington.pdf');
 
         foreach($files as $file) {
             if(substr($file, -4) !== ".pdf") {
@@ -150,6 +303,4 @@ class ElectoralRollService
             $this->logger->info("SUBURBS: " . json_encode($result['suburbs']));
         }
     }
-
-
 }

@@ -16,7 +16,7 @@ use JMS\Serializer\Annotation\Expose;
 /**
  * An entry from an electoral roll that was imported
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="VoteBundle\Repository\ElectoralRollImportRepository")
  * @ORM\Table(name="electoral_roll_import", indexes={@ORM\Index(name="import_idx", columns={"valid_date", "surname", "given_names"}), @ORM\Index(name="surname_idx", columns={"surname"})})
  */
 class ElectoralRollImport {

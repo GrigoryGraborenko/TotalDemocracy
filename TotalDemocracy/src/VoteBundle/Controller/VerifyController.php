@@ -111,7 +111,17 @@ class VerifyController extends FOSRestController {
             mkdir($temp_img_dir, 0777, true);
         }
 
-        $filename = "$temp_img_dir/" . Carbon::now("UTC")->timestamp . "_" . mt_rand(0, 100000) . ".jpeg";
+        // delete older files
+        $now_timestamp = Carbon::now("UTC")->timestamp;
+        $previous_files = scandir($temp_img_dir);
+        foreach($previous_files as $previous) {
+            $prior_timestamp = explode("-", $previous)[0];
+            if(is_numeric($prior_timestamp) && (($now_timestamp - intval($prior_timestamp)) > 30)) {
+                unlink("$temp_img_dir/$previous");
+            }
+        }
+
+        $filename = "$temp_img_dir/$now_timestamp-" . mt_rand(0, 100000) . ".jpeg";
         $output['image'] = "/$filename";
 
         $myFile = fopen($filename,"w");

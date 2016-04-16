@@ -13,7 +13,6 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
- * Remove old images
  * Preserve wrong data between errors
  * Some way to log out of "new user" mode
  * Show all, even stuff you can't vote on, if you choose

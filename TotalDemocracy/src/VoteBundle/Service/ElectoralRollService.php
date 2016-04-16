@@ -67,12 +67,21 @@ class ElectoralRollService
                 continue;
             }
             $details = array();
-            $min_len = min(count($headers), count($chunks));
-            for($i = 0; $i < $min_len; $i++) {
+
+            $chunk_count = count($chunks);
+            if(count($headers) !== $chunk_count) {
+                $this->logger->info("Incorrect number of chunks, found $chunk_count, should be " . count($headers) . ": " . json_encode($chunks));
+                continue;
+            }
+            for($i = 0; $i < $chunk_count; $i++) {
                 $details[$headers[$i]] = $chunks[$i];
             }
             $details["_LINE"] = $line;
             $scanned++;
+
+//            if(($details["support_level"] === "1") && ($details["primary_state"] !== "QLD")) {
+//                $this->logger->info("STRONG OUTSIDE QLD: " . json_encode($chunks));
+//            }
 
             if($details["primary_state"] !== "QLD") {
                 continue;
@@ -97,6 +106,18 @@ class ElectoralRollService
         $this->logger->info("Scanned $scanned people");
         $this->logger->info("Found " . count($people) . " suitable people");
 
+        $people_sort = function($a, $b) {
+//            return strnatcmp($a['last_name'], $b['last_name']);
+            $a_date = Carbon::parse($a['created_at']);
+            $b_date = Carbon::parse($b['created_at']);
+            if($a_date->gte($b_date)) {
+                return -1;
+            } else {
+                return 1;
+            }
+        };
+        usort($people, $people_sort);
+
         $roll_repo = $this->em->getRepository('VoteBundle:ElectoralRollImport');
 
         $matches = array("DIRECT" => array(), 'INDIRECT' => array());
@@ -119,13 +140,23 @@ class ElectoralRollService
 //                    continue;
 //                }
                 $found_address = true;
-                $matches['DIRECT'][] = array("person" => $person, "enrollment" => $enrolment);
+                if(count($enrollments) > 1) {
+                    $matches['INDIRECT'][] = array("person" => $person, "enrollment" => $enrolment);
+                }
+//                $matches['DIRECT'][] = array("person" => $person, "enrollment" => $enrolment);
                 break;
                 //$this->logger->info("Person: " . $enrolment->getSurname() . ", " . $enrolment->getGivenNames() . ": " . $enrolment->getUnitNumber() . "/" . $enrolment->getStreetNumber() . " " . $enrolment->getStreet() . " " . $enrolment->getStreetType() . " " . $enrolment->getSuburb());
             }
-            if((!$found_address) && (count($enrollments) === 1)) {
-                $matches['INDIRECT'][] = array("person" => $person, "enrollment" => $enrollments[0]);
+            if(count($enrollments) === 1) {
+                $type = "INDIRECT";
+                if(($person["middle_name"] != "") && $found_address) {
+                    $type = "DIRECT";
+                }
+                $matches[$type][] = array("person" => $person, "enrollment" => $enrollments[0]);
             }
+//            if((!$found_address) && (count($enrollments) === 1)) {
+//                $matches['INDIRECT'][] = array("person" => $person, "enrollment" => $enrollments[0]);
+//            }
 
             // there is only one person and their address matches
             // there is only one person and their address does not match
@@ -134,6 +165,21 @@ class ElectoralRollService
 
         $this->logger->info("Directly Matched " . count($matches['DIRECT']) . " people");
         $this->logger->info("Indirectly Matched " . count($matches['INDIRECT']) . " people");
+
+        $phone_format = function($number) {
+            $filtered = filter_var($number, FILTER_SANITIZE_NUMBER_INT) . "";
+//            $this->logger->info("NUMBER $number -> " . $filtered);
+            if($filtered === "") {
+                return "";
+            }
+            if(strlen($filtered) < 9) {
+                return "ERROR";
+            }
+            if(strlen($filtered) == 9) {
+                $filtered = "0" . $filtered;
+            }
+            return "'$filtered";
+        };
 
         foreach($matches as $type => $match_list) {
 
@@ -161,11 +207,11 @@ class ElectoralRollService
                     $title
                     ,$en->getGivenNames()
                     ,$en->getSurname()
-                    ,$person['born_at']
-                    ,$person["phone_number"]
-                    ,$person["work_phone_number"]
+                    ,"'" . Carbon::parse($person['born_at'])->format("d/m/Y")
+                    ,$phone_format($person["phone_number"])
+                    ,$phone_format($person["work_phone_number"])
                     ,"" // fax
-                    ,$person["mobile_number"]
+                    ,$phone_format($person["mobile_number"])
                     ,$person['email']
                     ,$address
                     ,""

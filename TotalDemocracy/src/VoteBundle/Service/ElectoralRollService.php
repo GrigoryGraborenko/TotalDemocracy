@@ -54,13 +54,17 @@ class ElectoralRollService
         if(!$handle) {
             return false;
         }
+        $matches = array("DIRECT" => array(), 'INDIRECT' => array());
+
         $headers = NULL;
         $people = array();
         $scanned = 0;
+
         while(($line = fgets($handle)) !== false) {
 
             //$chunks = explode(",", $line);
-            $chunks = $this->SplitCSVString($line); // handles inline commas
+            //$chunks = $this->SplitCSVString($line); // handles inline commas
+            $chunks = str_getcsv($line);
 
             if($headers === NULL) {
                 $headers = $chunks;
@@ -82,6 +86,10 @@ class ElectoralRollService
 //            if(($details["support_level"] === "1") && ($details["primary_state"] !== "QLD")) {
 //                $this->logger->info("STRONG OUTSIDE QLD: " . json_encode($chunks));
 //            }
+            if(($details["primary_state"] !== "QLD") && ($details["support_level"] === "1")) {
+                $matches['DIRECT'][] = array("person" => $details, "enrollment" => NULL);
+            }
+//            continue;
 
             if($details["primary_state"] !== "QLD") {
                 continue;
@@ -120,12 +128,12 @@ class ElectoralRollService
 
         $roll_repo = $this->em->getRepository('VoteBundle:ElectoralRollImport');
 
-        $matches = array("DIRECT" => array(), 'INDIRECT' => array());
         foreach($people as $person) {
 
             $first_name = $person["first_name"];
+            $given_names = $first_name;
             if($person["middle_name"] != "") {
-                $first_name .= " " . $person["middle_name"];
+                $given_names .= " " . $person["middle_name"];
             }
             $enrollments = $roll_repo->getBySurnameAndSimilarFirstName($person["last_name"], $first_name);
             if(count($enrollments) <= 0) {
@@ -140,23 +148,20 @@ class ElectoralRollService
 //                    continue;
 //                }
                 $found_address = true;
-                if(count($enrollments) > 1) {
-                    $matches['INDIRECT'][] = array("person" => $person, "enrollment" => $enrolment);
-                }
-//                $matches['DIRECT'][] = array("person" => $person, "enrollment" => $enrolment);
+                $matches['DIRECT'][] = array("person" => $person, "enrollment" => $enrolment);
                 break;
                 //$this->logger->info("Person: " . $enrolment->getSurname() . ", " . $enrolment->getGivenNames() . ": " . $enrolment->getUnitNumber() . "/" . $enrolment->getStreetNumber() . " " . $enrolment->getStreet() . " " . $enrolment->getStreetType() . " " . $enrolment->getSuburb());
             }
-            if(count($enrollments) === 1) {
-                $type = "INDIRECT";
-                if(($person["middle_name"] != "") && $found_address) {
-                    $type = "DIRECT";
-                }
-                $matches[$type][] = array("person" => $person, "enrollment" => $enrollments[0]);
-            }
-//            if((!$found_address) && (count($enrollments) === 1)) {
-//                $matches['INDIRECT'][] = array("person" => $person, "enrollment" => $enrollments[0]);
+//            if(count($enrollments) === 1) {
+//                $type = "INDIRECT";
+//                if(($person["middle_name"] != "") && $found_address) {
+//                    $type = "DIRECT";
+//                }
+//                $matches[$type][] = array("person" => $person, "enrollment" => $enrollments[0]);
 //            }
+            if((!$found_address) && (count($enrollments) === 1) && ($person["middle_name"] != "") && (strpos($enrolment->getGivenNames(), $given_names) === 0)) {
+                $matches['INDIRECT'][] = array("person" => $person, "enrollment" => $enrollments[0]);
+            }
 
             // there is only one person and their address matches
             // there is only one person and their address does not match
@@ -184,29 +189,40 @@ class ElectoralRollService
         foreach($matches as $type => $match_list) {
 
             $file_original = fopen("$type-original.csv", 'w');
-            $file_party = fopen("$type-party.csv", 'w');
+            $file_party = NULL;
 
             fwrite($file_original, implode(",", $headers));
 
-            fwrite($file_party, implode(",", array("Title", "First Name", "Surname", "Date of Birth", "Phone Number Home", "Phone Number Work", "Fax Number", "Mobile Number", "Email", "Address Line 1", "Address Line 2", "Address Line 3", "Suburb", "State", "Postcode")) . "\n");
-
+            $num_matches = 0;
             foreach($match_list as $match) {
+
+                if($file_party === NULL) {
+                    $file_party = fopen("$type-party-$num_matches.csv", 'w');
+                    fwrite($file_party, implode(",", array("Title", "First Name", "Surname", "Date of Birth", "Phone Number Home", "Phone Number Work", "Fax Number", "Mobile Number", "Email", "Address Line 1", "Address Line 2", "Address Line 3", "Suburb", "State", "Postcode")) . "\n");
+                }
+
                 $person = $match['person'];
                 $en = $match['enrollment'];
 //                $en_str = $en->getSurname() . ", " . $en->getGivenNames() . ": " . $en->getUnitNumber() . "/" . $en->getStreetNumber() . " " . $en->getStreet() . " " . $en->getStreetType() . " " . $en->getSuburb();
 
                 fwrite($file_original, $person['_LINE']);
 
-                $address = $en->getStreetNumber() . " " . $en->getStreet() . " " . $en->getStreetType();
-                if($en->getUnitNumber() !== NULL) {
-                    $address = $en->getUnitNumber() . "/" . $address;
+                if($en !== NULL) {
+                    $address = $en->getStreetNumber() . " " . $en->getStreet() . " " . $en->getStreetType();
+                    if ($en->getUnitNumber() !== NULL) {
+                        $address = $en->getUnitNumber() . "/" . $address;
+                    }
+                    $given_names = $en->getGivenNames();
+                } else {
+                    $given_names = $person["first_name"] . " " . $person["middle_name"];
+                    $address = $person["primary_address1"];
                 }
                 $title = ($person['sex'] === "F") ? "Ms" : (($person['sex'] === "M") ? "Mr" : "");
 
                 $party_data = array(
                     $title
-                    ,$en->getGivenNames()
-                    ,$en->getSurname()
+                    ,$given_names
+                    ,$person["last_name"]
                     ,"'" . Carbon::parse($person['born_at'])->format("d/m/Y")
                     ,$phone_format($person["phone_number"])
                     ,$phone_format($person["work_phone_number"])
@@ -223,61 +239,15 @@ class ElectoralRollService
 
                 fwrite($file_party, implode(",", $party_data) . "\n");
 
+                $num_matches++;
+                if(($num_matches % 550) === 0) {
+                    fclose($file_party);
+                    $file_party = NULL;
+                }
+
 //                $this->logger->info("$type: [" . $en_str . "] " . $person["first_name"] . " " . $person["middle_name"] . " " . $person["last_name"] . ", " . $person["primary_address2"] . "/" . $person["primary_address1"] . ', ' . $person["primary_city"] . ', ' . $person["primary_zip"]);
             }
         }
-    }
-
-    /**
-     * @param $str
-     * @return array
-     */
-    public function SplitCSVString($str) {
-
-        $len = strlen($str);
-        if($len == 0) {
-            return array();
-        }
-
-        $res = array();
-        $curr = '';
-        $lev = 0;
-        $escape = false;
-        for($i = 0; $i < $len; $i++) {
-            $c = $str[$i];
-            if($c === '\\') {
-                $escape = true;
-            } else if($c === '"') {
-                if($escape) {
-                    $curr .= $c;
-                } else {
-                    $lev++;
-                    if($lev > 2) {
-                        $lev = 1;
-                        $curr .= $c;
-                    }
-                }
-                $escape = false;
-            } else if($c === ',') {
-                if($lev == 1) {
-                    $curr .= $c;
-                } else {
-                    $res[] = $curr;
-                    $curr = '';
-                    $lev = 0;
-                }
-                $escape = false;
-            } else {
-                $curr .= $c;
-                if($lev == 2) {
-                    $lev = 0;
-                }
-                $escape = false;
-            }
-        }
-        $res[] = $curr;
-
-        return $res;
     }
 
     /**

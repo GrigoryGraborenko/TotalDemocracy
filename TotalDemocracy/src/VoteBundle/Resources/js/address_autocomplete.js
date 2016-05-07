@@ -32,6 +32,9 @@ function createAddressAutoComplete($postcode_input, $suburb_select, $street_inpu
             data.suburbs.forEach(function(sub) {
                 var $op = $('<option value="' + sub + '">' + sub + '</option>');
                 $suburb_select.append($op);
+                if(g_InitialData.suburb === sub){
+                    $suburb_select.val(sub);
+                }
             });
             if(data.suburbs.length === 1) {
                 $suburb_select.val(data.suburbs[0]);

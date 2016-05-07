@@ -13,6 +13,7 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
+ *
  * Preserve wrong data between errors
  * Some way to log out of "new user" mode
  * Show all, even stuff you can't vote on, if you choose
@@ -115,6 +116,24 @@ class CoreController extends FOSRestController {
         $view = $this->view($output, 200);
         $view->setFormat('json');
         return $this->handleView($view);
+    }
+
+    /**
+     * This is called by base twig on every page. It's responsible for grabbing output data and stuffing it into JS
+     */
+    public function getJSOutputAction(Request $request) {
+
+        $user = $this->getUser();
+        if($user === NULL) { // if logged out
+//            return $this->getExternalJSOutputAction($request);
+        }
+
+        $js_out = $this->get('vote.js');
+        $js_out->output("user", 123);
+
+        return $this->render("VoteBundle:Common:JSOutput.html.twig", array(
+            'js_output_data' => $js_out->getParameters()
+        ));
     }
 
 

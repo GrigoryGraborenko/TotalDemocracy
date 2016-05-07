@@ -67,18 +67,25 @@ class VerifyController extends FOSRestController {
             ,"suburb" => $user->getSuburb()
             ,"street" => $user->getStreet()
             ,"streetNumber" => $user->getStreetNumber()
-            ,"month_names" => array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
-            ,"years" => array()
         );
-        $curr_year = Carbon::now("UTC")->year;
-        for($i = ($curr_year - 16); $i > ($curr_year - 120); $i--) {
-            $output['years'][] = $i;
-        }
+
         if($user->getDOB()) {
             $dob = Carbon::instance($user->getDOB());
             $output["dobDate"] = $dob->day;
             $output["dobMonth"] = $dob->month;
             $output["dobYear"] = $dob->year;
+        }
+
+        // will replace the previous values if a prior form submission occurred
+        $output = $this->get('session')->getFlashBag()->get("previous_input", $output);
+
+        $this->get('vote.js')->output("suburb", $output["suburb"]);
+
+        $output["month_names"] = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+        $output["years"] = array();
+        $curr_year = Carbon::now("UTC")->year;
+        for($i = ($curr_year - 16); $i > ($curr_year - 120); $i--) {
+            $output['years'][] = $i;
         }
 
         $client = new HttpClient(array(
@@ -150,12 +157,25 @@ class VerifyController extends FOSRestController {
      * @Route("/verify", name="finish_verify")
      * @Method("POST");
      */
-    public function finishVerification(Request $request) {
+    public function finishVerificationAction(Request $request) {
 
-        $user = $this->getPotentialUser();
         $input = $request->request->all();
 
-        if( (!array_key_exists("names", $input)) ||
+        list($is_success, $output) = $this->finishVerification($input);
+
+        if(!$is_success) {
+            $this->get('session')->getFlashBag()->set("previous_input", $input);
+            throw new ErrorRedirectException("verify", $output);
+        }
+
+        return $this->render("VoteBundle:Pages:verify_success.html.twig", $output);
+    }
+
+    private function finishVerification($input) {
+
+        $user = $this->getPotentialUser();
+
+        if( (!array_key_exists("givenNames", $input)) ||
             (!array_key_exists("surname", $input)) ||
             (!array_key_exists("postcode", $input)) ||
             (!array_key_exists("suburb", $input)) ||
@@ -167,19 +187,19 @@ class VerifyController extends FOSRestController {
             (!array_key_exists("dobMonth", $input)) ||
             (!array_key_exists("dobYear", $input))) {
 
-            throw new ErrorRedirectException("verify", "Incorrect arguments");
+            return array(false, "Incorrect arguments");
         }
         if( (strlen($input["dobDate"]) <= 0) ||
             (strlen($input["dobMonth"]) <= 0) ||
             (strlen($input["dobYear"]) <= 0)) {
-            throw new ErrorRedirectException("verify", "Please enter date of birth");
+            return array(false, "Please enter date of birth");
         }
         if((strlen($input["streetNumber"]) <= 0)) {
-            throw new ErrorRedirectException("verify", "Please enter your street number");
+            return array(false, "Please enter your street number");
         }
 
         $other_user = $this->em->getRepository('VoteBundle:User')->findOneBy(array(
-            "givenNames" => ucwords(strtolower($input['names']))
+            "givenNames" => ucwords(strtolower($input['givenNames']))
             ,"surname" => ucwords(strtolower($input['surname']))
             ,"postcode" => strtoupper($input['postcode'])
             ,"suburb" => strtoupper($input['suburb'])
@@ -188,7 +208,7 @@ class VerifyController extends FOSRestController {
         if($other_user !== NULL) {
 
             if($other_user->getId() !== $user->getId()) {
-                throw new ErrorRedirectException("verify", "Another user has already verified with these details. If this was you, try your other email addresses.");
+                return array(false, "Another user has already verified with these details. If this was you, try your other email addresses.");
             }
             // TODO: check rate limiting, change of name?
 
@@ -209,7 +229,7 @@ class VerifyController extends FOSRestController {
             ,'__VIEWSTATE' => $session->get('verify.view_state')
             ,'__VIEWSTATEGENERATOR' => $session->get('verify.view_state_generator')
             ,'__EVENTVALIDATION' => $session->get('verify.event_validation')
-            ,'ctl00$ContentPlaceHolderBody$textGivenName' => $input['names']
+            ,'ctl00$ContentPlaceHolderBody$textGivenName' => $input['givenNames']
             ,'ctl00$ContentPlaceHolderBody$textSurname' => $input['surname']
             ,'ctl00$ContentPlaceHolderBody$textPostcode' => $input['postcode']
             ,'ctl00$ContentPlaceHolderBody$DropdownSuburb' => $input['suburb']
@@ -254,7 +274,7 @@ class VerifyController extends FOSRestController {
 
             $state_abb = substr($input['suburb'], strpos($input['suburb'], "(") + 1, -1);
 
-            $user->setGivenNames(ucwords(strtolower($input['names'])));
+            $user->setGivenNames(ucwords(strtolower($input['givenNames'])));
             $user->setSurname(ucwords(strtolower($input['surname'])));
             $user->setPostcode($input['postcode']);
             $user->setSuburb(strtoupper($input['suburb']));
@@ -269,7 +289,7 @@ class VerifyController extends FOSRestController {
             $fed_domain = $domain_repo->findOneBy(array("level" => "federal"));
             $state_domain = $domain_repo->findOneBy(array("level" => "state", "shortName" => $state_abb));
             if(($fed_domain === NULL) || ($state_domain === NULL)) {
-                throw new ErrorRedirectException("verify", "Could not find federal or state domain - please contact support");
+                return array(false, "Could not find federal or state domain - please contact support");
             }
 
             $user->clearAllElectorates();
@@ -319,12 +339,13 @@ class VerifyController extends FOSRestController {
                 ,"ward" => $council_ward
             );
         } else if(($success_nodes->count() > 0) && (($success_nodes->html() === "Please contact the AEC on 13 23 26 for assistance") || ($success_nodes->html() === "Your enrolment could not be confirmed. Please check the information you have entered"))) {
-            throw new ErrorRedirectException("verify", "Could not find you on the electoral role. Try with/without your middle name, or a previous address.");
+            return array(false, "Could not find you on the electoral role. Try with/without your middle name, or a previous address.");
         } else {
-            throw new ErrorRedirectException("verify", "Verification code is incorrect.");
+            return array(false, "Verification code is incorrect.");
         }
 
-        return $this->render("VoteBundle:Pages:verify_success.html.twig", $output);
+        return array(true, $output);
+//        return $this->render("VoteBundle:Pages:verify_success.html.twig", $output);
     }
 
     /**
@@ -366,7 +387,7 @@ class VerifyController extends FOSRestController {
         if($is_postcode) {
             foreach ($json_response['d'] as $item) {
                 if (strlen($item['value']) > 0) {
-                    $suburbs[] = array($item['value']);
+                    $suburbs[] = $item['value'];
                 }
             }
             $output = array("suburbs" => $suburbs);

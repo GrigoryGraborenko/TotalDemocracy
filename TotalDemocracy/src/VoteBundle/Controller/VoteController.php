@@ -2,6 +2,7 @@
 
 namespace VoteBundle\Controller;
 
+use VoteBundle\Controller\CommonController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -16,15 +17,21 @@ use VoteBundle\Entity\UserDocumentVote;
  * Class VoteController
  * @package VoteBundle\Controller
  */
-class VoteController extends FOSRestController {
+//class VoteController extends FOSRestController {
+class VoteController extends CommonController {
 
     /** @DI\Inject("doctrine.orm.entity_manager") */
-    private $em;
+    protected $em;
 
     /**
      * @Route("/vote", name="vote")
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request) {
+    public function voteAction(Request $request) {
+
+        $input = $request->query->all();
 
         $doc_repo = $this->em->getRepository('VoteBundle:Document');
         $vote_repo = $this->em->getRepository('VoteBundle:UserDocumentVote');
@@ -32,40 +39,67 @@ class VoteController extends FOSRestController {
 
         $output = array(
             "can_vote" => false
-            ,"cannot_vote_message" => "Must sign in to be able to vote"
         );
 
-        $user = $this->getUser();
-        $domains = array();
-        if($user === NULL) {
-            $session = $this->get("session");
-            if($session->has("new_user_id")) {
-                $user_id = $session->get("new_user_id");
-                $this->get("logger")->info("USER ID $user_id");
-                $temp_user = $this->em->getRepository('VoteBundle:User')->find($user_id);
-                if(($temp_user !== NULL) && ($temp_user->getWhenVerified() !== NULL)) {
-                    foreach($temp_user->getElectorates() as $electorate) {
-                        $domains[] = $electorate->getDomain();
-                    }
-                }
-            }
-        } else {
+        $levels = array(
+            "federal" => array("description" => "Federal Laws", "default" => "all")
+            ,"state" => array("description" => "State Laws", "default" => "all")
+            ,"local" => array("description" => "Local Laws & Applications", "default" => "all")
+        );
 
+        // if the user is verified, then the preferred defaults are the user's domains
+        $user = $this->getPotentialUser();
+        if($user !== NULL) {
             if($user->getWhenVerified() === NULL) {
                 $output['cannot_vote_message'] = '<a href="' . $this->generateUrl("verify") . '">Verify</a> on the electoral role to vote';
             } else {
                 $output['can_vote'] = true;
                 $output['user'] = $user;
                 foreach($user->getElectorates() as $electorate) {
-                    $domains[] = $electorate->getDomain();
+                    $domain = $electorate->getDomain();
+                    $levels[$domain->getLevel()]['default'] = $domain->getId();
                 }
             }
+        } else {
+            $output["cannot_vote_message"] = 'Must <a href="' . $this->generateUrl("fos_user_security_login") . '">log in</a> or <a href="' . $this->generateUrl("signup") . '">sign up</a> to be able to vote';
         }
-        if(count($domains) <= 0) {
-            $domains = $domain_repo->findBy(array("level" => "federal"));
+
+        $selected_domains = array();
+        foreach($levels as $type => &$level) {
+
+            $domains = $domain_repo->findBy(array("level" => $type));
+            if((count($domains) === 1) && ($level['default'] !== "none")) {
+                $level['default'] = "all";
+            }
+            if(array_key_exists($type, $input) && ((count($domains) > 1) || ($input[$type] === "none"))) {
+                $level['selected'] = $input[$type];
+            } else {
+                $level['selected'] = $level['default'];
+            }
+
+            $domain_options = array(
+                "all" => array("name" => ("All " . $level['description']))
+                ,"none" => array("name" => ("No " . $level['description']))
+            );
+            if(count($domains) > 1) {
+                $domain_options[""] = array("name" => "-----------");
+                foreach($domains as $domain) {
+                    if($level['selected'] === $domain->getId()) {
+                        $selected_domains[] = $domain;
+                    }
+                    $domain_options[$domain->getId()] = array("name" => $domain->getName());
+                }
+            }
+            if($level['selected'] === "all") {
+                $selected_domains = array_merge($selected_domains, $domains);
+            }
+            $level['domains'] = $domain_options;
         }
+        unset($level); // delete dangling reference, because PHP can be a very silly language
+
+        // this will find all documents that belong to this list of domains
         $docs = $doc_repo->findBy(array(
-            "domain" => $domains
+            "domain" => $selected_domains
         ));
         $docs_list = array();
         foreach($docs as $doc) {
@@ -85,6 +119,7 @@ class VoteController extends FOSRestController {
         }
 
         $output["doc_list"] = $docs_list;
+        $output['domains_levels'] = $levels;
 
         return $this->render('VoteBundle:Pages:vote.html.twig', $output);
     }
@@ -93,7 +128,7 @@ class VoteController extends FOSRestController {
      * @Route("/vote-on", name="vote_on", options={"expose"=true})
      * @Method("POST");
      */
-    public function voteAction(Request $request) {
+    public function voteOnAction(Request $request) {
 
         $user = $this->getUser();
         if($user === NULL) {

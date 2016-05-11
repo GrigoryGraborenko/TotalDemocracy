@@ -115,3 +115,6 @@ assetic:
         address_autocomplete:
             inputs:
                 - '@VoteBundle/Resources/js/address_autocomplete.js'
+        vote:
+            inputs:
+                - '@VoteBundle/Resources/js/vote.js'

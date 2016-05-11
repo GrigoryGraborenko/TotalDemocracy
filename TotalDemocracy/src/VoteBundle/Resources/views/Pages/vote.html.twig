@@ -8,13 +8,38 @@
         <p>Can vote in:
             <ul>
                 {% for electorate in user.electorates %}
-                    <li>{{ electorate.name }}</li>
+                    <li>{{ electorate.domain.name }}</li>
                 {% endfor %}
             </ul>
         </p>
     {% else %}
         <p class="color-red">{{ cannot_vote_message | raw }}</p>
     {% endif %}
+
+    <form class="form-inline">
+        <div class="form-group">
+            <label>Show: </label>
+
+            {% for type, level in domains_levels %}
+                <select class="form-control domain-select" data-level="{{ type }}">
+                    {% for id, domain in level.domains %}
+                        <option
+                                {% if id == "" %}
+                                    disabled
+                                {% else %}
+                                    {% if id != level.default %}
+                                        value="{{ id }}"
+                                    {% else %}
+                                        value=""
+                                    {% endif %}
+                                    {% if id == level.selected %}selected{% endif %}
+                                {% endif %}>{{ domain.name }}</option>
+                    {% endfor %}
+                </select>
+            {% endfor %}
+
+        </div>
+    </form>
 
     {% for doc in doc_list %}
         <div>
@@ -35,32 +60,9 @@
 {% endblock %}
 
 {% block javascripts %}
-<script>
-    $(document).ready(function() {
-        $('.vote-on').click(function() {
 
-            var $button = $(this);
-            var $both_buttons = $button.parent().find("button");
+    {% javascripts '@vote' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
 
-            $both_buttons.prop("disabled", false);
-            $button.prop("disabled", true);
-
-            var data = $button.data();
-            $.ajax({
-                url: Routing.generate('vote_on')
-                ,method: 'POST'
-                ,dataType: "json"
-                ,data: data
-            }).done(function(data) {
-
-                console.log(data);
-
-            }).error(function(response) {
-
-                console.log(response.responseJSON.result);
-
-            });
-        });
-    });
-</script>
 {% endblock %}

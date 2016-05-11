@@ -14,9 +14,11 @@ use VoteBundle\Exception\BadRequestException;
 /*
  * TODO FIXES:
  *
- * Preserve wrong data between errors
+ * Remove ability to vote for domains you aren't in
+ * Show vote numbers
+ *
+ * Make templates nice - login, forgot password etc
  * Some way to log out of "new user" mode
- * Show all, even stuff you can't vote on, if you choose
  * Abstain vote?
  * Close vote
  * Ensure voters can't change their names easily?
@@ -32,6 +34,7 @@ use VoteBundle\Exception\BadRequestException;
  * when registering you need to put tick box that somone has accepted terms and conditions http://www.karelboele.com/ is more up to date
  * before verify button you need comment "When you click verify you are asking us to submit your details to the Australian Electoral Commission website to verify and save your enrollment details on our system."
  * what about metadata on electoral roll import?
+ * turn SSL back on for verify
  *
  * TODO:
  * do g_initial data JS stuff, it's pretty useful

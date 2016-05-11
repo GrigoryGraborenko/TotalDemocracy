@@ -4,7 +4,7 @@ namespace VoteBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use FOS\RestBundle\Controller\FOSRestController;
+//use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 
 use JMS\DiExtraBundle\Annotation as DI;
@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Client as HttpClient;
 use Symfony\Component\DomCrawler\Crawler;
 
+use VoteBundle\Controller\CommonController;
 use VoteBundle\Exception\BadRequestException;
 use VoteBundle\Exception\ErrorRedirectException;
 
@@ -22,34 +23,15 @@ use VoteBundle\Entity\Domain;
  * Class VerifyController
  * @package VoteBundle\Controller
  */
-class VerifyController extends FOSRestController {
+class VerifyController extends CommonController {
 
     /** @DI\Inject("doctrine.orm.entity_manager") */
-    private $em;
+    protected $em;
 
     /** @DI\Inject("logger") */
     private $logger;
 
     private $verifySSL = false;
-
-    private function getPotentialUser() {
-        $user = $this->getUser();
-
-        if($user === NULL) {
-            $session = $this->get("session");
-            if(!$session->has("new_user_id")) {
-                throw new ErrorRedirectException("homepage", "No user available");
-            }
-            $user_id = $session->get("new_user_id");
-            $user = $this->em->getRepository('VoteBundle:User')->find($user_id);
-            if($user === NULL) {
-                $session->remove("new_user_id");
-                throw new ErrorRedirectException("homepage", "No user available");
-            }
-        }
-
-        return $user;
-    }
 
     /**
      * @Route("/verify", name="verify")
@@ -58,6 +40,9 @@ class VerifyController extends FOSRestController {
     public function indexAction(Request $request) {
 
         $user = $this->getPotentialUser();
+        if($user === NULL) {
+            throw new ErrorRedirectException("homepage", "No user available");
+        }
 
         $base_url = "https://oevf.aec.gov.au/";
         $output = array(
@@ -171,9 +156,16 @@ class VerifyController extends FOSRestController {
         return $this->render("VoteBundle:Pages:verify_success.html.twig", $output);
     }
 
+    /**
+     * @param $input
+     * @return array
+     */
     private function finishVerification($input) {
 
         $user = $this->getPotentialUser();
+        if($user === NULL) {
+            return array(false, "No user available");
+        }
 
         if( (!array_key_exists("givenNames", $input)) ||
             (!array_key_exists("surname", $input)) ||

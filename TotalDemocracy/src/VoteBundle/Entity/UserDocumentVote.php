@@ -14,7 +14,7 @@ use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="VoteBundle\Repository\UserDocumentVoteRepository")
  * @ORM\Table(name="user_document_vote")
  * @ExclusionPolicy("all")
  */
@@ -38,14 +38,14 @@ class UserDocumentVote {
     /**
      * The user this vote belongs to
      *
-     * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\User")
+     * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\User", inversedBy="votes")
      */
     protected $user;
 
     /**
      * The document the user is voting for or against
      *
-     * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Document")
+     * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Document", inversedBy="votes")
      */
     protected $document;
 

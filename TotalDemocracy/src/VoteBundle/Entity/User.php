@@ -108,6 +108,11 @@ class User extends BaseUser {
     private $electorates;
 
     /**
+     * @ORM\OneToMany(targetEntity="VoteBundle\Entity\UserDocumentVote", mappedBy="user")
+     */
+    private $votes;
+
+    /**
      * @ORM\Column(type="boolean", nullable=false)
      */
     protected $isVolunteer;
@@ -347,6 +352,20 @@ class User extends BaseUser {
      */
     public function clearAllElectorates() {
         $this->electorates->clear();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVotes() {
+        return $this->votes;
+    }
+
+    /**
+     * @param mixed $votes
+     */
+    public function setVotes($votes) {
+        $this->votes = $votes;
     }
 
     /**

@@ -107,16 +107,33 @@ class VoteController extends CommonController {
             $docs_list[] = $combined;
         }
 
-        if($output['can_vote']) {
-            // can optimize this later - make one single call to the DB with a list of doc ID's and a user ID
-            foreach($docs_list as &$doc) {
-                $vote = $vote_repo->findOneBy(array("user" => $user->getId(), "document" => $doc['doc']->getId()));
-                $doc['vote'] = $vote;
-                $doc['yes_vote'] = $vote && $vote->getIsSupporter();
-                $doc['no_vote'] = $vote && (!$vote->getIsSupporter());
+        $user_domain_ids = array();
+        if($output['can_vote'] && ($user !== NULL)) {
+
+            foreach($user->getElectorates() as $electorate) {
+                $user_domain_ids[] = $electorate->getDomain()->getId();
             }
-            unset($doc); // delete dangling reference, because PHP can be a very silly language
         }
+
+        // can optimize this later - make one single call to the DB with a list of doc ID's and a user ID
+        foreach($docs_list as &$doc) {
+
+            $can_vote_doc = in_array($doc['doc']->getDomain()->getId(), $user_domain_ids);
+            $doc['can_vote'] = $can_vote_doc;
+
+            $doc['total_yes'] = $vote_repo->countVotes($doc['doc']->getId(), true);
+            $doc['total_no'] = $vote_repo->countVotes($doc['doc']->getId(), false);
+            if(!$can_vote_doc) {
+                continue;
+            }
+
+            $vote = $vote_repo->findOneBy(array("user" => $user->getId(), "document" => $doc['doc']->getId()));
+            $doc['vote'] = $vote;
+            $doc['yes_vote'] = $vote && $vote->getIsSupporter();
+            $doc['no_vote'] = $vote && (!$vote->getIsSupporter());
+        }
+        unset($doc); // delete dangling reference, because PHP can be a very silly language
+//        }
 
         $output["doc_list"] = $docs_list;
         $output['domains_levels'] = $levels;
@@ -173,7 +190,12 @@ class VoteController extends CommonController {
         }
         $this->em->flush();
 
-        $output = array("success" => true);
+        $output = array(
+            "success" => true
+            ,"doc_id" => $doc->getId()
+            ,"total_yes" => $vote_repo->countVotes($doc->getId(), true)
+            ,"total_no" => $vote_repo->countVotes($doc->getId(), false)
+        );
 
         $view = $this->view($output, 200);
         $view->setFormat('json');

@@ -81,6 +81,11 @@ class Document {
     protected $text;
 
     /**
+     * @ORM\OneToMany(targetEntity="VoteBundle\Entity\UserDocumentVote", mappedBy="document")
+     */
+    private $votes;
+
+    /**
      * Document constructor.
      * @param $name
      * @param $text
@@ -205,5 +210,18 @@ class Document {
         $this->text = $text;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getVotes() {
+        return $this->votes;
+    }
+
+    /**
+     * @param mixed $votes
+     */
+    public function setVotes($votes) {
+        $this->votes = $votes;
+    }
 
 }

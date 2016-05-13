@@ -1,0 +1,46 @@
+{% extends "::base.html.twig" %}
+
+{% block content %}
+
+    <h1>Login</h1>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            <form class="form-horizontal" action="{{ path("fos_user_security_check") }}" method="post">
+
+                {% if error %}
+                    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+
+                <div class="form-group">
+                    <label class="col-sm-1 control-label" for="username"> Email: </label>
+                    <div class="col-sm-3">
+                        <input class="form-control" type="text" id="username" name="_username" value="{{ last_username }}" required="required" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-1 control-label" for="password"> Password: </label>
+                    <div class="col-sm-3">
+                        <input class="form-control" type="password" id="password" name="_password" required="required" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-1 col-sm-1">
+                        <input class="btn btn-success" type="submit" id="_submit" name="_submit" value="Login" />
+                    </div>
+
+                    <div class="col-sm-1">
+                        <a href="{{ path('fos_user_resetting_request') }}" class="btn btn-default">Forgot your password?</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}

@@ -14,10 +14,6 @@ use VoteBundle\Exception\BadRequestException;
 /*
  * TODO FIXES:
  *
- * Remove ability to vote for domains you aren't in
- * Show vote numbers
- *
- * Make templates nice - login, forgot password etc
  * Some way to log out of "new user" mode
  * Abstain vote?
  * Close vote
@@ -37,7 +33,6 @@ use VoteBundle\Exception\BadRequestException;
  * turn SSL back on for verify
  *
  * TODO:
- * do g_initial data JS stuff, it's pretty useful
  * Migrations
  * Scrape!
  * Special case for users with no email?

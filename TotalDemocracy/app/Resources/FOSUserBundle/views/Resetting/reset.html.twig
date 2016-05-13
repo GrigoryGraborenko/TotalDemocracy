@@ -1,0 +1,53 @@
+{% extends "::base.html.twig" %}
+
+{% block content %}
+
+    <h1>Password Reset</h1>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            {#{{ form_start(form, { 'action': path('fos_user_resetting_reset', {'token': token}), 'attr': { 'class': 'fos_user_resetting_reset' } }) }}#}
+            {#{{ form_widget(form) }}#}
+
+            {#<div class="form-group">#}
+            {#<input class="btn btn-success" type="submit" value="Reset" />#}
+            {#</div>#}
+
+            {#{{ form_end(form) }}#}
+
+            <form action="{{ path('fos_user_resetting_reset', {'token': token}) }}" method="POST" class="form-horizontal" >
+
+                {% for errorItem in form.plainPassword.first.vars.errors %}
+                    {% if errorItem.message == "fos_user.password.mismatch" %}
+                        <label class="control-label has-error" for="fos_user_resetting_form_plainPassword_first">Passwords don't match</label>
+                    {% endif %}
+                {% endfor %}
+
+                <input type="hidden" id="fos_user_resetting_form__token" name="fos_user_resetting_form[_token]" value="{{ app.session.get("_csrf/resetting") }}">
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="fos_user_resetting_form_plainPassword_first"> New Password: </label>
+                    <div class="col-sm-3">
+                        <input class="form-control" type="password" id="fos_user_resetting_form_plainPassword_first" name="fos_user_resetting_form[plainPassword][first]" required="required" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="fos_user_resetting_form_plainPassword_second"> Confirm New Password: </label>
+                    <div class="col-sm-3">
+                        <input class="form-control" type="password" id="fos_user_resetting_form_plainPassword_second" name="fos_user_resetting_form[plainPassword][second]" required="required" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-1">
+                        <input class="btn btn-success" type="submit" value="Reset" />
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+{% endblock %}

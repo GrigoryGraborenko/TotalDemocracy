@@ -102,6 +102,12 @@ class User extends BaseUser {
     protected $homeStreetNumber;
 
     /**
+     * @ORM\ManyToOne(targetEntity="VoteBundle\Entity\ServerEvent")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $registration_context;
+
+    /**
      * @ORM\ManyToMany(targetEntity="VoteBundle\Entity\Electorate", inversedBy="users")
      * @ORM\JoinTable(name="user_electorate")
      */
@@ -324,6 +330,20 @@ class User extends BaseUser {
      */
     public function setHomeStreetNumber($homeStreetNumber) {
         $this->homeStreetNumber = $homeStreetNumber;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRegistrationContext() {
+        return $this->registration_context;
+    }
+
+    /**
+     * @param mixed $registration_context
+     */
+    public function setRegistrationContext($registration_context) {
+        $this->registration_context = $registration_context;
     }
 
     /**

@@ -5,7 +5,6 @@ namespace VoteBundle\Controller;
 use VoteBundle\Controller\CommonController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 
 use JMS\DiExtraBundle\Annotation as DI;
@@ -17,7 +16,6 @@ use VoteBundle\Entity\UserDocumentVote;
  * Class VoteController
  * @package VoteBundle\Controller
  */
-//class VoteController extends FOSRestController {
 class VoteController extends CommonController {
 
     /** @DI\Inject("doctrine.orm.entity_manager") */

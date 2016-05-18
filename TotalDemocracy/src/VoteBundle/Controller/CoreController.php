@@ -13,6 +13,15 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
+ * Tracking cookie needs to time out on registration
+ * Need to be able to cancel it from profile too
+ * 
+ * Admin backend for candidates or volunteers
+ * Allow volunteer status change after register
+ * Registration needs captcha
+ * 404 page
+ * 500 page
+ * Icon, title and logo
  *
  * Some way to log out of "new user" mode
  * Abstain vote?
@@ -27,7 +36,7 @@ use VoteBundle\Exception\BadRequestException;
  * Add concept of "user verified but mismatch"
  * Better verified page, with proper info from users
  * Checkbox for "live here"
- * when registering you need to put tick box that somone has accepted terms and conditions http://www.karelboele.com/ is more up to date
+ * when registering you need to put tick box that someone has accepted terms and conditions http://www.karelboele.com/ is more up to date
  * before verify button you need comment "When you click verify you are asking us to submit your details to the Australian Electoral Commission website to verify and save your enrollment details on our system."
  * what about metadata on electoral roll import?
  * turn SSL back on for verify
@@ -121,13 +130,17 @@ class CoreController extends FOSRestController {
      */
     public function getJSOutputAction(Request $request) {
 
+        $js_out = $this->get('vote.js');
+
         $user = $this->getUser();
         if($user === NULL) { // if logged out
 //            return $this->getExternalJSOutputAction($request);
+            $js_out->output("user", "-");
+        } else {
+            $js_out->output("user", $user->getUsername());
         }
 
-        $js_out = $this->get('vote.js');
-        $js_out->output("user", 123);
+//        $js_out->output("user", NULL);
 
         return $this->render("VoteBundle:Common:JSOutput.html.twig", array(
             'js_output_data' => $js_out->getParameters()

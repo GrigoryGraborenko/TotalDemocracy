@@ -1,0 +1,54 @@
+{% extends "::base.html.twig" %}
+
+{% block content %}
+
+    <h1>Settings</h1>
+
+    {% if app.session.flashbag.has('error-redirect') %}
+        <h4>
+            {% for error in app.session.flashbag.get('error-redirect') %}
+                {{ error }}
+            {% endfor %}
+        </h4>
+    {% endif %}
+
+
+    {% if is_admin %}
+        <h3>admin!</h3>
+
+        {% if tracking_time_left is defined %}
+            <p>TIME: {{ tracking_time_left }}</p>
+            <p>CONTEXT: {{ tracking_context }}</p>
+        {% endif %}
+
+        <form action="{{ path("profile_track") }}" method="post">
+            <label>Track registrations</label>
+            <select class="form-control" name="time">
+                <option value="1">1 Hour</option>
+                <option value="2">2 Hours</option>
+                <option value="3">3 Hours</option>
+                <option value="6">6 Hours</option>
+            </select>
+            <select class="form-control" name="context">
+                <option>Stall</option>
+                <option>Door Knocking</option>
+                <option>Other</option>
+            </select>
+            <button class="btn btn-success" type="submit">Track</button>
+        </form>
+    {% endif %}
+
+{% endblock %}
+
+{% block javascripts %}
+
+    <script>
+        if(g_InitialData.tracking_token !== undefined) {
+            document.cookie = "tracking_token=" + g_InitialData.tracking_token;
+        }
+    </script>
+    {#{% javascripts '@vote' %}#}
+    {#<script src="{{ asset_url }}"></script>#}
+    {#{% endjavascripts %}#}
+
+{% endblock %}

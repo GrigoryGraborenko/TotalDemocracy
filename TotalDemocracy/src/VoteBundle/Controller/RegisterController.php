@@ -30,6 +30,7 @@ class RegisterController extends FOSRestController {
 
     /**
      * @Route("/signup", name="signup")
+     * @Method("GET");
      */
     public function indexAction(Request $request) {
 
@@ -48,6 +49,7 @@ class RegisterController extends FOSRestController {
 
     /**
      * @Route("/signup-email", name="signup_email")
+     * @Method("POST")
      */
     public function emailAction(Request $request) {
 
@@ -80,11 +82,22 @@ class RegisterController extends FOSRestController {
             }
             throw new ErrorRedirectException('signup', "$email is already taken, please check your inbox if this was you", "email-error");
         }
+
+        // actually create and save the user
         $user = $userManager->createUser();
         $user->setEmail($email);
         $user->setUsername($email);
         $user->setPlainPassword($this->getGUID());
         $user->setConfirmationToken($this->get('fos_user.util.token_generator')->generateToken());
+
+        $cookies = $request->cookies->all();
+        if(array_key_exists("tracking_token", $cookies)) {
+            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token']);
+            if((count($events) > 0) && (!$events[0]->getProcessed())) {
+                $user->setRegistrationContext($events[0]);
+            }
+            //$this->get("logger")->info("events " . count($events));
+        }
 
         $this->em->persist($user);
         $this->em->flush();

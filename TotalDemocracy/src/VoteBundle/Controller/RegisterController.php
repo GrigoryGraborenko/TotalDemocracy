@@ -17,6 +17,9 @@ use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use JMS\DiExtraBundle\Annotation as DI;
 
+use Carbon\Carbon;
+
+use VoteBundle\Entity\ServerEvent;
 use VoteBundle\Exception\ErrorRedirectException;
 
 /**
@@ -90,16 +93,25 @@ class RegisterController extends FOSRestController {
         $user->setPlainPassword($this->getGUID());
         $user->setConfirmationToken($this->get('fos_user.util.token_generator')->generateToken());
 
+        $event_json = array("ip" => $request->getClientIp());
         $cookies = $request->cookies->all();
         if(array_key_exists("tracking_token", $cookies)) {
-            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token']);
-            if((count($events) > 0) && (!$events[0]->getProcessed())) {
-                $user->setRegistrationContext($events[0]);
+            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
+            if(count($events) > 0) {
+                $event = $events[0];
+                $close_time = Carbon::instance($event->getDateCreated())->addHours($event->getAmount());
+                if(Carbon::now("UTC")->gt($close_time)) {
+                    $event->setProcessed(true);
+                } else {
+                    $event_json['registering_user'] = $event->getUser()->getEmail();
+                    $event_json['tracking_event'] = $event->getId();
+                }
             }
-            //$this->get("logger")->info("events " . count($events));
         }
 
+        $event = new ServerEvent("registration", $user, $event_json);
         $this->em->persist($user);
+        $this->em->persist($event);
         $this->em->flush();
 
         $this->get("session")->set("new_user_id", $user->getId());

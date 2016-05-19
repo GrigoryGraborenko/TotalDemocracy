@@ -13,9 +13,9 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
- * Tracking cookie needs to time out on registration
- * Need to be able to cancel it from profile too
- * 
+ * Make tracking pretty
+ * Maybe make it so that events have parents??
+ *
  * Admin backend for candidates or volunteers
  * Allow volunteer status change after register
  * Registration needs captcha

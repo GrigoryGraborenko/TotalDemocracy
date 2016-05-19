@@ -17,8 +17,11 @@
         <h3>admin!</h3>
 
         {% if tracking_time_left is defined %}
-            <p>TIME: {{ tracking_time_left }}</p>
-            <p>CONTEXT: {{ tracking_context }}</p>
+            <form action="{{ path("profile_untrack") }}" method="post">
+                <p>TIME: {{ tracking_time_left }}</p>
+                <p>CONTEXT: {{ tracking_context }}</p>
+                <p><button class="btn btn-warning" type="submit">CANCEL</button></p>
+            </form>
         {% endif %}
 
         <form action="{{ path("profile_track") }}" method="post">

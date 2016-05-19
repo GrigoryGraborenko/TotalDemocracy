@@ -56,9 +56,10 @@ class ServerEventRepository extends EntityRepository {
     /**
      * @param $name
      * @param $json_contains
+     * @param $is_processed
      * @return array
      */
-    public function findByJson($name, $json_contains) {
+    public function findByJson($name, $json_contains, $is_processed = NULL) {
 
         $qb = $this->createQueryBuilder('e');
         $qb
@@ -67,10 +68,15 @@ class ServerEventRepository extends EntityRepository {
             ->setParameter('name', $name)
 
             // filter by json likeness
-//            ->andWhere("e.json LIKE :json")
             ->andWhere($qb->expr()->like('e.json', ":json"))
             ->setParameter('json', "%" . $json_contains . "%")
         ;
+
+        if($is_processed !== NULL) {
+            // filter by name
+            $qb ->andWhere('e.processed = :processed')
+                ->setParameter('processed', $is_processed);
+        }
 
         $query = $qb->getQuery();
         return $query->getResult();

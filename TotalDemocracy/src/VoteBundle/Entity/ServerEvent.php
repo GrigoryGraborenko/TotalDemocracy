@@ -58,6 +58,7 @@ class ServerEvent {
     /**
      * ServerEvent constructor.
      * @param $name
+     * @param $user
      * @param $json
      * @param $amount
      */

@@ -133,4 +133,29 @@ class ProfileController extends FOSRestController {
 //        return $this->render('VoteBundle:Pages:profile.html.twig', $output);
     }
 
+    /**
+     * @Route("/settings/untrack", name="profile_untrack")
+     * @Method("POST")
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws ErrorRedirectException
+     */
+    public function profileUnTrackAction(Request $request) {
+
+        $is_admin = $this->get("security.authorization_checker")->isGranted("ROLE_ADMIN");
+        if(!$is_admin) {
+            throw new ErrorRedirectException("profile", "Access denied");
+        }
+
+        $event_repo = $this->em->getRepository('VoteBundle:ServerEvent');
+        $old_events = $event_repo->findBy(array("user" => $this->getUser(), "name" => "registration.track", "processed" => false));
+        foreach($old_events as $old_event) {
+            $old_event->setProcessed(true);
+        }
+        $this->em->flush();
+
+        return new RedirectResponse($this->generateUrl('profile'));
+    }
+
 }

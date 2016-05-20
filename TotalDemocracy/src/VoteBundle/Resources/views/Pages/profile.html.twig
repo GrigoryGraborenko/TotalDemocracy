@@ -12,33 +12,57 @@
         </h4>
     {% endif %}
 
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Details</h3>
+        </div>
+        <div class="panel-body">
+        </div>
+    </div>
+
+
 
     {% if is_admin %}
-        <h3>admin!</h3>
 
-        {% if tracking_time_left is defined %}
-            <form action="{{ path("profile_untrack") }}" method="post">
-                <p>TIME: {{ tracking_time_left }}</p>
-                <p>CONTEXT: {{ tracking_context }}</p>
-                <p><button class="btn btn-warning" type="submit">CANCEL</button></p>
-            </form>
-        {% endif %}
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h1 class="panel-title">Admin</h1>
+            </div>
+            <div class="panel-body">
+                <p>
+                    {% if tracking_time_left is defined %}
+                        <form action="{{ path("profile_untrack") }}" method="post">
+                            <span>Currently tracking new registrations on this device with <b>{{ tracking_time_left }}</b> in the context of <b>{{ tracking_context }}</b></span>
+                            <button class="btn btn-warning" type="submit">CANCEL</button>
+                        </form>
+                    {% else %}
+                        <span>Not currently tracking new registrations on this device</span>
+                    {% endif %}
+                </p>
 
-        <form action="{{ path("profile_track") }}" method="post">
-            <label>Track registrations</label>
-            <select class="form-control" name="time">
-                <option value="1">1 Hour</option>
-                <option value="2">2 Hours</option>
-                <option value="3">3 Hours</option>
-                <option value="6">6 Hours</option>
-            </select>
-            <select class="form-control" name="context">
-                <option>Stall</option>
-                <option>Door Knocking</option>
-                <option>Other</option>
-            </select>
-            <button class="btn btn-success" type="submit">Track</button>
-        </form>
+                <p>
+                    <form action="{{ path("profile_track") }}" method="post" class="form-inline">
+                        <div class="form-group">
+                            <span>Track new registrations from this device for </span>
+                            <select class="form-control" name="time">
+                                <option value="1">1 Hour</option>
+                                <option value="2">2 Hours</option>
+                                <option value="3">3 Hours</option>
+                                <option value="6">6 Hours</option>
+                            </select>
+                            <span> in the context of </span>
+                            <select class="form-control" name="context">
+                                <option>Door Knocking</option>
+                                <option>Stall</option>
+                                <option>Other</option>
+                            </select>
+                            <button class="btn btn-success" type="submit">Track</button>
+                        </div>
+                    </form>
+                </p>
+            </div>
+        </div>
+
     {% endif %}
 
 {% endblock %}

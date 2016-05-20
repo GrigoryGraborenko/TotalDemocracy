@@ -46,6 +46,17 @@ class ServerEvent {
     /** @ORM\Column(type="string", nullable=false) */
     protected $name;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="VoteBundle\Entity\ServerEvent", inversedBy="children")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true)
+     */
+    protected $parent;
+
+    /**
+     * @ORM\OneToMany(targetEntity="VoteBundle\Entity\ServerEvent", mappedBy="parent")
+     */
+    protected $children;
+
     /** @ORM\Column(type="decimal", scale = 2, nullable=true) */
     protected $amount;
 
@@ -61,11 +72,13 @@ class ServerEvent {
      * @param $user
      * @param $json
      * @param $amount
+     * @param $parent
      */
-    public function __construct($name, $user, $json = NULL, $amount = NULL) {
+    public function __construct($name, $user, $json = NULL, $amount = NULL, $parent = NULL) {
         $this->name = $name;
         $this->user = $user;
         $this->json = $json;
+        $this->parent = $parent;
         $this->amount = $amount;
         $this->processed = false;
 
@@ -136,6 +149,27 @@ class ServerEvent {
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getParent() {
+        return $this->parent;
+    }
+
+    /**
+     * @param mixed $parent
+     */
+    public function setParent($parent) {
+        $this->parent = $parent;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChildren() {
+        return $this->children;
     }
 
     /**

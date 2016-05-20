@@ -46,7 +46,7 @@ class VoteController extends CommonController {
         );
 
         // if the user is verified, then the preferred defaults are the user's domains
-        $user = $this->getPotentialUser();
+        $user = $this->getPotentialUser($this->em);
         if($user !== NULL) {
             if($user->getWhenVerified() === NULL) {
                 $output['cannot_vote_message'] = '<a href="' . $this->generateUrl("verify") . '">Verify</a> on the electoral role to vote';

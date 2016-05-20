@@ -39,7 +39,7 @@ class Document {
     /**
      * The domain the document applies in
      *
-     * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Domain")
+     * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Domain", inversedBy="documents")
      * @ORM\JoinColumn(name="domain_id", referencedColumnName="id", nullable=false)
      */
     protected $domain;

@@ -13,15 +13,13 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
- * Make tracking pretty
- * Maybe make it so that events have parents??
- *
- * Admin backend for candidates or volunteers
  * Allow volunteer status change after register
+ * Admin backend for candidates or volunteers
  * Registration needs captcha
  * 404 page
  * 500 page
  * Icon, title and logo
+ * Make confirm pretty
  *
  * Some way to log out of "new user" mode
  * Abstain vote?

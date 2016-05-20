@@ -39,7 +39,7 @@ class VerifyController extends CommonController {
      */
     public function indexAction(Request $request) {
 
-        $user = $this->getPotentialUser();
+        $user = $this->getPotentialUser($this->em);
         if($user === NULL) {
             throw new ErrorRedirectException("homepage", "No user available");
         }
@@ -162,7 +162,7 @@ class VerifyController extends CommonController {
      */
     private function finishVerification($input) {
 
-        $user = $this->getPotentialUser();
+        $user = $this->getPotentialUser($this->em);
         if($user === NULL) {
             return array(false, "No user available");
         }

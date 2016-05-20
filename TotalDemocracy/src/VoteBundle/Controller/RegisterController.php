@@ -92,26 +92,23 @@ class RegisterController extends FOSRestController {
         $user->setUsername($email);
         $user->setPlainPassword($this->getGUID());
         $user->setConfirmationToken($this->get('fos_user.util.token_generator')->generateToken());
+        $this->em->persist($user);
 
-        $event_json = array("ip" => $request->getClientIp());
+        $event = new ServerEvent("registration", $user, array("ip" => $request->getClientIp()));
+        $this->em->persist($event);
         $cookies = $request->cookies->all();
         if(array_key_exists("tracking_token", $cookies)) {
             $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
             if(count($events) > 0) {
-                $event = $events[0];
-                $close_time = Carbon::instance($event->getDateCreated())->addHours($event->getAmount());
+                $track_event = $events[0];
+                $close_time = Carbon::instance($track_event->getDateCreated())->addHours($track_event->getAmount());
                 if(Carbon::now("UTC")->gt($close_time)) {
-                    $event->setProcessed(true);
+                    $track_event->setProcessed(true);
                 } else {
-                    $event_json['registering_user'] = $event->getUser()->getEmail();
-                    $event_json['tracking_event'] = $event->getId();
+                    $event->setParent($track_event);
                 }
             }
         }
-
-        $event = new ServerEvent("registration", $user, $event_json);
-        $this->em->persist($user);
-        $this->em->persist($event);
         $this->em->flush();
 
         $this->get("session")->set("new_user_id", $user->getId());

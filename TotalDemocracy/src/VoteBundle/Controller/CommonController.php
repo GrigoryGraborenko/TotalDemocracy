@@ -18,7 +18,7 @@ class CommonController extends FOSRestController {
     /**
      * @return mixed|null
      */
-    protected function getPotentialUser() {
+    protected function getPotentialUser($em) {
         $user = $this->getUser();
 
         if($user === NULL) {
@@ -27,7 +27,7 @@ class CommonController extends FOSRestController {
                 return NULL;
             }
             $user_id = $session->get("new_user_id");
-            $user = $this->em->getRepository('VoteBundle:User')->find($user_id);
+            $user = $em->getRepository('VoteBundle:User')->find($user_id);
             if($user === NULL) {
                 $session->remove("new_user_id");
                 return NULL;

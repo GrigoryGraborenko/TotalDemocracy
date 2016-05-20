@@ -40,7 +40,7 @@ class Electorate {
     /**
      * The domain the electorate elects representatives for
      *
-     * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Domain")
+     * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Domain", inversedBy="electorates")
      */
     protected $domain;
 

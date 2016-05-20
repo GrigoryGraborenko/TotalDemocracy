@@ -58,6 +58,16 @@ class Domain {
     protected $shortName;
 
     /**
+     * @ORM\OneToMany(targetEntity="VoteBundle\Entity\Electorate", mappedBy="domain")
+     */
+    protected $electorates;
+
+    /**
+     * @ORM\OneToMany(targetEntity="VoteBundle\Entity\Document", mappedBy="domain")
+     */
+    protected $documents;
+
+    /**
      * Domain constructor.
      * @param $level
      * @param $name
@@ -122,6 +132,20 @@ class Domain {
      */
     public function setShortName($shortName) {
         $this->shortName = $shortName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getElectorates() {
+        return $this->electorates;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDocuments() {
+        return $this->documents;
     }
 
 }

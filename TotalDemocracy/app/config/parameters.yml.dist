@@ -16,6 +16,10 @@ parameters:
     mailer_user:       ~
     mailer_password:   ~
 
+    google.recaptcha.public: TO_BE_UPDATED
+    google.recaptcha.private: TO_BE_UPDATED
+    google.analytics: TO_BE_UPDATED
+
     url_base:          TO_BE_UPDATED
 
     # A secret key that's used to generate certain security-related tokens

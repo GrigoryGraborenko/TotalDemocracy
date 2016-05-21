@@ -23,6 +23,14 @@
                     </h4>
                 {% endif %}
 
+                {% if recaptcha is defined %}
+                    <div class="form-group">
+                        <div class="col-sm-offset-1 col-sm-3">
+                            <div class="g-recaptcha center-block" style="width:304px" data-sitekey="{{ recaptcha }}"></div>
+                        </div>
+                    </div>
+                {% endif %}
+
                 <div class="form-group">
                     <div class="col-sm-offset-1 col-sm-3">
                         <button class="btn btn-success" type="submit">Register</button>
@@ -32,5 +40,13 @@
             </form>
         </div>
     </div>
+
+{% endblock %}
+
+{% block javascripts %}
+
+    {% if recaptcha is defined %}
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    {% endif %}
 
 {% endblock %}

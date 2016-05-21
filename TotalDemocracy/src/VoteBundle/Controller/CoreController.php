@@ -13,12 +13,9 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
- * Registration needs captcha
- * Google analytics
  * 404 page
  * 500 page
  * Icon, title and logo
- * Make confirm pretty
  * when registering you need to put tick box that someone has accepted terms and conditions http://www.karelboele.com/ is more up to date
  * before verify button you need comment "When you click verify you are asking us to submit your details to the Australian Electoral Commission website to verify and save your enrollment details on our system."
  * Make sure that rego and verify both can be switched off for maintenance

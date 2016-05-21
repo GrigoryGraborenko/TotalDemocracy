@@ -8,6 +8,8 @@ imports:
 parameters:
     locale: en
     httpProtocol: http
+    recaptcha: true
+    analytics: true
 
 framework:
     #esi:             ~
@@ -38,6 +40,9 @@ framework:
 twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
+    globals:
+        enable_analytics: "%analytics%"
+        google_analytics: "%google.analytics%"
 
 # Doctrine Configuration
 doctrine:

@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use JMS\DiExtraBundle\Annotation as DI;
 
 use Carbon\Carbon;
+use GuzzleHttp\Client as HttpClient;
 
 use VoteBundle\Entity\ServerEvent;
 use VoteBundle\Exception\ErrorRedirectException;
@@ -47,7 +48,12 @@ class RegisterController extends FOSRestController {
             throw new ErrorRedirectException('homepage', "Cannot register twice");
         }
 
-        return $this->render('VoteBundle:Pages:register.html.twig', array());
+        $output = array();
+        if($this->getParameter("recaptcha") === true) {
+            $output['recaptcha'] = $this->getParameter("google.recaptcha.public");
+        }
+
+        return $this->render('VoteBundle:Pages:register.html.twig', $output);
     }
 
     /**
@@ -65,6 +71,34 @@ class RegisterController extends FOSRestController {
         if(!array_key_exists("email", $input)) {
             throw new ErrorRedirectException('signup', "Email not specified", "email-error");
         }
+
+        if($this->getParameter("recaptcha") === true) {
+            if(!array_key_exists("g-recaptcha-response", $input)) {
+                throw new ErrorRedirectException('signup', "Recaptcha response not found", "email-error");
+            }
+            $recaptcha_response = $input["g-recaptcha-response"];
+            $recapcha_private = $this->getParameter("google.recaptcha.private");
+
+            $client = new HttpClient(array('exceptions' => false));
+            $response = $client->post("https://www.google.com/recaptcha/api/siteverify", array('form_params' => array(
+                "secret" => $recapcha_private
+                ,"response" => $recaptcha_response
+                ,"remoteip" => $request->getClientIp()
+            )));
+            if($response->getStatusCode() === 200) {
+                $json_return = json_decode($response->getBody()->getContents(), true);
+                if($json_return === NULL) {
+                    throw new ErrorRedirectException('signup', "Could not process recaptcha response", "email-error");
+                } else if((!array_key_exists("success", $json_return)) || ($json_return["success"] !== true)) {
+                    throw new ErrorRedirectException('signup', "Please verify that you are not a bot with the reCaptcha below", "email-error");
+                }
+            } else {
+                throw new ErrorRedirectException('signup', "Could not get recaptcha response", "email-error");
+            }
+
+        }
+
+        //$input["g-recaptcha-response"]
 
         $email = $input["email"];
 

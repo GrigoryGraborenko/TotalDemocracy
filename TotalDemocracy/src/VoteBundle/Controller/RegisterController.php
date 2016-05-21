@@ -133,6 +133,10 @@ class RegisterController extends FOSRestController {
             throw new ErrorRedirectException('homepage', "Email or confirmation token is incorrect");
         }
 
+        if($new_user->getSuburb()) {
+            $this->get("vote.js")->output("suburb", $new_user->getSuburb());
+        }
+
         $pass_min_length = $this->get("vote.option")->getInteger("password.length.min");
         $phone_min_length = $this->get("vote.option")->getInteger("phone.length.min");
         $output = array(
@@ -141,10 +145,19 @@ class RegisterController extends FOSRestController {
             ,"password_min_length" => $pass_min_length
             ,"phone_min_length" => $phone_min_length
 
-            ,"postcode" => $new_user->getPostcode()
-            ,"suburb" => $new_user->getSuburb()
-            ,"street" => $new_user->getStreet()
-            ,"streetNumber" => $new_user->getStreetNumber()
+//            ,"postcode" => $new_user->getPostcode()
+//            ,"suburb" => $new_user->getSuburb()
+//            ,"street" => $new_user->getStreet()
+//            ,"streetNumber" => $new_user->getStreetNumber()
+
+            ,"isVolunteer" => $new_user->getIsVolunteer()
+            ,"isMember" => $new_user->getIsMember()
+            ,"phone" => $new_user->getPhone()
+            ,"homePostcode" => $new_user->getPostcode() // all four default to what was verified
+            ,"homeSuburb" => $new_user->getSuburb()
+            ,"homeStreet" => $new_user->getStreet()
+            ,"homeStreetNumber" => $new_user->getStreetNumber()
+
         );
 
         return $this->render('VoteBundle:Pages:register_finish.html.twig', $output);
@@ -173,8 +186,8 @@ class RegisterController extends FOSRestController {
 
         $password = $input['password'];
         $phone = $input['phone'];
-        $is_volunteer = array_key_exists('volunteer', $input);
-        $is_member = array_key_exists('member', $input);
+        $is_volunteer = array_key_exists('isVolunteer', $input);
+        $is_member = array_key_exists('isMember', $input);
 
         $min_password_len = $this->get("vote.option")->getInteger("password.length.min");
         $phone_min_length = $this->get("vote.option")->getInteger("phone.length.min");
@@ -191,15 +204,15 @@ class RegisterController extends FOSRestController {
         }
 
         if($is_volunteer) {
-            if( array_key_exists("postcode", $input) &&
-                array_key_exists("suburb", $input) &&
-                array_key_exists("streetNumber", $input) &&
-                array_key_exists("street", $input)) {
+            if( array_key_exists("homePostcode", $input) &&
+                array_key_exists("homeSuburb", $input) &&
+                array_key_exists("homeStreetNumber", $input) &&
+                array_key_exists("homeStreet", $input)) {
 
-                $new_user->setHomePostcode($input["postcode"]);
-                $new_user->setHomeSuburb($input["suburb"]);
-                $new_user->setHomeStreetNumber($input["streetNumber"]);
-                $new_user->setHomeStreet($input["street"]);
+                $new_user->setHomePostcode($input["homePostcode"]);
+                $new_user->setHomeSuburb($input["homeSuburb"]);
+                $new_user->setHomeStreetNumber($input["homeStreetNumber"]);
+                $new_user->setHomeStreet($input["homeStreet"]);
             } else {
                 $this->get("logger")->info(json_encode($url_params));
                 throw new ErrorRedirectException('signup_finish', "If you wish to volunteer, please enter your home address", "confirm-error", $url_params);

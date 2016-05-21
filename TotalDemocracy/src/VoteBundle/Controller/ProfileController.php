@@ -34,7 +34,19 @@ class ProfileController extends FOSRestController {
 
         $user = $this->getUser();
 
-        $output = array();
+        $output = array(
+            "isVolunteer" => $user->getIsVolunteer()
+            ,"isMember" => $user->getIsMember()
+            ,"phone" => $user->getPhone()
+            ,"homePostcode" => $user->getHomePostcode()
+            ,"homeSuburb" => $user->getHomeSuburb()
+            ,"homeStreet" => $user->getHomeStreet()
+            ,"homeStreetNumber" => $user->getHomeStreetNumber()
+        );
+
+        if($user->getHomeSuburb()) {
+            $this->get("vote.js")->output("suburb", $user->getHomeSuburb());
+        }
 
         $is_admin = $this->get("security.authorization_checker")->isGranted("ROLE_ADMIN");
         $output['is_admin'] = $is_admin;
@@ -79,6 +91,57 @@ class ProfileController extends FOSRestController {
     }
 
     /**
+     * @Route("/settings/update", name="profile_update")
+     * @Method("POST")
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws ErrorRedirectException
+     */
+    public function profileUpdateAction(Request $request) {
+
+        $input = $request->request->all();
+        $user = $this->getUser();
+
+//        $this->get("logger")->info("INPUT: " .json_encode($input));
+
+        if(!array_key_exists("phone", $input)) {
+            throw new ErrorRedirectException("profile", "Incorrect parameters");
+        }
+
+        $is_volunteer = array_key_exists("isVolunteer", $input);
+
+        if($is_volunteer) {
+            if( (!array_key_exists("homePostcode", $input)) ||
+                (!array_key_exists("homeSuburb", $input)) ||
+                (!array_key_exists("homeStreet", $input)) ||
+                (!array_key_exists("homeStreetNumber", $input))) {
+                throw new ErrorRedirectException("profile", "Cannot volunteer without home address");
+            }
+            $user->setHomePostcode($input['homePostcode']);
+            $user->setHomeSuburb($input['homeSuburb']);
+            $user->setHomeStreet($input['homeStreet']);
+            $user->setHomeStreetNumber($input['homeStreetNumber']);
+        }
+//        if($is_volunteer && (
+//            (!array_key_exists("homePostcode", $input)) ||
+//            (!array_key_exists("homeSuburb", $input)) ||
+//            (!array_key_exists("homeStreet", $input)) ||
+//            (!array_key_exists("homeStreetNumber", $input))
+//            )) {
+//            throw new ErrorRedirectException("profile", "Cannot volunteer without home address");
+//        }
+
+        $user->setIsVolunteer($is_volunteer);
+        $user->setIsMember(array_key_exists("isMember", $input));
+        $user->setPhone($input['phone']);
+
+        $this->em->flush();
+
+        return new RedirectResponse($this->generateUrl('profile'));
+    }
+
+    /**
      * @Route("/settings/track", name="profile_track")
      * @Method("POST")
      *
@@ -90,13 +153,10 @@ class ProfileController extends FOSRestController {
 
         $user = $this->getUser();
 
-//        $output = array();
         $input = $request->request->all();
         if((!array_key_exists("time", $input)) || (!array_key_exists("context", $input))) {
             throw new ErrorRedirectException("profile", "Incorrect parameters");
         }
-
-//        $this->get("logger")->info("TRACK: " . json_encode($input));
 
         $is_admin = $this->get("security.authorization_checker")->isGranted("ROLE_ADMIN");
         if(!$is_admin) {
@@ -122,15 +182,7 @@ class ProfileController extends FOSRestController {
         $this->em->persist($event);
         $this->em->flush();
 
-//        $this->get('vote.event')
-
-//        $output['is_admin'] = $is_admin;
-//        if($is_admin) {
-//            $output['is_admin'] = true;
-//        }
-
         return new RedirectResponse($this->generateUrl('profile'));
-//        return $this->render('VoteBundle:Pages:profile.html.twig', $output);
     }
 
     /**

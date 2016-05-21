@@ -17,6 +17,38 @@
             <h3 class="panel-title">Details</h3>
         </div>
         <div class="panel-body">
+            <form action="{{ path("profile_update") }}" method="post" class="form-horizontal">
+
+                {{ include('VoteBundle:Profile:userDetails.html.twig') }}
+
+                {#<div class="form-group">#}
+
+                    {#<div class="col-sm-offset-2 col-sm-10">#}
+                        {#<div class="checkbox">#}
+                            {#<label>#}
+                                {#<input type="checkbox" id="volunteer-input" name="isVolunteer" {% if isVolunteer %}checked{% endif %}> Volunteer#}
+                            {#</label>#}
+                        {#</div>#}
+                    {#</div>#}
+                    {#<div class="col-sm-offset-2 col-sm-10">#}
+                        {#<div class="checkbox">#}
+                            {#<label>#}
+                                {#<input type="checkbox" id="member-input" name="isMember" {% if isMember %}checked{% endif %}> Member#}
+                            {#</label>#}
+                        {#</div>#}
+                    {#</div>#}
+                {#</div>#}
+
+                {#<div class="form-group">#}
+                    {#<label class="col-sm-2 control-label" for="surname-input">Surname</label>#}
+                    {#<div class="col-sm-4">#}
+                        {#<input class="form-control" type="text" id="surname-input" name="surname" value="{{ surname }}" placeholder="Last name">#}
+                    {#</div>#}
+                {#</div>#}
+                <div class="col-sm-offset-2">
+                    <button class="btn btn-success" type="submit">Update</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -69,10 +101,32 @@
 
 {% block javascripts %}
 
+    {% javascripts '@address_autocomplete' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
     <script>
         if(g_InitialData.tracking_token !== undefined) {
             document.cookie = "tracking_token=" + g_InitialData.tracking_token;
         }
+        $(document).ready(function() {
+
+            var $postcode_input = $("#postcode-input");
+            var $suburb_select = $("#suburb-select");
+            var $street_input = $("#street-input");
+            var $all_street_inputs = $(".street-inputs");
+            var $home_address_div = $("#home-address-div");
+            var $volunteer_input = $("#volunteer-input");
+
+            var is_volunteer = $volunteer_input.checked;
+            $volunteer_input.change(function() {
+                is_volunteer = this.checked;
+                $home_address_div.collapse(is_volunteer ? "show" : "hide");
+            });
+
+            var address_verify = createAddressAutoComplete($postcode_input, $suburb_select, $street_input, $all_street_inputs);
+        });
+
     </script>
     {#{% javascripts '@vote' %}#}
     {#<script src="{{ asset_url }}"></script>#}

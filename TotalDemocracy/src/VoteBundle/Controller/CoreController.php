@@ -13,20 +13,22 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
- * Allow volunteer status change after register
- * Admin backend for candidates or volunteers
  * Registration needs captcha
+ * Google analytics
  * 404 page
  * 500 page
  * Icon, title and logo
  * Make confirm pretty
+ * when registering you need to put tick box that someone has accepted terms and conditions http://www.karelboele.com/ is more up to date
+ * before verify button you need comment "When you click verify you are asking us to submit your details to the Australian Electoral Commission website to verify and save your enrollment details on our system."
+ * Make sure that rego and verify both can be switched off for maintenance
+ * Admin backend for candidates or volunteers
  *
  * Some way to log out of "new user" mode
  * Abstain vote?
  * Close vote
  * Ensure voters can't change their names easily?
  * Report bug button on all pages
- * Make sure that rego and verify both can be switched off for maintenance
  * Rate limit new email registrations
  * Rate limit re-votes
  * Load up email with social links
@@ -34,8 +36,6 @@ use VoteBundle\Exception\BadRequestException;
  * Add concept of "user verified but mismatch"
  * Better verified page, with proper info from users
  * Checkbox for "live here"
- * when registering you need to put tick box that someone has accepted terms and conditions http://www.karelboele.com/ is more up to date
- * before verify button you need comment "When you click verify you are asking us to submit your details to the Australian Electoral Commission website to verify and save your enrollment details on our system."
  * what about metadata on electoral roll import?
  * turn SSL back on for verify
  *

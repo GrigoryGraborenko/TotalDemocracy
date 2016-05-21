@@ -4,40 +4,22 @@
 
     <h1>REGISTER FINISH</h1>
 
-    <form action="{{ path("signup_confirm", { "email": email, "confirm_token": token }) }}" method="post">
+    <form action="{{ path("signup_confirm", { "email": email, "confirm_token": token }) }}" method="post" class="form-horizontal">
 
-        <p>
-            <input type="checkbox" name="member"> I would like to be a member
-        </p>
-        <p>
-            <input type="checkbox" id="volunteer-checkbox" name="volunteer"> I would like to volunteer
-        </p>
-        <div id="home-address-div" class="collapse">
-            <p>
-                <label>Postcode</label><input type="text" id="postcode-input" name="postcode" value="{{ postcode }}">
-            </p>
-            <p>
-                <label>Suburb/Locality</label><select id="suburb-select" name="suburb" disabled>
-                    <option>- None Selected -</option>
-                </select>
-            </p>
-            <p>
-                <label>Street Number</label><input type="text" class="street-inputs" id="street-number-input" name="streetNumber" value="{{ streetNumber }}" disabled>
-            </p>
-            <p>
-                <label>Street</label><input type="text" class="street-inputs" id="street-input" name="street" value="{{ street }}" disabled>
-            </p>
+        {{ include('VoteBundle:Profile:userDetails.html.twig') }}
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="password-input">Password</label>
+            <div class="col-sm-4">
+                <input type="password" class="form-control" id="password-input" name="password">
+            </div>
         </div>
-        <p>
-            <label>Phone number: </label><input type="text" id="phone-input" name="phone">
-        </p>
-
-        <p>
-            <label>Password: </label><input type="password" id="password-input" name="password">
-        </p>
-        <p>
-            <label>Re-enter your password: </label><input type="password" id="password-repeat-input">
-        </p>
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="password-repeat-input">Re-enter your password</label>
+            <div class="col-sm-4">
+                <input type="password" class="form-control" id="password-repeat-input">
+            </div>
+        </div>
 
         <h4 id="error-text" class="color-red">
         {% if app.session.flashbag.has('confirm-error') %}
@@ -71,7 +53,7 @@
             var address_verify = createAddressAutoComplete($postcode_input, $suburb_select, $street_input, $all_street_inputs);
 
             var is_volunteer = false;
-            $("#volunteer-checkbox").change(function() {
+            $("#volunteer-input").change(function() {
                 is_volunteer = this.checked;
                 $home_address_div.collapse(is_volunteer ? "show" : "hide");
             });

@@ -1,0 +1,65 @@
+<div class="form-group">
+
+    <div class="col-sm-offset-2 col-sm-10">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="volunteer-input" name="isVolunteer" {% if isVolunteer %}checked{% endif %}> Volunteer
+            </label>
+        </div>
+    </div>
+    <div class="col-sm-offset-2 col-sm-10">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="member-input" name="isMember" {% if isMember %}checked{% endif %}> Member
+            </label>
+        </div>
+    </div>
+
+</div>
+
+{#<div class="form-group">#}
+    {#<label class="col-sm-2 control-label" for="postcode-input">Postcode</label>#}
+    {#<div class="col-sm-4">#}
+        {#<input class="form-control" type="text" id="postcode-input" name="postcode" value="{{ postcode }}" placeholder="Postcode">#}
+    {#</div>#}
+{#</div>#}
+
+<div id="home-address-div" class="collapse{% if isVolunteer %} in{% endif %}">
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="postcode-input">Postcode</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="postcode-input" name="homePostcode" value="{{ homePostcode }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="suburb-select">Suburb/Locality</label>
+        <div class="col-sm-4">
+            <select class="form-control" id="suburb-select" name="homeSuburb" disabled>
+                <option>- None Selected -</option>
+            </select>
+        </div>
+            {#<div>#}
+            {#<label>Suburb/Locality</label><select id="suburb-select" name="homeSuburb" disabled>#}
+                {#<option>- None Selected -</option>#}
+            {#</select>#}
+        {#</div>#}
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="street-number-input">Street Number</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control street-inputs" id="street-number-input" name="homeStreetNumber" value="{{ homeStreetNumber }}" disabled>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="street-input">Street</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control street-inputs" id="street-input" name="homeStreet" value="{{ homeStreet }}" disabled>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="phone-input">Phone number</label>
+    <div class="col-sm-4">
+        <input type="text" class="form-control" id="phone-input" name="phone" value="{{ phone }}">
+    </div>
+</div>

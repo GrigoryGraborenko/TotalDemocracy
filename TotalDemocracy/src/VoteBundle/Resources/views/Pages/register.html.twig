@@ -11,10 +11,19 @@
                 <div class="form-group">
                     <label class="col-sm-1 control-label" for="email-input">Email</label>
                     <div class="col-sm-3">
-                        <input class="form-control" type="text" id="email-input" name="email" placeholder="example@email.com">
+                        <input class="form-control" type="text" id="email-input" name="email" value="{{ email }}" placeholder="example@email.com">
                     </div>
                 </div>
-                {##}
+                <div class="form-group">
+                    <div class="col-sm-offset-1 col-sm-3">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="understand-input" name="understand" ><span>I agree to the <a href="{{ path('terms') }}">Terms & Conditions</a></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 {% if app.session.flashbag.has('email-error') %}
                     <h4>
                         {% for error in app.session.flashbag.get('email-error') %}

@@ -13,11 +13,10 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
- * Icon, title and logo
- * when registering you need to put tick box that someone has accepted terms and conditions http://www.karelboele.com/ is more up to date
- * before verify button you need comment "When you click verify you are asking us to submit your details to the Australian Electoral Commission website to verify and save your enrollment details on our system."
+ * Verification success and electorate listings should be prettier
  * Make sure that rego and verify both can be switched off for maintenance
  * Admin backend for candidates or volunteers
+ * Logo on the menu should be the proper image
  *
  * Some way to log out of "new user" mode
  * Abstain vote?
@@ -56,6 +55,13 @@ class CoreController extends FOSRestController {
     public function indexAction(Request $request) {
 
         return $this->render('VoteBundle:Pages:home.html.twig', array());
+    }
+
+    /**
+     * @Route("/terms_and_conditions", name="terms")
+     */
+    public function termsAction(Request $request) {
+        return $this->render('VoteBundle:Pages:terms.html.twig', array());
     }
 
     /**

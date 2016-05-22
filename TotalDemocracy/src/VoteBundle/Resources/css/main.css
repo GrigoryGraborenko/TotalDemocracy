@@ -2,3 +2,22 @@
 .color-red {
     color: #ff0000;
 }
+
+* {
+    margin: 0;
+}
+html, body {
+    height: 100%;
+}
+.wrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -120px; /* the bottom margin is the negative value of the footer's height */
+}
+.footer, .push {
+    height: 120px; /* .push must be the same height as .footer */
+}
+.footer {
+    background-color: rgb(220, 220, 220);
+}

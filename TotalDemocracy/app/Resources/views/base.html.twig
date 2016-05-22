@@ -5,10 +5,12 @@
         <title>{% block title %}People Decide - Voting Platform{% endblock %}</title>
         {% block stylesheets %}
         {% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+        {#<link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />#}
+        <link rel="icon" type="image/x-icon" href="http://d3n8a8pro7vhmx.cloudfront.net/peopledecide/sites/6/favicon_images/original/pd-favicon.jpg?1462100046"/>
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/black-tie/jquery-ui.css">
+
 
         {% stylesheets '@stylesheets' %}
             <link rel="stylesheet" href="{{ asset_url }}" />
@@ -50,7 +52,6 @@
                             <p class="navbar-text">Logged in as <b>{{ app.user.email }}</b></p>
                             <li><a href="{{ path("fos_user_security_logout") }}">Logout</a></li>
                         {% else %}
-                            {#<li>fsdgfsg</li>#}
                             <li {% if routename == 'fos_user_security_login' %}class="active"{% endif %}>
                                 <a href="{{ path("fos_user_security_login") }}">Login</a>
                             </li>
@@ -60,11 +61,16 @@
             </div>
         </nav>
 
-        <div class="container">
-
+        <div class="container wrapper">
             {% block content %}{% endblock %}
-
-        </div><!-- /.container -->
+            <div class="push"></div>
+        </div>
+        <div class="footer">
+            <div class="container">
+                <p></p>
+                <p><a href="{{ path('terms') }}">Terms & Conditions</a></p>
+            </div>
+        </div>
 
         {{ render(controller('VoteBundle:Core:getJSOutput', { 'request': app.request })) }}
 

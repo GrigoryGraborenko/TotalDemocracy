@@ -53,6 +53,14 @@ class RegisterController extends FOSRestController {
             $output['recaptcha'] = $this->getParameter("google.recaptcha.public");
         }
 
+        $bag = $this->get("session")->getFlashBag();
+        if($bag->has("email")) {
+            $output["email"] = $bag->get("email")[0];
+        } else {
+            $output["email"] = NULL;
+        }
+
+
         return $this->render('VoteBundle:Pages:register.html.twig', $output);
     }
 
@@ -64,12 +72,20 @@ class RegisterController extends FOSRestController {
 
         $user = $this->getUser();
         if($user !== NULL) {
-            throw new ErrorRedirectException('homepage', "Cannot register twice");
+            throw new ErrorRedirectException('homepage', "Cannot register twice", "email-error");
         }
 
         $input = $request->request->all();
         if(!array_key_exists("email", $input)) {
             throw new ErrorRedirectException('signup', "Email not specified", "email-error");
+        }
+        $email = $input["email"];
+
+        $session = $this->get("session");
+        $session->getFlashBag()->set("email", $email);
+
+        if(!array_key_exists("understand", $input)) {
+            throw new ErrorRedirectException('signup', "Cannot register without agreeing to the terms and conditions", "email-error");
         }
 
         if($this->getParameter("recaptcha") === true) {
@@ -97,8 +113,6 @@ class RegisterController extends FOSRestController {
             }
 
         }
-
-        $email = $input["email"];
 
         //$this->get("logger")->info("INPUT " . json_encode($input));
 
@@ -143,7 +157,7 @@ class RegisterController extends FOSRestController {
         }
         $this->em->flush();
 
-        $this->get("session")->set("new_user_id", $user->getId());
+        $session->set("new_user_id", $user->getId());
 
         $this->sendRegistrationEmail($user->getEmailCanonical(), $user->getConfirmationToken());
 

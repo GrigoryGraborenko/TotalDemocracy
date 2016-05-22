@@ -13,8 +13,6 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
- * 404 page
- * 500 page
  * Icon, title and logo
  * when registering you need to put tick box that someone has accepted terms and conditions http://www.karelboele.com/ is more up to date
  * before verify button you need comment "When you click verify you are asking us to submit your details to the Australian Electoral Commission website to verify and save your enrollment details on our system."
@@ -34,7 +32,6 @@ use VoteBundle\Exception\BadRequestException;
  * Better verified page, with proper info from users
  * Checkbox for "live here"
  * what about metadata on electoral roll import?
- * turn SSL back on for verify
  *
  * TODO:
  * Migrations

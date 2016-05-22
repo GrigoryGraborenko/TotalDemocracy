@@ -6,7 +6,7 @@ parameters:
 services:
     core_exception_listener:
         class: VoteBundle\Listener\CoreExceptionListener
-        arguments: ["@logger", "@router", "@twig", "@session"]
+        arguments: ["@kernel", "@logger", "@router", "@twig", "@session"]
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
             - { name: monolog.logger, channel: app }

@@ -21,6 +21,7 @@ use VoteBundle\Exception\ErrorRedirectException;
 
 class CoreExceptionListener {
 
+    private $kernel;
     private $logger;
     private $router;
     private $twig;
@@ -29,7 +30,8 @@ class CoreExceptionListener {
     /**
      * Constructor
      */
-    public function __construct(Logger $logger, Router $router, \Twig_Environment $twig, $session) {
+    public function __construct($kernel, Logger $logger, Router $router, \Twig_Environment $twig, $session) {
+        $this->kernel = $kernel;
         $this->logger = $logger;
         $this->router = $router;
         $this->twig = $twig;
@@ -48,9 +50,16 @@ class CoreExceptionListener {
             $event->setResponse($this->getBadRequestResponse($exception));
         } elseif ($exception instanceof ErrorRedirectException) {
             $event->setResponse($this->getErrorRedirectResponse($exception));
+        } elseif ($exception instanceof NotFoundHttpException) {
+            $event->setResponse(new Response($this->twig->render('VoteBundle:Errors:404.html.twig', array())));
         } else {
             $this->logger->error($exception->getMessage() . " => " . $exception->getFile() . ", line " . $exception->getLine());
-            throw $exception;
+            if($this->kernel->getEnvironment() === "dev") {
+                throw $exception;
+            } else {
+                $details = $exception->getMessage();
+                $event->setResponse(new Response($this->twig->render('VoteBundle:Errors:500.html.twig', array("details" => $details))));
+            }
         }
     }
 

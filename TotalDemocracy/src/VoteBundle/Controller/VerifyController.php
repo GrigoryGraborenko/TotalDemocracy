@@ -31,7 +31,7 @@ class VerifyController extends CommonController {
     /** @DI\Inject("logger") */
     private $logger;
 
-    private $verifySSL = false;
+    private $verifySSL = true;
 
     /**
      * @Route("/verify", name="verify")

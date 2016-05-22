@@ -98,8 +98,6 @@ class RegisterController extends FOSRestController {
 
         }
 
-        //$input["g-recaptcha-response"]
-
         $email = $input["email"];
 
         //$this->get("logger")->info("INPUT " . json_encode($input));

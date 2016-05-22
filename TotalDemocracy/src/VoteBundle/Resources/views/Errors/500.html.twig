@@ -1,0 +1,12 @@
+{% extends "::base.html.twig" %}
+
+{% block content %}
+
+    <h1>Server Error</h1>
+
+    <p>Please report this bug!</p>
+    {% if details is defined %}
+        <p><b>{{ details }}</b></p>
+    {% endif %}
+
+{% endblock %}

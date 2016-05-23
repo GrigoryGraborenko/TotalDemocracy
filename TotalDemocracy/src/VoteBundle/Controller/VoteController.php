@@ -22,7 +22,7 @@ class VoteController extends CommonController {
     protected $em;
 
     /**
-     * @Route("/vote", name="vote")
+     * @Route("/", name="vote")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -56,6 +56,7 @@ class VoteController extends CommonController {
                 foreach($user->getElectorates() as $electorate) {
                     $domain = $electorate->getDomain();
                     $levels[$domain->getLevel()]['default'] = $domain->getId();
+                    $output[$domain->getLevel()] = $electorate;
                 }
             }
         } else {

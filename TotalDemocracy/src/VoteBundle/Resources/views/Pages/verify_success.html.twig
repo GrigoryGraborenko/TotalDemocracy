@@ -2,14 +2,23 @@
 
 {% block content %}
 
-    <h1>Verify Success!</h1>
+    <h1>Verification Success!</h1>
 
-    <p>You are registered in {{ federal }}, {{ state }}, {{ council }}, {{ ward }}</p>
+    <p>You are registered to vote in:
+        <ul>
+            <li>Federal Division: {{ federal.name }}</li>
+            <li>State District: {{ state.name }}</li>
+            <li>Local Government Area: {{ local.domain.name }}</li>
+            <li>Local Ward/Division: {{ local.name }}</li>
+        </ul>
+    </p>
 
     {% if is_user_enabled %}
         <p>
             You can start voting right away.
-            <a href="{{ path("vote") }}"><button class="btn btn-success">Vote</button></a>
+        </p>
+        <p>
+            <a href="{{ path("vote") }}" class="btn btn-success">Vote</a>
         </p>
     {% else %}
         <p>You can start voting once you complete your registration. Please check your email for further instructions.

@@ -19,32 +19,8 @@
         <div class="panel-body">
             <form action="{{ path("profile_update") }}" method="post" class="form-horizontal">
 
-                {{ include('VoteBundle:Profile:userDetails.html.twig') }}
+                {{ include('VoteBundle:Profile:user_details.html.twig') }}
 
-                {#<div class="form-group">#}
-
-                    {#<div class="col-sm-offset-2 col-sm-10">#}
-                        {#<div class="checkbox">#}
-                            {#<label>#}
-                                {#<input type="checkbox" id="volunteer-input" name="isVolunteer" {% if isVolunteer %}checked{% endif %}> Volunteer#}
-                            {#</label>#}
-                        {#</div>#}
-                    {#</div>#}
-                    {#<div class="col-sm-offset-2 col-sm-10">#}
-                        {#<div class="checkbox">#}
-                            {#<label>#}
-                                {#<input type="checkbox" id="member-input" name="isMember" {% if isMember %}checked{% endif %}> Member#}
-                            {#</label>#}
-                        {#</div>#}
-                    {#</div>#}
-                {#</div>#}
-
-                {#<div class="form-group">#}
-                    {#<label class="col-sm-2 control-label" for="surname-input">Surname</label>#}
-                    {#<div class="col-sm-4">#}
-                        {#<input class="form-control" type="text" id="surname-input" name="surname" value="{{ surname }}" placeholder="Last name">#}
-                    {#</div>#}
-                {#</div>#}
                 <div class="col-sm-offset-2">
                     <button class="btn btn-success" type="submit">Update</button>
                 </div>
@@ -52,6 +28,53 @@
         </div>
     </div>
 
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h3 class="panel-title">Password</h3>
+        </div>
+        <div class="panel-body">
+            <form action="{{ path("password_update") }}" method="post" class="form-horizontal">
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="password-input">Enter old password</label>
+                    <div class="col-sm-4">
+                        <input type="password" class="form-control" id="password-input" name="old-password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="password-input">Password</label>
+                    <div class="col-sm-4">
+                        <input type="password" class="form-control" id="password-input" name="password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="password-repeat-input">Re-enter your password</label>
+                    <div class="col-sm-4">
+                        <input type="password" class="form-control" id="password-repeat-input" name="repeat-password">
+                    </div>
+                </div>
+
+                {% if app.session.flashbag.has('error-password') %}
+                    <h4 class="col-sm-offset-2 color-red">
+                        {% for error in app.session.flashbag.get('error-password') %}
+                            {{ error }}
+                        {% endfor %}
+                    </h4>
+                {% endif %}
+                {% if app.session.flashbag.has('success-password') %}
+                    <h4 class="col-sm-offset-2 color-green">
+                        {% for success in app.session.flashbag.get('success-password') %}
+                            {{ success }}
+                        {% endfor %}
+                    </h4>
+                {% endif %}
+
+                <div class="col-sm-offset-2">
+                    <button class="btn btn-success" type="submit">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
 
     {% if is_admin %}

@@ -6,7 +6,7 @@
 
     <form action="{{ path("signup_confirm", { "email": email, "confirm_token": token }) }}" method="post" class="form-horizontal">
 
-        {{ include('VoteBundle:Profile:userDetails.html.twig') }}
+        {{ include('VoteBundle:Profile:user_details.html.twig') }}
 
         <div class="form-group">
             <label class="col-sm-2 control-label" for="password-input">Password</label>

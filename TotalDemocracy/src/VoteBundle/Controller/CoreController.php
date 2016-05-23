@@ -13,10 +13,26 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
+ *
+doing the captcha with people doorknocking is irrelevant, time consuming and fiddly on small device can I just log in to my admin account and add people from front end without captcha?
+c) DOB can’t be younger than 18
+Have external "Get bills" url
+b) I would get the official logo of Vyvyan for website and emails
+you need to scrap these from aec because State District, Local Government Area and Local Ward/Division may be called something else in different states.
+f) Please add Privacy Policy and Rules to footer and please link all including Terms to karelboele.com website so we change it we only have to change it in one place eg: karelboele.com/privacy-policy karelboele.com/rules karelboele.com/terms-conditions
+g) BUG verification link in email not working, there is extra string before the address
+h) Make a separate menu item “Volunteer" with “Volunteer address”. When they click activation link in email it takes them to Volunteer first ("Volunteer address" is mandatory if they didn’t verify and optional if they verified), then take them to settings with member tick box (only if they have verified), phone number and password
+i) When Volunteer ticked it needs these options see tick boxes and fields http://www.peopledecide.org.au/volunteer (when to call and when available etc, not phone number and publish on website)
+j) When logged in and verified change name “Verify" to ‘Verify or update address”
+l) If you can get the Bills scrapped in next that would be good because there will be changes with that I think
+
+ *
+ * Minimum password complexity
  * Verification success and electorate listings should be prettier
  * Make sure that rego and verify both can be switched off for maintenance
  * Admin backend for candidates or volunteers
  * Logo on the menu should be the proper image
+ * Remember details on rego confirm
  *
  * Some way to log out of "new user" mode
  * Abstain vote?
@@ -50,7 +66,7 @@ class CoreController extends FOSRestController {
     private $em;
 
     /**
-     * @Route("/", name="homepage")
+     * @Route("/home", name="homepage")
      */
     public function indexAction(Request $request) {
 

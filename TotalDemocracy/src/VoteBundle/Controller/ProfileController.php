@@ -142,6 +142,47 @@ class ProfileController extends FOSRestController {
     }
 
     /**
+     * @Route("/settings/password", name="password_update")
+     * @Method("POST")
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws ErrorRedirectException
+     */
+    public function passwordUpdateAction(Request $request) {
+
+        $user = $this->getUser();
+
+        $input = $request->request->all();
+        if((!array_key_exists("password", $input)) || (!array_key_exists("old-password", $input)) || (!array_key_exists("repeat-password", $input))) {
+            throw new ErrorRedirectException("profile", "Incorrect parameters", "error-password");
+        }
+
+        $factory = $this->get('security.encoder_factory');
+        $encoder = $factory->getEncoder($user);
+        if($encoder->isPasswordValid($user->getPassword(), $input['old-password'], $user->getSalt()) !== true) {
+            throw new ErrorRedirectException("profile", "Old password not entered correctly", "error-password");
+        }
+
+        $password = $input["password"];
+        if($password !== $input["repeat-password"]) {
+            throw new ErrorRedirectException("profile", "Passwords do not match", "error-password");
+        }
+        if(strlen($password) <= 0) {
+            throw new ErrorRedirectException("profile", "Please enter a new password", "error-password");
+        }
+
+        $user->setPlainPassword($password);
+        $user_manager = $this->get('fos_user.user_manager');
+        $user_manager->updatePassword($user);
+        $this->em->flush();
+
+        $this->get("session")->getFlashBag()->set("success-password", "You have successfully updated your password");
+
+        return new RedirectResponse($this->generateUrl('profile'));
+    }
+
+    /**
      * @Route("/settings/track", name="profile_track")
      * @Method("POST")
      *

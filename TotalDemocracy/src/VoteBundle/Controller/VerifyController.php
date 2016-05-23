@@ -325,10 +325,11 @@ class VerifyController extends CommonController {
 
             $output = array(
                 "is_user_enabled" => $user->isEnabled()
-                ,"federal" => $federal_electorate
-                ,"state" => $state_district
-                ,"council" => $council
-                ,"ward" => $council_ward
+                ,"federal" => $fed_elect
+                ,"state" => $state_elect
+                ,"local" => $local_elect
+//                ,"council" => $council
+//                ,"ward" => $council_ward
             );
         } else if(($success_nodes->count() > 0) && (($success_nodes->html() === "Please contact the AEC on 13 23 26 for assistance") || ($success_nodes->html() === "Your enrolment could not be confirmed. Please check the information you have entered"))) {
             return array(false, "Could not find you on the electoral role. Try with/without your middle name, or a previous address.");

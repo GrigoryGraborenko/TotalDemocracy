@@ -25,7 +25,7 @@
                 </div>
 
                 {% if app.session.flashbag.has('email-error') %}
-                    <h4>
+                    <h4 class="col-sm-offset-1 color-red">
                         {% for error in app.session.flashbag.get('email-error') %}
                             {{ error }}
                         {% endfor %}

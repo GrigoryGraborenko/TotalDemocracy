@@ -14,8 +14,11 @@ use VoteBundle\Exception\BadRequestException;
 /*
  * TODO FIXES:
  *
-doing the captcha with people doorknocking is irrelevant, time consuming and fiddly on small device can I just log in to my admin account and add people from front end without captcha?
-c) DOB can’t be younger than 18
+ *
+n) Can you make my karel@jnana.com.au account an admin account and delete all my other accounts karelb@me.com, contact@ecodirectory.com.au and contact@eserai.com?
+o) On the voting page people will also want to be able to search and display bills by keyword (search for keyword in their title and summary)
+p) On the voting page people will want to be able to opt-in to email notifications for new or updated Bills for their filter combination, eg: notify me when new or updated Federal Bills with keyword environment in them. *
+
 Have external "Get bills" url
 b) I would get the official logo of Vyvyan for website and emails
 you need to scrap these from aec because State District, Local Government Area and Local Ward/Division may be called something else in different states.

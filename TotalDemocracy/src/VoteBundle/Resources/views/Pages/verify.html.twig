@@ -88,7 +88,7 @@
                     </div>
                 </div>
 
-                <h4 id="error-text" class="color-red">
+                <h4 id="error-text" class="col-sm-offset-2 color-red">
                     {% if app.session.flashbag.has('error-redirect') %}
                         {% for error in app.session.flashbag.get('error-redirect') %}
                             {{ error }}

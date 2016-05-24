@@ -189,6 +189,10 @@ class VerifyController extends CommonController {
         if((strlen($input["streetNumber"]) <= 0)) {
             return array(false, "Please enter your street number");
         }
+        $dob = Carbon::createFromDate($input['dobYear'], $input['dobMonth'], $input['dobDate'], "UTC")->startOfDay();
+        if($dob->diffInYears(Carbon::now("UTC")) < 18) {
+            return array(false, "Must be over 18 to verify");
+        }
 
         $other_user = $this->em->getRepository('VoteBundle:User')->findOneBy(array(
             "givenNames" => ucwords(strtolower($input['givenNames']))
@@ -273,7 +277,7 @@ class VerifyController extends CommonController {
             $user->setStreet(strtoupper($input['street']));
             $user->setWhenVerified(Carbon::now("UTC"));
             $user->setStreetNumber($input['streetNumber']);
-            $user->setDOB(Carbon::createFromDate($input['dobYear'], $input['dobMonth'], $input['dobDate'], "UTC")->startOfDay());
+            $user->setDOB($dob);
 
             $domain_repo = $this->em->getRepository('VoteBundle:Domain');
             $elect_repo = $this->em->getRepository('VoteBundle:Electorate');

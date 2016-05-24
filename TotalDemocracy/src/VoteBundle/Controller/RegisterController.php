@@ -48,8 +48,24 @@ class RegisterController extends FOSRestController {
             throw new ErrorRedirectException('homepage', "Cannot register twice");
         }
 
+        $recaptcha = $this->getParameter("recaptcha");
+
+        $cookies = $request->cookies->all();
+        if(array_key_exists("tracking_token", $cookies)) {
+            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
+            if(count($events) > 0) {
+                $track_event = $events[0];
+                $close_time = Carbon::instance($track_event->getDateCreated())->addHours($track_event->getAmount());
+                if(Carbon::now("UTC")->gt($close_time)) {
+                    $track_event->setProcessed(true);
+                } else {
+                    $recaptcha = false;
+                }
+            }
+        }
+
         $output = array();
-        if($this->getParameter("recaptcha") === true) {
+        if($recaptcha === true) {
             $output['recaptcha'] = $this->getParameter("google.recaptcha.public");
         }
 
@@ -88,7 +104,19 @@ class RegisterController extends FOSRestController {
             throw new ErrorRedirectException('signup', "Cannot register without agreeing to the terms and conditions", "email-error");
         }
 
-        if($this->getParameter("recaptcha") === true) {
+        $recaptcha = $this->getParameter("recaptcha");
+
+        $cookies = $request->cookies->all();
+        $track_event = NULL;
+        if(array_key_exists("tracking_token", $cookies)) {
+            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
+            if(count($events) > 0) {
+                $track_event = $events[0];
+                $recaptcha = false;
+            }
+        }
+
+        if($recaptcha === true) {
             if(!array_key_exists("g-recaptcha-response", $input)) {
                 throw new ErrorRedirectException('signup', "Recaptcha response not found", "email-error");
             }
@@ -111,7 +139,6 @@ class RegisterController extends FOSRestController {
             } else {
                 throw new ErrorRedirectException('signup', "Could not get recaptcha response", "email-error");
             }
-
         }
 
         //$this->get("logger")->info("INPUT " . json_encode($input));
@@ -141,20 +168,8 @@ class RegisterController extends FOSRestController {
         $this->em->persist($user);
 
         $event = new ServerEvent("registration", $user, array("ip" => $request->getClientIp()));
+        $event->setParent($track_event);
         $this->em->persist($event);
-        $cookies = $request->cookies->all();
-        if(array_key_exists("tracking_token", $cookies)) {
-            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
-            if(count($events) > 0) {
-                $track_event = $events[0];
-                $close_time = Carbon::instance($track_event->getDateCreated())->addHours($track_event->getAmount());
-                if(Carbon::now("UTC")->gt($close_time)) {
-                    $track_event->setProcessed(true);
-                } else {
-                    $event->setParent($track_event);
-                }
-            }
-        }
         $this->em->flush();
 
         $session->set("new_user_id", $user->getId());

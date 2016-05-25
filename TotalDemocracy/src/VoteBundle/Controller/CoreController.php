@@ -30,6 +30,7 @@ j) When logged in and verified change name “Verify" to ‘Verify or update add
 l) If you can get the Bills scrapped in next that would be good because there will be changes with that I think
 
  *
+ * Public bill list needs to be limited, and repo method used for vote page too
  * Minimum password complexity
  * Verification success and electorate listings should be prettier
  * Make sure that rego and verify both can be switched off for maintenance
@@ -84,7 +85,7 @@ class CoreController extends FOSRestController {
     }
 
     /**
-     * @Route("/login_json", name="login_json")
+     * @Route("/api/login", name="api_login")
      * @Method("POST");
      */
     public function loginJSONAction(Request $request) {
@@ -123,7 +124,7 @@ class CoreController extends FOSRestController {
     }
 
     /**
-     * @Route("/logout_json", name="logout_json")
+     * @Route("/api/logout", name="api_logout")
      * @Method("POST");
      */
     public function logoutJSONAction(Request $request) {
@@ -140,6 +141,24 @@ class CoreController extends FOSRestController {
         $view = $this->view($output, 200);
         $view->setFormat('json');
         return $this->handleView($view);
+    }
+
+    /**
+     * @Route("/api/documents", name="api_documents")
+     * @Method("GET");
+     */
+    public function publicDocumentAction(Request $request) {
+
+        $doc_repo = $this->em->getRepository('VoteBundle:Document');
+        $vote_repo = $this->em->getRepository('VoteBundle:UserDocumentVote');
+
+        $docs = $doc_repo->findBy(array(), array("whenCreated" => "DESC"), 2);
+
+        $all_docs = $doc_repo->getDocumentsWithVoteTotals();
+        $output = array("docs" => $all_docs);
+//        \Symfony\Component\VarDumper\VarDumper::dump($all_docs);
+
+        return $this->render("VoteBundle:API:documents.html.twig", $output);
     }
 
     /**

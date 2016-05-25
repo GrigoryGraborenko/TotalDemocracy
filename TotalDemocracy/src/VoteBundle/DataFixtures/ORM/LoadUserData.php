@@ -20,6 +20,8 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface {
         $manager->persist($this->createUser('bob', false, array("electorate-federal-griffith", "electorate-state-south-brisbane", "electorate-local-coorparoo")));
         $manager->persist($this->createUser('steve', false, 'smith'));
         $manager->persist($this->createUser('harry', false, 'henderson'));
+        $manager->persist($this->createUser('terry', false, 'archer'));
+        $manager->persist($this->createUser('sally', true, 'winston'));
         $manager->persist($this->createUser('admin', true));
 
         $manager->flush();
@@ -53,6 +55,6 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface {
      * {@inheritDoc}
      */
     public function getOrder() {
-        return 3; // the order in which fixtures will be loaded
+        return 2; // the order in which fixtures will be loaded
     }
 }

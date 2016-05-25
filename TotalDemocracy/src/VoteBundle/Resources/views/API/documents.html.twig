@@ -1,0 +1,10 @@
+<div class="pd-document-list">
+    {% for doc_info in docs %}
+        {% set doc = doc_info[0] %}
+        <div class="pd-document">
+            <h3 class="pd-document-header">{{ doc.name }}</h3>
+            <div class="pd-document-info">{{ doc.domain.level | capitalize }}: {{ doc.domain.name }} [{{ doc_info.supporters }} votes for, {{ doc_info.opponents }} against]</div>
+            <div class="pd-document-summary">{{ doc.text }}</div>
+        </div>
+    {% endfor %}
+</div>

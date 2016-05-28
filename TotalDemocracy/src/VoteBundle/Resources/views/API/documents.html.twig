@@ -4,7 +4,7 @@
         <div class="pd-document">
             <h3 class="pd-document-header">{{ doc.name }}</h3>
             <div class="pd-document-info">{{ doc.domain.level | capitalize }}: {{ doc.domain.name }} [{{ doc_info.supporters }} votes for, {{ doc_info.opponents }} against]</div>
-            <div class="pd-document-summary">{{ doc.text }}</div>
+            <div class="pd-document-summary">{{ doc.summary }}</div>
         </div>
     {% endfor %}
 </div>

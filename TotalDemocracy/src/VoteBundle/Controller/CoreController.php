@@ -19,6 +19,8 @@ n) Can you make my karel@jnana.com.au account an admin account and delete all my
 o) On the voting page people will also want to be able to search and display bills by keyword (search for keyword in their title and summary)
 p) On the voting page people will want to be able to opt-in to email notifications for new or updated Bills for their filter combination, eg: notify me when new or updated Federal Bills with keyword environment in them. *
 
+//http://www.aph.gov.au/Parliamentary_Business/Bills_Legislation/Bills_Search_Results?page=1&drt=2&drv=7&drvH=7&pnu=44&pnuH=44&f=12%2f11%2f2013&to=27%2f05%2f2016&ps=10&ito=1&q=&bs=1&pbh=1&bhor=1&np=1&pmb=1&g=1&st=2
+
 Have external "Get bills" url
 b) I would get the official logo of Vyvyan for website and emails
 you need to scrap these from aec because State District, Local Government Area and Local Ward/Division may be called something else in different states.

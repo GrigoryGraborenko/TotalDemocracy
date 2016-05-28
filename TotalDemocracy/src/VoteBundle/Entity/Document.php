@@ -16,7 +16,7 @@ use JMS\Serializer\Annotation\Expose;
 
 /**
  * @ORM\Entity(repositoryClass="VoteBundle\Repository\DocumentRepository")
- * @ORM\Table(name="document")
+ * @ORM\Table(name="document", indexes={@ORM\Index(name="external_idx", columns={"external_id"})})
  * @ExclusionPolicy("all")
  */
 class Document {
@@ -32,7 +32,6 @@ class Document {
     /**
      * @ORM\Column(type="datetime")
      * @Gedmo\Timestampable(on="create")
-     * @Expose
      */
     protected $whenCreated;
 
@@ -54,10 +53,28 @@ class Document {
      * @ORM\Column(type="string")
      * @Expose
      */
+    protected $state;
+
+    /**
+     * @ORM\Column(type="string")
+     * @Expose
+     */
     protected $name;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text")
+     * @Expose
+     */
+    protected $summary;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @Expose
+     */
+    protected $dateCreated;
+
+    /**
+     * @ORM\Column(type="string", name="external_id", nullable=true)
      * @Expose
      */
     protected $externalID;
@@ -69,13 +86,13 @@ class Document {
     protected $externalURL;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      * @Expose
      */
     protected $customData;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text", nullable=true)
      * @Expose
      */
     protected $text;
@@ -87,14 +104,22 @@ class Document {
 
     /**
      * Document constructor.
-     * @param $name
-     * @param $text
      * @param $domain
+     * @param $type
+     * @param $name
+     * @param $summary
+     * @param $date_created
+     * @param null $customData
+     * @param null $text
      */
-    public function __construct($domain, $type, $name, $text) {
+    public function __construct($domain, $type, $name, $summary, $date_created, $customData = NULL, $text = NULL) {
         $this->domain = $domain;
         $this->type = $type;
+        $this->state = "open";
         $this->name = $name;
+        $this->summary = $summary;
+        $this->dateCreated = $date_created;
+        $this->setCustomData($customData);
         $this->text = $text;
     }
 
@@ -143,6 +168,20 @@ class Document {
     /**
      * @return mixed
      */
+    public function getState() {
+        return $this->state;
+    }
+
+    /**
+     * @param mixed $state
+     */
+    public function setState($state) {
+        $this->state = $state;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getName() {
         return $this->name;
     }
@@ -152,6 +191,34 @@ class Document {
      */
     public function setName($name) {
         $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSummary() {
+        return $this->summary;
+    }
+
+    /**
+     * @param mixed $summary
+     */
+    public function setSummary($summary) {
+        $this->summary = $summary;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateCreated() {
+        return $this->dateCreated;
+    }
+
+    /**
+     * @param mixed $dateCreated
+     */
+    public function setDateCreated($dateCreated) {
+        $this->dateCreated = $dateCreated;
     }
 
     /**
@@ -193,7 +260,11 @@ class Document {
      * @param mixed $customData
      */
     public function setCustomData($customData) {
-        $this->customData = $customData;
+        if(is_array($customData)) {
+            $this->customData = json_encode($customData);
+        } else {
+            $this->customData = $customData;
+        }
     }
 
     /**

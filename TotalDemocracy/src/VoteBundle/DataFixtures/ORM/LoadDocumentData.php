@@ -8,6 +8,7 @@
 
 namespace VoteBundle\DataFixtures\ORM;
 
+use Carbon\Carbon;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
@@ -49,7 +50,7 @@ class LoadDocumentData extends AbstractFixture implements OrderedFixtureInterfac
     private function createDocument($domain_ref, $name, $text, $supporters = array(), $opponents = array()) {
 
         $domain = $this->getReference($domain_ref);
-        $doc = new Document($domain, "bill", $name, $text);
+        $doc = new Document($domain, "bill", $name, $text, Carbon::now("UTC"));
         $this->manager->persist($doc);
 
         foreach($supporters as $supporter) {

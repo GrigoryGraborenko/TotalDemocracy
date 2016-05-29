@@ -32,6 +32,7 @@ j) When logged in and verified change name “Verify" to ‘Verify or update add
 l) If you can get the Bills scrapped in next that would be good because there will be changes with that I think
 
  *
+ * Make sure that federal scraping takes into account changes - formalize state var to be more universal
  * Public bill list needs to be limited, and repo method used for vote page too
  * Minimum password complexity
  * Verification success and electorate listings should be prettier

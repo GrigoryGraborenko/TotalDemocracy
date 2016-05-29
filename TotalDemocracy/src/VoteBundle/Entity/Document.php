@@ -52,6 +52,7 @@ class Document {
     /**
      * @ORM\Column(type="string")
      * @Expose
+     * should be open, passed, rejected, suspended
      */
     protected $state;
 

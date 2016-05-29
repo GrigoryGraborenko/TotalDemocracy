@@ -68,10 +68,11 @@ class ScrapeCommand extends ContainerAwareCommand {
 
         $this->log('=============================SCRAPE===================================');
 
-        $fed_result = $this->processFederalAustralia();
-        if($fed_result === true) {
-            $this->log("Successfully processed federal bills");
-        }
+//        $fed_result = $this->processFederalAustralia();
+//        if($fed_result === true) {
+//            $this->log("Successfully processed federal bills");
+//        }
+        $qld_result = $this->processQueensland();
 //        $this->processBrisbaneCityCouncil();
 
         $this->log('----------------------------------------------------------------------');
@@ -270,12 +271,6 @@ class ScrapeCommand extends ContainerAwareCommand {
                 }
                 $doc_id = $doc_query_params['bId'];
 
-                $existing = $doc_repo->findBy(array("domain" => $domain, "externalID" => $doc_id));
-                if(count($existing) > 0) {
-                    $num_existing++;
-                    continue;
-                }
-
                 $external_url = NULL;
                 $definitions = array();
                 foreach($extra_links as $extra) {
@@ -311,17 +306,27 @@ class ScrapeCommand extends ContainerAwareCommand {
                     $date = Carbon::now("UTC");
                 }
 
-                $document = new Document($domain, "bill", $title, $summary, $date);
+                $document = $doc_repo->findOneBy(array("domain" => $domain, "externalID" => $doc_id));
+                if($document === NULL) {
+                    $document = new Document($domain, "bill", $title, $summary, $date);
+                    $document->setExternalID($doc_id);
+                    $this->em->persist($document);
+                    $num_new++;
+                } else {
+                    $num_existing++;
+                }
                 $document->setExternalURL($external_url);
-                $document->setExternalID($doc_id);
+
                 if(array_key_exists("Status", $definitions)) {
-                    $document->setState($definitions["Status"]);
+                    if($definitions["Status"] === "Not Proceeding") {
+                        $document->setState("suspended");
+                    } else {
+                        $document->setState("open");
+                    }
                     unset($definitions["Status"]);
                 }
                 $document->setCustomData($definitions);
 
-                $this->em->persist($document);
-                $num_new++;
             }
 
             $page++;
@@ -342,6 +347,84 @@ class ScrapeCommand extends ContainerAwareCommand {
         $this->log("Found $num_new new documents and $num_existing existing ones");
 
         $this->em->flush();
+
+        return true;
+    }
+
+    /**
+     * Downloads and stores new bills from queensland parliament
+     *
+     * @return bool
+     */
+    private function processQueensland() {
+
+        $doc_repo = $this->em->getRepository('VoteBundle:Document');
+        $domain = $this->em->getRepository('VoteBundle:Domain')->findOneBy(array("level" => "state", "name" => "Queensland"));
+
+        $client = new HttpClient(array(
+            'verify' => true
+        ));
+
+        $response = $client->request("GET", "https://www.parliament.qld.gov.au/work-of-assembly/bills-and-legislation/Bills-before-the-House");
+        if($response->getStatusCode() !== 200) {
+            $this->log("Could not get bills index");
+            return false;
+        }
+        $crawler = new Crawler($response->getBody()->getContents());
+
+        $num_new = 0;
+        $num_existing = 0;
+
+        foreach($crawler->filter(".bill") as $doc_node) {
+            $doc_crawler = new Crawler($doc_node);
+
+            $title_link = $doc_crawler->filter(".bill-title a")->getNode(0);
+            $info_tags = $doc_crawler->filter(".bill-info p")->getNode(0)->childNodes;
+            $doc_links = $doc_crawler->filter(".bill-docs a");
+            if(($title_link === NULL) || (count($info_tags) <= 0) || (count($doc_links) <= 0)) {
+                continue;
+            }
+
+            $title = $title_link->textContent;
+            $url = $title_link->getAttribute("href");
+
+            $doc_fname = substr($url, strripos($url, "/") + 1);
+            if((substr($doc_fname, 0, 1) === "B") && (substr($doc_fname, 3, 1) === "_") && (substr($doc_fname, 8, 1) === "_")) {
+                $doc_id = substr($doc_fname, 0, 8);
+            } else {
+                $doc_id = str_replace(".pdf", "", $doc_fname);
+            }
+
+//            $this->log("BILL: $doc_id $title : $url");
+
+            $extra = array();
+
+            $date = NULL;
+            for($i = 0; $i < count($info_tags); $i++) {
+                $tag = $info_tags->item($i);
+                if(($tag->nodeName === "span") && (strstr($tag->textContent, "Introduced") !== false)) {
+                    $extra['introducer'] = $info_tags->item($i + 1)->textContent;
+                    $date = explode(" ", $info_tags->item($i + 2)->textContent);
+                    $date = explode("/", $date[count($date) - 1]);
+                    $date = Carbon::createFromDate($date[2], $date[1], $date[0])->startOfDay();
+                }
+            }
+            $document = $doc_repo->findOneBy(array("domain" => $domain, "externalID" => $doc_id));
+            if($document === NULL) {
+                $document = new Document($domain, "bill", $title, "No summary available", $date);
+                $document->setExternalID($doc_id);
+                $this->em->persist($document);
+                $num_new++;
+            } else {
+                $num_existing++;
+            }
+            $document->setExternalURL($url);
+            $document->setCustomData($extra);
+        }
+
+        $this->em->flush();
+
+        $this->log("Found $num_new new documents and $num_existing existing ones");
 
         return true;
     }

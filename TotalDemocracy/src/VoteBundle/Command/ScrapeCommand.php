@@ -72,8 +72,8 @@ class ScrapeCommand extends ContainerAwareCommand {
 //        if($fed_result === true) {
 //            $this->log("Successfully processed federal bills");
 //        }
-        $qld_result = $this->processQueensland();
-//        $this->processBrisbaneCityCouncil();
+//        $qld_result = $this->processQueensland();
+        $this->processBrisbaneCityCouncil();
 
         $this->log('----------------------------------------------------------------------');
 
@@ -103,12 +103,25 @@ class ScrapeCommand extends ContainerAwareCommand {
         ));
 
         // TODO: return to this week
-//        $timeframe = "thismonth";
-        $timeframe = "thisweek";
+        $timeframe = "thismonth";
+//        $timeframe = "thisweek";
         $response = $client->request("GET", "https://pdonline.brisbane.qld.gov.au/masterviewUI/modules/ApplicationMaster/default.aspx?page=found&1=$timeframe&6=F");
         $crawler = new Crawler($response->getBody()->getContents());
 
-        $application_ids = array();
+        $applications = array();
+
+        $num_new = 0;
+        $num_existing = 0;
+        $num_closed = 0;
+
+        // check old open applicatiobs
+        foreach($doc_repo->findBy(array("domain" => $domain, "state" => "open")) as $exist) {
+            if($exist->getExternalId() === NULL) {
+                continue;
+            }
+            $applications[$exist->getExternalId()] = array("doc" => $exist);
+            $num_existing++;
+        }
 
         foreach($crawler->filter('.rgNumPart a') as $link) {
             $page_url = str_replace("javascript:__doPostBack('", "", str_replace("','')", "", $link->getAttribute("href")));
@@ -118,40 +131,68 @@ class ScrapeCommand extends ContainerAwareCommand {
                     "__EVENTTARGET" => $page_url
                 )
             ));
-            $sub_crawler = new Crawler($response->getBody()->getContents());
-            foreach($sub_crawler->filter('.rgMasterTable tbody a') as $sub_link) {
-                $url = $sub_link->getAttribute("href");
-
-                $application_ids[] = str_replace("default.aspx?page=wrapper&key=", "", $url);
+            $page_crawler = new Crawler($response->getBody()->getContents());
+            foreach($page_crawler->filter('.rgMasterTable tbody tr') as $app_info) {
+                $sub_crawler = new Crawler($app_info);
+                $url = $sub_crawler->filter("a")->getNode(0)->getAttribute("href");
+                $date = explode("/", $sub_crawler->filter("td")->getNode(3)->textContent);
+                $date = Carbon::createFromDate($date[2], $date[1], $date[0], "UTC")->startOfDay();
+                $app_id = str_replace("default.aspx?page=wrapper&key=", "", $url);
+                if(!array_key_exists($app_id, $applications)) {
+                    $applications[$app_id] = array("date" => $date);
+                }
             }
         }
-
         $this->log("Loaded indices, scraping individual documents...");
 
-        $found_num = 0;
-        foreach($application_ids as $app_id) {
-
-            // skip already added ones
-            if($doc_repo->findOneBy(array("domain" => $domain, "externalID" => $app_id))) {
-                continue;
-            }
+        foreach($applications as $app_id => $app_info) {
 
             $url = "https://pdonline.brisbane.qld.gov.au/masterviewUI/modules/ApplicationMaster/default.aspx?page=wrapper&key=$app_id";
+
             $response = $client->request("GET", $url);
             $crawler = new Crawler($response->getBody()->getContents());
 
-//            $details_node = $crawler->filter("#lblDetails")->children();
+            $detail_tags = $crawler->filter("#lblDetails")->getNode(0)->childNodes;
 
-            $detail_texts = $crawler->filter("#lblDetails")->filterXPath('//text()')->extract(['_text']);
-            $is_impact = strpos($detail_texts[4], "Impact") !== false;
+            $activities = array();
+            $activity_names = array();
+
+            $is_impact = false;
+            //$activity =
+            $num_activities = ($detail_tags->length - 1) / 9;
+            for($a = 0; $a < $num_activities; $a++) {
+
+                $activity = array(
+                    "activity" => trim($detail_tags->item($a * 9 + 2)->textContent)
+                    ,"level" => trim($detail_tags->item($a * 9 + 5)->textContent)
+                    ,"permit" => trim($detail_tags->item($a * 9 + 8)->textContent)
+                );
+
+                if(strpos($activity["level"], "Impact") !== false) {
+                    $is_impact = true;
+                }
+                if(strlen($activity['activity']) > 0) {
+                    $activity_names[] = $activity['activity'];
+                }
+                $activities[] = $activity;
+            }
 
             if(!$is_impact) {
                 continue;
             }
+
+            $decision_text = $crawler->filter("#lblDecision")->getNode(0)->textContent;
+            if(strpos($decision_text, "No decision made") === false) {
+                $state = "closed";
+                $num_closed++;
+            } else {
+                $state = "open";
+            }
+
             $people_texts = $crawler->filter("#lblPeople")->filterXPath('//text()')->extract(['_text']);
             $properties_texts = $crawler->filter("#lblProperties")->filterXPath('//text()')->extract(['_text']);
 
-            $activity = trim($detail_texts[2]);
+            $activity = implode(", ", $activity_names);
             $applicant = trim($people_texts[0]);
             $properties = array();
             foreach($properties_texts as $property) {
@@ -161,7 +202,12 @@ class ScrapeCommand extends ContainerAwareCommand {
                 }
                 $properties[] = $trimmed;
             }
-            $properties = implode(", ", $properties);
+            $details = array(
+                "properties" => $properties
+                ,"applicant" => $applicant
+                ,"activities" => $activities
+            );
+
 
 //            $this->logger->info($app_id);
 //            $this->logger->info(json_encode($detail_texts));
@@ -169,21 +215,29 @@ class ScrapeCommand extends ContainerAwareCommand {
 //            $this->logger->info(json_encode($properties_texts));
 //            $this->logger->info($crawler->filter("#lblDetails")->first()->html());
 
-            $text = "Applicant: $applicant. Properties: $properties";
+//            $app_info['url'] = $url;
+//            $app_info['state'] = $state;
+//            $text = "Applicant: $applicant. Properties: $properties";
 
-            $date = Carbon::now("UTC");
+            if(array_key_exists("doc", $app_info)) {
+                $document = $app_info['doc'];
+            } else {
+                $properties = implode(", ", $properties);
+                $summary = "Applicant: $applicant. Properties: $properties";
 
-            $document = new Document($domain, "application", $activity, $text, $date);
-            $document->setExternalID($app_id);
-            $document->setExternalURL($url);
-
-            $this->em->persist($document);
-            $found_num++;
+                $document = new Document($domain, "application", $activity, $summary, $app_info['date']);
+                $document->setExternalID($app_id);
+                $document->setExternalURL($url);
+                $this->em->persist($document);
+                $num_new++;
+            }
+            $document->setState($state);
+            $document->setCustomData($details);
         }
 
         $this->em->flush();
 
-        $this->log("Finished, created $found_num new documents.");
+        $this->log("Finished, created $num_new new documents, checked $num_existing old ones and closed $num_closed of them.");
 
     }
 

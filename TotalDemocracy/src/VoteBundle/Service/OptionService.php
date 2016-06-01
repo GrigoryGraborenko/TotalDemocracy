@@ -44,10 +44,8 @@ class OptionService
 //    const defaultParams = array(
         $this->defaultParams = array(
 
-        "register_enable"                                        => array("default" => "true", "type" => "boolean", "label" => "Allows registration. ")
-        ,"verify_enable"                                         => array("default" => "true", "type" => "boolean", "label" => "Allows verification. ")
-
-        //,"core_ajax.milliseconds"                                => array("default" => "8000", "type" => "int", "label" => "Milliseconds between each core AJAX call. ")
+        "register.enable"                                        => array("default" => "true", "type" => "boolean", "label" => "Allows registration. ")
+        ,"verify.enable"                                         => array("default" => "true", "type" => "boolean", "label" => "Allows verification. ")
         ,"password.length.min"                                   => array("default" => "8", "type" => "int", "label" => "Minimum password length. ")
         ,"phone.length.min"                                      => array("default" => "6", "type" => "int", "label" => "Minimum phone number length. ")
 

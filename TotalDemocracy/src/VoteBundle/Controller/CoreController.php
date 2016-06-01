@@ -29,10 +29,8 @@ g) BUG verification link in email not working, there is extra string before the 
 h) Make a separate menu item “Volunteer" with “Volunteer address”. When they click activation link in email it takes them to Volunteer first ("Volunteer address" is mandatory if they didn’t verify and optional if they verified), then take them to settings with member tick box (only if they have verified), phone number and password
 i) When Volunteer ticked it needs these options see tick boxes and fields http://www.peopledecide.org.au/volunteer (when to call and when available etc, not phone number and publish on website)
 j) When logged in and verified change name “Verify" to ‘Verify or update address”
-l) If you can get the Bills scrapped in next that would be good because there will be changes with that I think
 
  *
- * Make sure that federal scraping takes into account changes - formalize state var to be more universal
  * Public bill list needs to be limited, and repo method used for vote page too
  * Minimum password complexity
  * Verification success and electorate listings should be prettier

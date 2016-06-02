@@ -20,6 +20,7 @@ class RegistrationTest extends BaseFunctionalTestCase {
         $this->attemptRegistration("bob@test.com", false); // already in the fixtures
         $this->attemptRegistration("test@test.com", true);
         $this->attemptRegistration("test@test.com", false);
+        $this->attemptRegistration("testblah", false);
     }
 
     // test order of verification, registration

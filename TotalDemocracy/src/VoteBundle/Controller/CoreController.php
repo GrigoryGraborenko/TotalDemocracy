@@ -151,15 +151,13 @@ class CoreController extends FOSRestController {
     public function publicDocumentAction(Request $request) {
 
         $doc_repo = $this->em->getRepository('VoteBundle:Document');
-        $vote_repo = $this->em->getRepository('VoteBundle:UserDocumentVote');
 
-        $docs = $doc_repo->findBy(array(), array("whenCreated" => "DESC"), 2);
-
-        $all_docs = $doc_repo->getDocumentsWithVoteTotals();
+        $all_docs = $doc_repo->getDocumentsWithVoteTotals(6);
         $output = array("docs" => $all_docs);
-//        \Symfony\Component\VarDumper\VarDumper::dump($all_docs);
 
-        return $this->render("VoteBundle:API:documents.html.twig", $output);
+        $response = $this->render("VoteBundle:API:documents.html.twig", $output);
+        $response->headers->set('Access-Control-Allow-Origin', 'true');
+        return $response;
     }
 
     /**

@@ -19,7 +19,7 @@ use Doctrine\ORM\Query;
  */
 class DocumentRepository extends EntityRepository {
 
-    public function getDocumentsWithVoteTotals() {
+    public function getDocumentsWithVoteTotals($max_results) {
 
         $qb = $this->createQueryBuilder('d');
         $query = $qb
@@ -30,7 +30,9 @@ class DocumentRepository extends EntityRepository {
             ->addSelect("SUM(CASE WHEN v.isSupporter = false THEN 1 ELSE 0 END) as opponents")
             ->addGroupBy("d")
 
-            ->addOrderBy("d.whenCreated")
+            ->addOrderBy("d.dateCreated", "DESC")
+            ->addOrderBy("d.whenCreated", "DESC")
+            ->setMaxResults($max_results)
 
             ->getQuery();
 

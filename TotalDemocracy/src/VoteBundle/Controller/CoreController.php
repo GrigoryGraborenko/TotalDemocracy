@@ -156,7 +156,7 @@ class CoreController extends FOSRestController {
         $output = array("docs" => $all_docs);
 
         $response = $this->render("VoteBundle:API:documents.html.twig", $output);
-        $response->headers->set('Access-Control-Allow-Origin', 'true');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
     }
 

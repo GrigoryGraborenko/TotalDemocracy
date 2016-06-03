@@ -19,19 +19,15 @@ n) Can you make my karel@jnana.com.au account an admin account and delete all my
 o) On the voting page people will also want to be able to search and display bills by keyword (search for keyword in their title and summary)
 p) On the voting page people will want to be able to opt-in to email notifications for new or updated Bills for their filter combination, eg: notify me when new or updated Federal Bills with keyword environment in them. *
 
-//http://www.aph.gov.au/Parliamentary_Business/Bills_Legislation/Bills_Search_Results?page=1&drt=2&drv=7&drvH=7&pnu=44&pnuH=44&f=12%2f11%2f2013&to=27%2f05%2f2016&ps=10&ito=1&q=&bs=1&pbh=1&bhor=1&np=1&pmb=1&g=1&st=2
-
-Have external "Get bills" url
 b) I would get the official logo of Vyvyan for website and emails
-you need to scrap these from aec because State District, Local Government Area and Local Ward/Division may be called something else in different states.
-f) Please add Privacy Policy and Rules to footer and please link all including Terms to karelboele.com website so we change it we only have to change it in one place eg: karelboele.com/privacy-policy karelboele.com/rules karelboele.com/terms-conditions
-g) BUG verification link in email not working, there is extra string before the address
 h) Make a separate menu item “Volunteer" with “Volunteer address”. When they click activation link in email it takes them to Volunteer first ("Volunteer address" is mandatory if they didn’t verify and optional if they verified), then take them to settings with member tick box (only if they have verified), phone number and password
 i) When Volunteer ticked it needs these options see tick boxes and fields http://www.peopledecide.org.au/volunteer (when to call and when available etc, not phone number and publish on website)
 j) When logged in and verified change name “Verify" to ‘Verify or update address”
+g) BUG verification link in email not working, there is extra string before the address
+you need to scrap these from aec because State District, Local Government Area and Local Ward/Division may be called something else in different states.
 
  *
- * Public bill list needs to be limited, and repo method used for vote page too
+ * Repo method used for vote page too
  * Minimum password complexity
  * Verification success and electorate listings should be prettier
  * Make sure that rego and verify both can be switched off for maintenance
@@ -76,13 +72,6 @@ class CoreController extends FOSRestController {
     public function indexAction(Request $request) {
 
         return $this->render('VoteBundle:Pages:home.html.twig', array());
-    }
-
-    /**
-     * @Route("/terms_and_conditions", name="terms")
-     */
-    public function termsAction(Request $request) {
-        return $this->render('VoteBundle:Pages:terms.html.twig', array());
     }
 
     /**

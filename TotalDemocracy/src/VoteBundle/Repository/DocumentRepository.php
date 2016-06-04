@@ -19,10 +19,10 @@ use Doctrine\ORM\Query;
  */
 class DocumentRepository extends EntityRepository {
 
-    public function getDocumentsWithVoteTotals($max_results) {
+    public function getDocumentsWithVoteTotals($max_results = NULL, $domains = NULL, $filter = NULL) {
 
         $qb = $this->createQueryBuilder('d');
-        $query = $qb
+        $qb
             ->leftJoin('d.votes', 'v')
             ->addSelect("d as doc")
 
@@ -32,11 +32,20 @@ class DocumentRepository extends EntityRepository {
 
             ->addOrderBy("d.dateCreated", "DESC")
             ->addOrderBy("d.whenCreated", "DESC")
-            ->setMaxResults($max_results)
+        ;
+        if($max_results !== NULL) {
+            $qb->setMaxResults($max_results);
+        }
+        if($domains !== NULL) {
+            $qb ->andWhere("d.domain IN (:domains)")
+                ->setParameter("domains", $domains);
+        }
+        if($filter !== NULL) {
+            $qb ->andWhere("(d.name LIKE :filter) OR (d.summary LIKE :filter)")
+                ->setParameter("filter", "%" . $filter . "%");
+        }
 
-            ->getQuery();
-
-        return $query->getResult();
+        return $qb->getQuery()->getResult();
     }
 
 }

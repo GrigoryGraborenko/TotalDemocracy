@@ -30,18 +30,39 @@ var encodeURLParams = function(params) {
 
 $(document).ready(function() {
 
-    $('.domain-select').change(function() {
-
-        $select = $(this);
-        var val = $select.val();
+    function refreshFilter(name, value) {
 
         var params = decodeURLParams();
-        if(val === "") {
-            delete params[$select.data().level];
-        } else {
-            params[$select.data().level] = val;
+        if(name !== undefined) {
+            params[name] = value;
         }
-        window.location.search = encodeURLParams(params);
+        params.filter = $("#filter-input").val();
+
+        var deletions = [];
+        for(var ind in params) {
+            if(params[ind] === "") {
+                deletions.push(ind);
+            }
+        }
+        deletions.forEach(function(del_ind) {
+            delete params[del_ind];
+        });
+        var encoded = encodeURLParams(params);
+        if(encoded === "") {
+            window.location = window.location.pathname;
+            return;
+        }
+        window.location.search = encoded;
+    }
+
+    $('.domain-select').change(function() {
+        $select = $(this);
+        refreshFilter($select.data().level, $select.val());
+    });
+
+    $("#filter-form").submit(function() {
+        refreshFilter();
+        return false;
     });
 
     $('.vote-on').click(function() {

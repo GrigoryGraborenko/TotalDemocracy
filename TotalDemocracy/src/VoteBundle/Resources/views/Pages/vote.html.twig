@@ -18,7 +18,7 @@
         <p class="color-red">{{ cannot_vote_message | raw }}</p>
     {% endif %}
 
-    <form class="form-inline">
+    <form id="filter-form" class="form-inline">
         <div class="form-group">
             <label>Show: </label>
 
@@ -41,11 +41,17 @@
             {% endfor %}
 
         </div>
+        <div class="form-group">
+            <label>Search: </label>
+            <input id="filter-input" class="form-control" type="text" name="filter" value="{{ filter }}">
+            <button class="btn btn-success" type="submit">Refresh</button>
+        </div>
+
     </form>
 
     {% for doc in doc_list %}
         <div data-doc-block="{{ doc.doc.id }}">
-            <h3>{{ doc.doc.name }} [<span class="yes-count">{{ doc.total_yes }}</span> voted yes, <span class="no-count">{{ doc.total_no }}</span> voted no]</h3>
+            <h3>{{ doc.doc.name }} [<span class="yes-count">{{ doc.supporters }}</span> voted yes, <span class="no-count">{{ doc.opponents }}</span> voted no]</h3>
             <h6>{{ doc.doc.domain.name }}{% if doc.doc.externalURL is not null %} - <a href="{{ doc.doc.externalURL }}">View details</a>{% endif %}</h6>
             <p>{{ doc.doc.summary }}</p>
             {% if doc.can_vote %}

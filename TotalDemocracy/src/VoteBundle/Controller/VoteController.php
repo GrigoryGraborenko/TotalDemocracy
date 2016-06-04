@@ -96,19 +96,17 @@ class VoteController extends CommonController {
         }
         unset($level); // delete dangling reference, because PHP can be a very silly language
 
-        // this will find all documents that belong to this list of domains
-        $docs = $doc_repo->findBy(array(
-            "domain" => $selected_domains
-        ));
-        $docs_list = array();
-        foreach($docs as $doc) {
-            $combined = array("doc" => $doc);
-            $docs_list[] = $combined;
+        $filter = NULL;
+        if(array_key_exists("filter", $input)) {
+            $filter = $input["filter"];
         }
+        $output["filter"] = $filter;
+
+        // this will find all documents that belong to this list of domains, along with their tallies
+        $docs_list = $doc_repo->getDocumentsWithVoteTotals(NULL, $selected_domains, $filter);
 
         $user_domain_ids = array();
         if($output['can_vote'] && ($user !== NULL)) {
-
             foreach($user->getElectorates() as $electorate) {
                 $user_domain_ids[] = $electorate->getDomain()->getId();
             }
@@ -117,11 +115,10 @@ class VoteController extends CommonController {
         // can optimize this later - make one single call to the DB with a list of doc ID's and a user ID
         foreach($docs_list as &$doc) {
 
+            $doc['doc'] = $doc[0];
             $can_vote_doc = in_array($doc['doc']->getDomain()->getId(), $user_domain_ids);
             $doc['can_vote'] = $can_vote_doc;
 
-            $doc['total_yes'] = $vote_repo->countVotes($doc['doc']->getId(), true);
-            $doc['total_no'] = $vote_repo->countVotes($doc['doc']->getId(), false);
             if(!$can_vote_doc) {
                 continue;
             }
@@ -132,7 +129,6 @@ class VoteController extends CommonController {
             $doc['no_vote'] = $vote && (!$vote->getIsSupporter());
         }
         unset($doc); // delete dangling reference, because PHP can be a very silly language
-//        }
 
         $output["doc_list"] = $docs_list;
         $output['domains_levels'] = $levels;

@@ -58,6 +58,7 @@ class RegisterController extends FOSRestController {
                 $close_time = Carbon::instance($track_event->getDateCreated())->addHours($track_event->getAmount());
                 if(Carbon::now("UTC")->gt($close_time)) {
                     $track_event->setProcessed(true);
+                    $this->em->flush();
                 } else {
                     $recaptcha = false;
                 }
@@ -75,7 +76,6 @@ class RegisterController extends FOSRestController {
         } else {
             $output["email"] = NULL;
         }
-
 
         return $this->render('VoteBundle:Pages:register.html.twig', $output);
     }
@@ -173,6 +173,7 @@ class RegisterController extends FOSRestController {
         $this->em->flush();
 
         $session->set("new_user_id", $user->getId());
+        $session->getFlashBag()->get("email");
 
         $this->sendRegistrationEmail($user->getEmailCanonical(), $user->getConfirmationToken());
 

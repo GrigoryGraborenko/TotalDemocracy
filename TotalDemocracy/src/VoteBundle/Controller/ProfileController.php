@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Cookie;
 
 use JMS\DiExtraBundle\Annotation as DI;
 
@@ -33,6 +34,9 @@ class ProfileController extends FOSRestController {
     public function profileAction(Request $request) {
 
         $user = $this->getUser();
+        if($user === NULL) {
+            throw new ErrorRedirectException("homepage", "Not logged in");
+        }
 
         $output = array(
             "isVolunteer" => $user->getIsVolunteer()
@@ -50,6 +54,7 @@ class ProfileController extends FOSRestController {
 
         $is_admin = $this->get("security.authorization_checker")->isGranted("ROLE_ADMIN");
         $output['is_admin'] = $is_admin;
+        $new_cookie = NULL;
         if($is_admin) {
 
             $since = Carbon::now("UTC")->subDays(1);
@@ -58,36 +63,28 @@ class ProfileController extends FOSRestController {
             if(count($events) > 0) {
                 $event = $events[0];
                 $close_time = Carbon::instance($event->getDateCreated())->addHours($event->getAmount());
-//                $close_time = Carbon::instance($event->getDateCreated())->addMinutes($event->getAmount());
                 if(Carbon::now("UTC")->gt($close_time)) {
                     $event->setProcessed(true);
                     $this->em->flush();
                 } else {
                     $json = $event->getJsonArray();
-                    $diff_min = $close_time->diffInMinutes();
-                    $diff_hours = floor($diff_min / 60);
-                    $diff_min -= $diff_hours * 60;
+                    $diff_min_total = $close_time->diffInMinutes();
+                    $diff_hours = floor($diff_min_total / 60);
+                    $diff_min = $diff_min_total - $diff_hours * 60;
                     $output['tracking_time_left'] = "$diff_hours hours and $diff_min minutes left";
                     $output['tracking_token'] = $json['token'];
                     $output['tracking_context'] = $json['context'];
-
-                    $this->get("vote.js")->output("tracking_token", $json['token']);
+                    $new_cookie = new Cookie("tracking_token", $json['token'], time() + $diff_min_total * 60);
                 }
             }
-            /*
-            $latest = NULL;
-            $latest_token = "";
-            foreach($events as $event) {
-                $close_time = Carbon::instance($event->getDateCreated())->addHours($event->getAmount());
-                if(($latest === NULL) || ($close_time->gt($latest))) {
-                    $latest = $close_time;
-                }
-            }*/
-//            $output['track_close_time'] =
-//            $output['is_admin'] = true;
         }
 
-        return $this->render('VoteBundle:Pages:profile.html.twig', $output);
+        $response = $this->render('VoteBundle:Pages:profile.html.twig', $output);
+        if($new_cookie) {
+            $response->headers->setCookie($new_cookie);
+        }
+
+        return $response;
     }
 
     /**
@@ -100,8 +97,11 @@ class ProfileController extends FOSRestController {
      */
     public function profileUpdateAction(Request $request) {
 
-        $input = $request->request->all();
         $user = $this->getUser();
+        if($user === NULL) {
+            throw new ErrorRedirectException("homepage", "Not logged in");
+        }
+        $input = $request->request->all();
 
 //        $this->get("logger")->info("INPUT: " .json_encode($input));
 
@@ -152,6 +152,9 @@ class ProfileController extends FOSRestController {
     public function passwordUpdateAction(Request $request) {
 
         $user = $this->getUser();
+        if($user === NULL) {
+            throw new ErrorRedirectException("homepage", "Not logged in");
+        }
 
         $input = $request->request->all();
         if((!array_key_exists("password", $input)) || (!array_key_exists("old-password", $input)) || (!array_key_exists("repeat-password", $input))) {
@@ -193,6 +196,9 @@ class ProfileController extends FOSRestController {
     public function profileTrackAction(Request $request) {
 
         $user = $this->getUser();
+        if($user === NULL) {
+            throw new ErrorRedirectException("homepage", "Not logged in");
+        }
 
         $input = $request->request->all();
         if((!array_key_exists("time", $input)) || (!array_key_exists("context", $input))) {
@@ -236,13 +242,18 @@ class ProfileController extends FOSRestController {
      */
     public function profileUnTrackAction(Request $request) {
 
+        $user = $this->getUser();
+        if($user === NULL) {
+            throw new ErrorRedirectException("homepage", "Not logged in");
+        }
+
         $is_admin = $this->get("security.authorization_checker")->isGranted("ROLE_ADMIN");
         if(!$is_admin) {
             throw new ErrorRedirectException("profile", "Access denied");
         }
 
         $event_repo = $this->em->getRepository('VoteBundle:ServerEvent');
-        $old_events = $event_repo->findBy(array("user" => $this->getUser(), "name" => "registration.track", "processed" => false));
+        $old_events = $event_repo->findBy(array("user" => $user, "name" => "registration.track", "processed" => false));
         foreach($old_events as $old_event) {
             $old_event->setProcessed(true);
         }

@@ -54,7 +54,7 @@ class BaseFunctionalTestCase extends WebTestCase {
     }
 
 
-    protected function logIn($username = 'bob@test.com', $password = 'test', $is_admin = false) {
+    protected function login($username = 'bob@test.com', $password = 'test', $is_admin = false) {
 
         $this->session = $this->container->get('session');
 
@@ -70,6 +70,12 @@ class BaseFunctionalTestCase extends WebTestCase {
         $cookie = new Cookie($this->session->getName(), $this->session->getId());
         $this->client->getCookieJar()->set($cookie);
         return $user;
+    }
+
+    protected function logout() {
+
+        $this->container->get('security.token_storage')->setToken(null);
+        $this->container->get('session')->invalidate();
     }
 
     /**

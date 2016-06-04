@@ -132,9 +132,6 @@
     {% endjavascripts %}
 
     <script>
-        if(g_InitialData.tracking_token !== undefined) {
-            document.cookie = "tracking_token=" + g_InitialData.tracking_token;
-        }
         $(document).ready(function() {
 
             var $postcode_input = $("#postcode-input");

@@ -96,17 +96,15 @@ class CoreController extends FOSRestController {
             throw new BadRequestException('Incorrect Username/Password');
         }
 
-        // TODO: actually log in!
         $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
         $this->get('security.token_storage')->setToken($token);
-
 
         $output = array(
             "success" => true
             ,"token" => $this->get("session")->getId()
         );
 
-        $this->get("logger")->info("INPUT: " . json_encode($input));
+//        $this->get("logger")->info("INPUT: " . json_encode($input));
 
         $view = $this->view($output, 200);
         $view->setFormat('json');

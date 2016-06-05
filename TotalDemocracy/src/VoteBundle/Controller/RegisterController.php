@@ -21,7 +21,9 @@ use Carbon\Carbon;
 use GuzzleHttp\Client as HttpClient;
 
 use VoteBundle\Entity\ServerEvent;
+use VoteBundle\Entity\Volunteer;
 use VoteBundle\Exception\ErrorRedirectException;
+use VoteBundle\VoteBundle;
 
 /**
  * Class RegisterController
@@ -218,10 +220,19 @@ class RegisterController extends FOSRestController {
             ,"isVolunteer" => $new_user->getIsVolunteer()
             ,"isMember" => $new_user->getIsMember()
             ,"phone" => $new_user->getPhone()
-            ,"homePostcode" => $new_user->getPostcode() // all four default to what was verified
-            ,"homeSuburb" => $new_user->getSuburb()
-            ,"homeStreet" => $new_user->getStreet()
-            ,"homeStreetNumber" => $new_user->getStreetNumber()
+            ,"volunteer" => NULL
+//            ,"homePostcode" => $new_user->getPostcode() // all four default to what was verified
+//            ,"homeSuburb" => $new_user->getSuburb()
+//            ,"homeStreet" => $new_user->getStreet()
+//            ,"homeStreetNumber" => $new_user->getStreetNumber()
+//
+//            ,"willPollBooth" => false
+//            ,"willDoorKnock" => false
+//            ,"willSignage" => false
+//            ,"willCall" => false
+//            ,"willHouseParty" => false
+//            ,"willEnvelopes" => false
+//            ,"willOther" => false
 
         );
 
@@ -272,14 +283,27 @@ class RegisterController extends FOSRestController {
             if( array_key_exists("homePostcode", $input) &&
                 array_key_exists("homeSuburb", $input) &&
                 array_key_exists("homeStreetNumber", $input) &&
-                array_key_exists("homeStreet", $input)) {
+                array_key_exists("homeStreet", $input) &&
+                array_key_exists("homeStreetNumber", $input) &&
+                array_key_exists("whenAvailable", $input) &&
+                array_key_exists("whenToCall", $input) &&
+                array_key_exists("bestCommunication", $input)) {
 
-                $new_user->setHomePostcode($input["homePostcode"]);
-                $new_user->setHomeSuburb($input["homeSuburb"]);
-                $new_user->setHomeStreetNumber($input["homeStreetNumber"]);
-                $new_user->setHomeStreet($input["homeStreet"]);
+                $volunteer = new Volunteer($new_user, $input["homePostcode"], $input["homeSuburb"], $input["homeStreetNumber"], $input["homeStreet"]
+                    ,array_key_exists("willPollBooth", $input), array_key_exists("willDoorKnock", $input), array_key_exists("willSignage", $input)
+                    ,array_key_exists("willCall", $input), array_key_exists("willHouseParty", $input), array_key_exists("willEnvelopes", $input));
+
+                if(array_key_exists("willOther", $input) && array_key_exists("willOtherText", $input) && ($input["willOtherText"] !== "")) {
+                    $volunteer->setWillOther($input["willOtherText"]);
+                }
+                $volunteer->setWhenAvailable($input["whenAvailable"]);
+                $volunteer->setWhenToCall($input["whenToCall"]);
+                $volunteer->setBestCommunication($input["bestCommunication"]);
+
+                $this->em->persist($volunteer);
+                $new_user->setVolunteer($volunteer);
+
             } else {
-                $this->get("logger")->info(json_encode($url_params));
                 throw new ErrorRedirectException('signup_finish', "If you wish to volunteer, please enter your home address", "confirm-error", $url_params);
             }
         }
@@ -295,7 +319,7 @@ class RegisterController extends FOSRestController {
         $token = new UsernamePasswordToken($new_user, null, 'main', $new_user->getRoles());
         $this->get('security.token_storage')->setToken($token);
 
-        return new RedirectResponse($this->generateUrl('homepage'));
+        return new RedirectResponse($this->generateUrl('vote'));
     }
 
     /**

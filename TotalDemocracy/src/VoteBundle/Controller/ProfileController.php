@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use JMS\DiExtraBundle\Annotation as DI;
 
 use VoteBundle\Entity\ServerEvent;
+use VoteBundle\Entity\Volunteer;
 
 use VoteBundle\Exception\ErrorRedirectException;
 
@@ -30,6 +31,7 @@ class ProfileController extends FOSRestController {
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws ErrorRedirectException
      */
     public function profileAction(Request $request) {
 
@@ -38,18 +40,16 @@ class ProfileController extends FOSRestController {
             throw new ErrorRedirectException("homepage", "Not logged in");
         }
 
+        $volunteer = $user->getVolunteer();
         $output = array(
             "isVolunteer" => $user->getIsVolunteer()
             ,"isMember" => $user->getIsMember()
             ,"phone" => $user->getPhone()
-            ,"homePostcode" => $user->getHomePostcode()
-            ,"homeSuburb" => $user->getHomeSuburb()
-            ,"homeStreet" => $user->getHomeStreet()
-            ,"homeStreetNumber" => $user->getHomeStreetNumber()
+            ,"volunteer" => $volunteer
         );
 
-        if($user->getHomeSuburb()) {
-            $this->get("vote.js")->output("suburb", $user->getHomeSuburb());
+        if($volunteer && $volunteer->getHomeSuburb()) {
+            $this->get("vote.js")->output("suburb", $volunteer->getHomeSuburb());
         }
 
         $is_admin = $this->get("security.authorization_checker")->isGranted("ROLE_ADMIN");
@@ -115,22 +115,41 @@ class ProfileController extends FOSRestController {
             if( (!array_key_exists("homePostcode", $input)) ||
                 (!array_key_exists("homeSuburb", $input)) ||
                 (!array_key_exists("homeStreet", $input)) ||
-                (!array_key_exists("homeStreetNumber", $input))) {
-                throw new ErrorRedirectException("profile", "Cannot volunteer without home address");
+                (!array_key_exists("homeStreetNumber", $input)) ||
+                (!array_key_exists("whenAvailable", $input)) ||
+                (!array_key_exists("whenToCall", $input)) ||
+                (!array_key_exists("bestCommunication", $input))
+            ) {
+                throw new ErrorRedirectException("profile", "Incorrect parameters");
             }
-            $user->setHomePostcode($input['homePostcode']);
-            $user->setHomeSuburb($input['homeSuburb']);
-            $user->setHomeStreet($input['homeStreet']);
-            $user->setHomeStreetNumber($input['homeStreetNumber']);
+            $volunteer = $user->getVolunteer();
+            if($volunteer === NULL) {
+                $volunteer = new Volunteer($user, $input["homePostcode"], $input["homeSuburb"], $input["homeStreetNumber"], $input["homeStreet"]);
+                $this->em->persist($volunteer);
+                $user->setVolunteer($volunteer);
+            }
+
+            $volunteer->setHomePostcode($input['homePostcode']);
+            $volunteer->setHomeSuburb($input['homeSuburb']);
+            $volunteer->setHomeStreet($input['homeStreet']);
+            $volunteer->setHomeStreetNumber($input['homeStreetNumber']);
+            $volunteer->setWillPollBooth(array_key_exists("willPollBooth", $input));
+            $volunteer->setWillDoorKnock(array_key_exists("willDoorKnock", $input));
+            $volunteer->setWillSignage(array_key_exists("willSignage", $input));
+            $volunteer->setWillCall(array_key_exists("willCall", $input));
+            $volunteer->setWillHouseParty(array_key_exists("willHouseParty", $input));
+            $volunteer->setWillEnvelopes(array_key_exists("willEnvelopes", $input));
+
+            $volunteer->setWhenAvailable($input["whenAvailable"]);
+            $volunteer->setWhenToCall($input["whenToCall"]);
+            $volunteer->setBestCommunication($input["bestCommunication"]);
+
+            if(array_key_exists("willOther", $input) && array_key_exists("willOtherText", $input) && ($input["willOtherText"] !== "")) {
+                $volunteer->setWillOther($input["willOtherText"]);
+            } else {
+                $volunteer->setWillOther(NULL);
+            }
         }
-//        if($is_volunteer && (
-//            (!array_key_exists("homePostcode", $input)) ||
-//            (!array_key_exists("homeSuburb", $input)) ||
-//            (!array_key_exists("homeStreet", $input)) ||
-//            (!array_key_exists("homeStreetNumber", $input))
-//            )) {
-//            throw new ErrorRedirectException("profile", "Cannot volunteer without home address");
-//        }
 
         $user->setIsVolunteer($is_volunteer);
         $user->setIsMember(array_key_exists("isMember", $input));

@@ -18,7 +18,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label" for="postcode-input">Postcode</label>
         <div class="col-sm-4">
-            <input type="text" class="form-control" id="postcode-input" name="homePostcode" value="{{ homePostcode }}">
+            <input type="text" class="form-control" id="postcode-input" name="homePostcode" {% if volunteer is not null %}value="{{ volunteer.homePostcode }}"{% endif %}>
         </div>
     </div>
     <div class="form-group">
@@ -32,15 +32,98 @@
     <div class="form-group">
         <label class="col-sm-2 control-label" for="street-number-input">Street Number</label>
         <div class="col-sm-4">
-            <input type="text" class="form-control street-inputs" id="street-number-input" name="homeStreetNumber" value="{{ homeStreetNumber }}" disabled>
+            <input type="text" class="form-control street-inputs" id="street-number-input" name="homeStreetNumber" {% if volunteer is not null %}value="{{ volunteer.homeStreetNumber }}"{% endif %} disabled>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label" for="street-input">Street</label>
         <div class="col-sm-4">
-            <input type="text" class="form-control street-inputs" id="street-input" name="homeStreet" value="{{ homeStreet }}" disabled>
+            <input type="text" class="form-control street-inputs" id="street-input" name="homeStreet" {% if volunteer is not null %}value="{{ volunteer.homeStreet }}"{% endif %} disabled>
         </div>
     </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="willPollBooth" {% if volunteer is not null and volunteer.willPollBooth %}checked{% endif %}> I will hand out how-to-vote cards on election day
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="willDoorKnock" {% if volunteer is not null and volunteer.willDoorKnock %}checked{% endif %}> I will walk neighbourhoods and knock on voters' doors
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="willSignage" {% if volunteer is not null and volunteer.willSignage %}checked{% endif %}> I will place signage outside my house
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="willCall" {% if volunteer is not null and volunteer.willCall %}checked{% endif %}> I will call voters
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="willHouseParty" {% if volunteer is not null and volunteer.willHouseParty %}checked{% endif %}> I will host a house party
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="willEnvelopes" {% if volunteer is not null and volunteer.willEnvelopes %}checked{% endif %}> I will stuff envelopes
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="willOther" {% if volunteer is not null and volunteer.willOther is not null %}checked{% endif %}> I will help in other ways (suggestions below)
+                    <input class="form-control" type="text" name="willOtherText" {% if volunteer is not null %}value="{{ volunteer.willOther }}"{% endif %}>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="postcode-input">When you are available (optional)</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" name="whenAvailable" {% if volunteer is not null %}value="{{ volunteer.whenAvailable }}"{% endif %}>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="postcode-input">The best time to call (optional)</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" name="whenToCall" {% if volunteer is not null %}value="{{ volunteer.whenToCall }}"{% endif %}>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="suburb-select">Your preferred method of communication</label>
+        <div class="col-sm-4">
+            <select class="form-control" name="bestCommunication">
+                <option value="email" {% if volunteer is not null and volunteer.bestCommunication == "email" %}selected{% endif %}> Email </option>
+                <option value="text" {% if volunteer is not null and volunteer.bestCommunication == "text" %}selected{% endif %}> Text Message </option>
+                <option value="phone" {% if volunteer is not null and volunteer.bestCommunication == "phone" %}selected{% endif %}> Phone Call </option>
+                <option value="none" {% if volunteer is not null and volunteer.bestCommunication == "none" %}selected{% endif %}> None </option>
+            </select>
+        </div>
+    </div>
+
+    {#<div class="form-group">#}
+        {#<label class="col-sm-2 control-label" for="street-input">Street</label>#}
+        {#<div class="col-sm-4">#}
+            {#<input type="text" class="form-control street-inputs" id="street-input" name="homeStreet" value="{{ homeStreet }}" disabled>#}
+        {#</div>#}
+    {#</div>#}
 </div>
 <div class="form-group">
     <label class="col-sm-2 control-label" for="phone-input">Phone number</label>

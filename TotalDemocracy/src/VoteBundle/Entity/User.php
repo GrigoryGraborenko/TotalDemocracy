@@ -82,35 +82,20 @@ class User extends BaseUser {
     protected $phone;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $homePostcode;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $homeSuburb;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $homeStreet;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $homeStreetNumber;
-
-    /**
      * @ORM\ManyToMany(targetEntity="VoteBundle\Entity\Electorate", inversedBy="users")
      * @ORM\JoinTable(name="user_electorate")
      */
-    private $electorates;
+    protected $electorates;
 
     /**
      * @ORM\OneToMany(targetEntity="VoteBundle\Entity\UserDocumentVote", mappedBy="user")
      */
-    private $votes;
+    protected $votes;
+
+    /**
+     * @ORM\OneToOne(targetEntity="VoteBundle\Entity\Volunteer", inversedBy="user")
+     */
+    protected $volunteer;
 
     /**
      * @ORM\Column(type="boolean", nullable=false)
@@ -273,62 +258,6 @@ class User extends BaseUser {
     /**
      * @return mixed
      */
-    public function getHomePostcode() {
-        return $this->homePostcode;
-    }
-
-    /**
-     * @param mixed $homePostcode
-     */
-    public function setHomePostcode($homePostcode) {
-        $this->homePostcode = $homePostcode;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getHomeSuburb() {
-        return $this->homeSuburb;
-    }
-
-    /**
-     * @param mixed $homeSuburb
-     */
-    public function setHomeSuburb($homeSuburb) {
-        $this->homeSuburb = $homeSuburb;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getHomeStreet() {
-        return $this->homeStreet;
-    }
-
-    /**
-     * @param mixed $homeStreet
-     */
-    public function setHomeStreet($homeStreet) {
-        $this->homeStreet = $homeStreet;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getHomeStreetNumber() {
-        return $this->homeStreetNumber;
-    }
-
-    /**
-     * @param mixed $homeStreetNumber
-     */
-    public function setHomeStreetNumber($homeStreetNumber) {
-        $this->homeStreetNumber = $homeStreetNumber;
-    }
-
-    /**
-     * @return mixed
-     */
     public function getElectorates() {
         return $this->electorates;
     }
@@ -366,6 +295,20 @@ class User extends BaseUser {
      */
     public function setVotes($votes) {
         $this->votes = $votes;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVolunteer() {
+        return $this->volunteer;
+    }
+
+    /**
+     * @param mixed $volunteer
+     */
+    public function setVolunteer($volunteer) {
+        $this->volunteer = $volunteer;
     }
 
     /**

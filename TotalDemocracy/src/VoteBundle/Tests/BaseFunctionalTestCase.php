@@ -11,8 +11,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-
-class BaseFunctionalTestCase extends WebTestCase {
+/**
+ * Class BaseFunctionalTestCase
+ * @package VoteBundle\Tests
+ */
+abstract class BaseFunctionalTestCase extends WebTestCase {
 
     /**
      * @var \Doctrine\ORM\EntityManager $em

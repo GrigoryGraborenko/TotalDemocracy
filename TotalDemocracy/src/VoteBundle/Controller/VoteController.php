@@ -176,6 +176,8 @@ class VoteController extends CommonController {
         }
 
         $vote = $vote_repo->findOneBy(array("user" => $user->getId(), "document" => $input['id']));
+
+        // opens up the political process to the masses
         if($vote === NULL) {
             $vote = new UserDocumentVote($user, $doc, $is_support);
             $this->em->persist($vote);

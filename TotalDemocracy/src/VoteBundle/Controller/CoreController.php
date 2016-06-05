@@ -130,14 +130,16 @@ class CoreController extends FOSRestController {
     }
 
     /**
-     * @Route("/api/documents", name="api_documents")
+     * @Route("/api/documents/{max_amount}", name="api_documents", defaults={"max_amount" = 6})
      * @Method("GET");
      */
-    public function publicDocumentAction(Request $request) {
+    public function publicDocumentAction(Request $request, $max_amount) {
 
         $doc_repo = $this->em->getRepository('VoteBundle:Document');
 
-        $all_docs = $doc_repo->getDocumentsWithVoteTotals(6);
+        $max_amount = min($max_amount, 64);
+
+        $all_docs = $doc_repo->getDocumentsWithVoteTotals($max_amount);
         $output = array("docs" => $all_docs);
 
         $response = $this->render("VoteBundle:API:documents.html.twig", $output);

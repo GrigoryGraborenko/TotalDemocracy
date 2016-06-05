@@ -25,11 +25,32 @@ class RegistrationTest extends BaseFunctionalTestCase {
         $reg_event = $this->em->getRepository("VoteBundle:ServerEvent")->findOneBy(array("user" => $new_user, "name" => "registration"));
         $this->assertNotNull($reg_event, 'No registration event found');
         $this->assertNull($reg_event->getParent(), "Registration event should have no tracking event");
+
+        $this->attemptLogin($new_user->getEmail(), "fsdsfs", false);
+
+        $password = "pass1234";
+        $this->attemptConfirmation($new_user, $password);
+
+        $this->attemptLogin($new_user->getEmail(), "fdsf", false);
+        $this->attemptLogin($new_user->getEmail(), $password, true);
     }
 
-    // test menus as well, if they appear or not
+    // test order of verification, registration, confirmation
+
     public function testMenus() {
 
+        $this->checkMenuNames(array("Register", "Vote", "Login"));
+
+        $this->attemptRegistration("test@test.com", true);
+        $this->checkMenuNames(array("Register", "Verify", "Vote", "Login"));
+
+        $this->client->request('GET', "/signup");
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), "Failed to load signup page");
+
+        $this->checkMenuNames(array("Register", "Vote", "Login"));
+
+        $this->login("admin@test.com", "test", true);
+        $this->checkMenuNames(array("Verify", "Vote", "Settings", "Logout"));
     }
 
     public function testTracking() {
@@ -92,10 +113,11 @@ class RegistrationTest extends BaseFunctionalTestCase {
         $this->assertNull($reg_event->getParent(), 'Registration parent event found');
     }
 
-    // test order of verification, registration
-
-    // test tracking
-
+    /**
+     * @param $email
+     * @param $should_succeed
+     * @return null|object
+     */
     private function attemptRegistration($email, $should_succeed) {
 
         $crawler = $this->client->request('GET', "/signup");
@@ -122,5 +144,84 @@ class RegistrationTest extends BaseFunctionalTestCase {
             $this->assertStringEndsWith("/signup", $response->headers->get('location'), "Should have failed to register $email");
         }
         return NULL;
+    }
+
+    /**
+     * @param $user
+     * @param null $password
+     */
+    private function attemptConfirmation($user, $password = NULL) {
+
+        $this->assertFalse($user->isEnabled(), "User should not be enabled");
+
+        $email = $user->getEmail();
+        $token = $user->getConfirmationToken();
+
+        $crawler = $this->client->request('GET', "/signup-finish/$email/$token");
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), "Failed to load signup confirm page");
+
+        $form = $crawler->selectButton('Finish Registration')->form();
+        $this->assertNotNull($form, 'No form found');
+
+        if($password === NULL) {
+            $password = "password";
+        }
+
+        $this->client->submit($form, array(
+            'password'      => $password
+            ,'phone'        => "123456787"
+        ));
+
+        $this->em->refresh($user);
+
+        $this->assertTrue($user->isEnabled(), "User should be enabled");
+
+//        $this->assertEquals(302, $this->client->getResponse()->getStatusCode(), "Failed to confirm");
+    }
+
+    /**
+     * @param $email
+     * @param string $password
+     * @param bool $should_succeed
+     */
+    private function attemptLogin($email, $password = "password", $should_succeed = true) {
+
+        $crawler = $this->client->request('GET', "/login");
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), "Failed to load login confirm page");
+
+        $form = $crawler->selectButton('Login')->form();
+        $this->assertNotNull($form, 'Could not find form');
+
+        $this->client->submit($form, array(
+            '_username'        => $email
+            ,'_password'    => $password
+        ));
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(302, $response->getStatusCode(), "Did not redirect after login attempt");
+        if($should_succeed) {
+            $this->assertStringEndsNotWith("login", $response->headers->get('location'), "Failed to login in");
+        } else {
+            $this->assertStringEndsWith("login", $response->headers->get('location'), "Failed to login in");
+        }
+
+    }
+
+    /**
+     * @return array
+     */
+    private function checkMenuNames($expected) {
+
+        $crawler = $this->client->request('GET', "/");
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), "Failed to load home page");
+        $links = $crawler->filter("#navbar a");
+        $link_names = array();
+        foreach($links as $link) {
+            $link_names[] = $link->textContent;
+        }
+        $this->assertEmpty(array_merge(array_diff($expected, $link_names), array_diff($link_names, $expected)), "Incorrect menus, should be " . json_encode($expected) .  ", was " .json_encode($link_names));
+//        $this->assertArraySubset($expected, $link_names, true, "Incorrect menus, should be " . json_encode($expected) .  ", was " .json_encode($link_names));
+//        $this->assertArraySubset($link_names, $expected, true, "Incorrect menus, should be " . json_encode($expected) .  ", was " .json_encode($link_names));
+        //return $link_names;
     }
 }

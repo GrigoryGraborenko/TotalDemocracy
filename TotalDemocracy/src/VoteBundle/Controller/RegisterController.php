@@ -194,6 +194,9 @@ class RegisterController extends FOSRestController {
         if($new_user === NULL) {
             throw new ErrorRedirectException('homepage', "Email or confirmation token is incorrect");
         }
+        if($new_user->isEnabled()) {
+            throw new ErrorRedirectException('homepage', "Cannot register twice");
+        }
 
         if($new_user->getSuburb()) {
             $this->get("vote.js")->output("suburb", $new_user->getSuburb());

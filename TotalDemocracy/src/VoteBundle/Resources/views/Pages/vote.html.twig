@@ -7,10 +7,18 @@
     {% if can_vote %}
         <p>You are registered to vote in:
             <ul>
-                <li>Federal Division: {{ federal.name }}</li>
-                <li>State District: {{ state.name }}</li>
-                <li>Local Government Area: {{ local.domain.name }}</li>
-                <li>Local Ward/Division: {{ local.name }}</li>
+                {% if federal is defined %}
+                    <li>Federal Division: {{ federal.name }}</li>
+                {% endif %}
+                {% if state is defined %}
+                    <li>State District: {{ state.name }}</li>
+                {% endif %}
+                {% if local is defined %}
+                    <li>Local Government Area: {{ local.domain.name }}</li>
+                {% endif %}
+                {% if local is defined %}
+                    <li>Local Ward/Division: {{ local.name }}</li>
+                {% endif %}
             </ul>
         </p>
         <p>These details are correct as of {{ user.whenVerified | date("d/m/Y") }}</p>
@@ -49,14 +57,14 @@
 
     </form>
 
-    {% for doc in doc_list %}
-        <div data-doc-block="{{ doc.doc.id }}">
-            <h3>{{ doc.doc.name }} [<span class="yes-count">{{ doc.supporters }}</span> voted yes, <span class="no-count">{{ doc.opponents }}</span> voted no]</h3>
-            <h6>{{ doc.doc.domain.name }}{% if doc.doc.externalURL is not null %} - <a href="{{ doc.doc.externalURL }}">View details</a>{% endif %}</h6>
-            <p>{{ doc.doc.summary }}</p>
-            {% if doc.can_vote %}
-                <button class="btn btn-success vote-on" data-id="{{ doc.doc.id }}" data-vote="true" {% if doc.yes_vote %}disabled{% endif %}>Yes</button>
-                <button class="btn btn-danger vote-on" data-id="{{ doc.doc.id }}" data-vote="false" {% if doc.no_vote %}disabled{% endif %}>No</button>
+    {% for info in doc_list %}
+        <div data-doc-block="{{ info.doc.id }}" class="pd-document-internal">
+            <h3>{{ info.doc.name }} [<span class="yes-count">{{ info.supporters }}</span> voted yes, <span class="no-count">{{ info.opponents }}</span> voted no]</h3>
+            <h6>{{ info.doc.domain.name }}{% if info.doc.externalURL is not null %} - <a href="{{ info.doc.externalURL }}">View details</a>{% endif %}</h6>
+            <p>{{ info.doc.summary }}</p>
+            {% if info.can_vote %}
+                <button class="btn btn-success vote-on" data-id="{{ info.doc.id }}" data-vote="true" {% if info.yes_vote %}disabled{% endif %}>Yes</button>
+                <button class="btn btn-danger vote-on" data-id="{{ info.doc.id }}" data-vote="false" {% if info.no_vote %}disabled{% endif %}>No</button>
             {% endif %}
         </div>
     {% endfor %}

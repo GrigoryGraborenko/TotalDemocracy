@@ -14,6 +14,8 @@ use Carbon\Carbon;
 
 class RegistrationTest extends BaseFunctionalTestCase {
 
+    // TODO: ensure that when confirming, the address is pre-filled from verification
+
     // test registration
     public function testRegistration() {
 
@@ -220,8 +222,5 @@ class RegistrationTest extends BaseFunctionalTestCase {
             $link_names[] = $link->textContent;
         }
         $this->assertEmpty(array_merge(array_diff($expected, $link_names), array_diff($link_names, $expected)), "Incorrect menus, should be " . json_encode($expected) .  ", was " .json_encode($link_names));
-//        $this->assertArraySubset($expected, $link_names, true, "Incorrect menus, should be " . json_encode($expected) .  ", was " .json_encode($link_names));
-//        $this->assertArraySubset($link_names, $expected, true, "Incorrect menus, should be " . json_encode($expected) .  ", was " .json_encode($link_names));
-        //return $link_names;
     }
 }

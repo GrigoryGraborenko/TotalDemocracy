@@ -7,9 +7,12 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Carbon\Carbon;
 use VoteBundle\Entity\User;
 
 class LoadUserData extends AbstractFixture implements OrderedFixtureInterface {
+
+    private $manager;
 
     /**
      * {@inheritDoc}
@@ -17,15 +20,16 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface {
      */
     public function load(ObjectManager $manager) {
 
-        $manager->persist($this->createUser('bob', false, array("electorate-federal-griffith", "electorate-state-south-brisbane", "electorate-local-coorparoo")));
-        $manager->persist($this->createUser('steve', false, 'smith'));
-        $manager->persist($this->createUser('harry', false, 'henderson'));
-        $manager->persist($this->createUser('terry', false, 'archer'));
-        $manager->persist($this->createUser('sally', true, 'winston'));
-        $manager->persist($this->createUser('admin', true));
+        $this->manager = $manager;
+
+        $this->createUser('bob', false, array("electorate-federal-banks", "electorate-state-albert", "electorate-local-central-ward"))->setWhenVerified(Carbon::now("UTC"));
+        $this->createUser('steve', false);
+        $this->createUser('harry', false);
+        $this->createUser('terry', false);
+        $this->createUser('sally', true);
+        $this->createUser('admin', true);
 
         $manager->flush();
-
     }
 
     private function createUser($first_name, $is_admin, $electorate_references = array()) {
@@ -45,8 +49,10 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface {
 
         $this->addReference('user-' . $first_name, $user);
 
-//        foreach($electorate_references as $elect_ref) {
-//        }
+        $this->manager->persist($user);
+        foreach($electorate_references as $elect_ref) {
+            $user->addElectorate($this->getReference($elect_ref));
+        }
 
         return $user;
     }

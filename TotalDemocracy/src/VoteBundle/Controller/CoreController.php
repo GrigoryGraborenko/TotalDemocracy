@@ -15,15 +15,20 @@ use VoteBundle\Exception\BadRequestException;
  * TODO FIXES:
  *
  *
+ * completely remove homepage
+ *
+ *
 n) Can you make my karel@jnana.com.au account an admin account and delete all my other accounts karelb@me.com, contact@ecodirectory.com.au and contact@eserai.com?
-p) On the voting page people will want to be able to opt-in to email notifications for new or updated Bills for their filter combination, eg: notify me when new or updated Federal Bills with keyword environment in them. *
 
 h) Make a separate menu item “Volunteer" with “Volunteer address”. When they click activation link in email it takes them to Volunteer first ("Volunteer address" is mandatory if they didn’t verify and optional if they verified), then take them to settings with member tick box (only if they have verified), phone number and password
 j) When logged in and verified change name “Verify" to ‘Verify or update address”
 g) BUG verification link in email not working, there is extra string before the address
 you need to scrap these from aec because State District, Local Government Area and Local Ward/Division may be called something else in different states.
+    Gregory James McFarlane 2096 Freshwater (Wilson st)
 
+confirmation details need to be pre-filled
 ensure that vote filters work properly - need to disable until JS loads, get rid of hanging query string
+ARE YOU ACTUALLY REMOVING OLD ELECTORATES?
  *
  * Minimum password complexity
  * Verification success and electorate listings should be prettier
@@ -44,6 +49,8 @@ ensure that vote filters work properly - need to disable until JS loads, get rid
  * Better verified page, with proper info from users
  * Checkbox for "live here"
  * what about metadata on electoral roll import?
+
+p) On the voting page people will want to be able to opt-in to email notifications for new or updated Bills for their filter combination, eg: notify me when new or updated Federal Bills with keyword environment in them. *
  *
  * TODO:
  * Migrations

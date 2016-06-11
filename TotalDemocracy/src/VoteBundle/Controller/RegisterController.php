@@ -13,7 +13,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use JMS\DiExtraBundle\Annotation as DI;
 
@@ -86,7 +85,7 @@ class RegisterController extends FOSRestController {
      * @Route("/signup-email", name="signup_email")
      * @Method("POST")
      */
-    public function emailAction(Request $request) {
+    public function signupEmailAction(Request $request) {
 
         $user = $this->getUser();
         if($user !== NULL) {
@@ -143,13 +142,9 @@ class RegisterController extends FOSRestController {
             }
         }
 
-        //$this->get("logger")->info("INPUT " . json_encode($input));
-
-        $validator = $this->get('validator');
-        $emailConstraint = new EmailConstraint();
-        $errors  = $validator->validate($email, $emailConstraint);
-        if((count($errors) > 0) || (strlen($email) < 1)) {
-            throw new ErrorRedirectException('signup', "$email is an invalid email", "email-error");
+        $email_valid = $this->get("vote.user")->isEmailValid($email);
+        if($email_valid !== true) {
+            throw new ErrorRedirectException('signup', $email_valid, "email-error");
         }
 
         $userManager = $this->get('fos_user.user_manager');
@@ -204,36 +199,20 @@ class RegisterController extends FOSRestController {
             $this->get("vote.js")->output("suburb", $new_user->getSuburb());
         }
 
-        $pass_min_length = $this->get("vote.option")->getInteger("password.length.min");
-        $phone_min_length = $this->get("vote.option")->getInteger("phone.length.min");
+        $options = $this->get("vote.option");
+
+        $pass_min_length = $options->getInteger("password.length.min");
+        $phone_min_length = $options->getInteger("phone.length.min");
         $output = array(
             "email" => $email
             ,"token" => $confirm_token
             ,"password_min_length" => $pass_min_length
             ,"phone_min_length" => $phone_min_length
 
-//            ,"postcode" => $new_user->getPostcode()
-//            ,"suburb" => $new_user->getSuburb()
-//            ,"street" => $new_user->getStreet()
-//            ,"streetNumber" => $new_user->getStreetNumber()
-
             ,"isVolunteer" => $new_user->getIsVolunteer()
             ,"isMember" => $new_user->getIsMember()
             ,"phone" => $new_user->getPhone()
             ,"volunteer" => NULL
-//            ,"homePostcode" => $new_user->getPostcode() // all four default to what was verified
-//            ,"homeSuburb" => $new_user->getSuburb()
-//            ,"homeStreet" => $new_user->getStreet()
-//            ,"homeStreetNumber" => $new_user->getStreetNumber()
-//
-//            ,"willPollBooth" => false
-//            ,"willDoorKnock" => false
-//            ,"willSignage" => false
-//            ,"willCall" => false
-//            ,"willHouseParty" => false
-//            ,"willEnvelopes" => false
-//            ,"willOther" => false
-
         );
 
         return $this->render('VoteBundle:Pages:register_finish.html.twig', $output);
@@ -265,11 +244,14 @@ class RegisterController extends FOSRestController {
         $is_volunteer = array_key_exists('isVolunteer', $input);
         $is_member = array_key_exists('isMember', $input);
 
-        $min_password_len = $this->get("vote.option")->getInteger("password.length.min");
-        $phone_min_length = $this->get("vote.option")->getInteger("phone.length.min");
-        if(strlen($password) < $min_password_len) {
-            throw new ErrorRedirectException('signup_finish', "Password is too short, needs to be at least $min_password_len characters long", "confirm-error", $url_params);
+        $options = $this->get("vote.option");
+
+        $password_valid = $this->get("vote.user")->isPasswordValid($password);
+        if($password_valid !== true) {
+            throw new ErrorRedirectException('signup_finish', $password_valid, "confirm-error", $url_params);
         }
+
+        $phone_min_length = $options->getInteger("phone.length.min");
         if(strlen($phone) < $phone_min_length) {
             throw new ErrorRedirectException('signup_finish', "Phone number is too short, needs to be at least $phone_min_length characters long", "confirm-error", $url_params);
         }

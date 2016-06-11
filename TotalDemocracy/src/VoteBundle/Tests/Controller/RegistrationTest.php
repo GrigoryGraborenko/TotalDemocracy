@@ -31,7 +31,8 @@ class RegistrationTest extends BaseFunctionalTestCase {
         $this->attemptLogin($new_user->getEmail(), "fsdsfs", false);
 
         $password = "pass1234";
-        $this->attemptConfirmation($new_user, $password);
+        $this->attemptConfirmation($new_user, "tiny", false); // too short a password
+        $this->attemptConfirmation($new_user, $password, true);
 
         $this->attemptLogin($new_user->getEmail(), "fdsf", false);
         $this->attemptLogin($new_user->getEmail(), $password, true);
@@ -150,9 +151,10 @@ class RegistrationTest extends BaseFunctionalTestCase {
 
     /**
      * @param $user
-     * @param null $password
+     * @param $password
+     * @param bool $expect_success
      */
-    private function attemptConfirmation($user, $password = NULL) {
+    private function attemptConfirmation($user, $password, $expect_success = true) {
 
         $this->assertFalse($user->isEnabled(), "User should not be enabled");
 
@@ -176,9 +178,11 @@ class RegistrationTest extends BaseFunctionalTestCase {
 
         $this->em->refresh($user);
 
-        $this->assertTrue($user->isEnabled(), "User should be enabled");
-
-//        $this->assertEquals(302, $this->client->getResponse()->getStatusCode(), "Failed to confirm");
+        if($expect_success) {
+            $this->assertTrue($user->isEnabled(), "User should be enabled");
+        } else {
+            $this->assertFalse($user->isEnabled(), "User should not be enabled");
+        }
     }
 
     /**

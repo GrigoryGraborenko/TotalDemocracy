@@ -26,7 +26,6 @@ confirmation details need to be pre-filled
 ensure that vote filters work properly - need to disable until JS loads, get rid of hanging query string
 ARE YOU ACTUALLY REMOVING OLD ELECTORATES?
  *
- * Minimum password complexity
  * Verification success and electorate listings should be prettier
  * Make sure that rego and verify both can be switched off for maintenance
  * Admin backend for candidates or volunteers

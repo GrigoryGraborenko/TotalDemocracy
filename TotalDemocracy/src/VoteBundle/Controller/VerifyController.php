@@ -64,6 +64,8 @@ class VerifyController extends CommonController {
         // will replace the previous values if a prior form submission occurred
         $output = $this->get('session')->getFlashBag()->get("previous_input", $output);
 
+        $output['verify_button_text'] = ($user->getWhenVerified() === NULL) ? "Verify" : "Verify or Update Address";
+
         $this->get('vote.js')->output("suburb", $output["suburb"]);
 
         $output["month_names"] = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
@@ -268,6 +270,9 @@ class VerifyController extends CommonController {
             $council = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGA2')->html();
             $council_ward = $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGAWard2')->html();
 
+            $state_descriptor = str_replace(":", "", $crawler->filter('#ctl00_ContentPlaceHolderBody_labelStateDistrict')->html());
+            $local_descriptor = str_replace(":", "", $crawler->filter('#ctl00_ContentPlaceHolderBody_labelLGAWard')->html());
+
             $state_abb = substr($input['suburb'], strpos($input['suburb'], "(") + 1, -1);
 
             $user->setGivenNames(ucwords(strtolower($input['givenNames'])));
@@ -301,7 +306,7 @@ class VerifyController extends CommonController {
             $state_elect = $elect_repo->findOneBy(array("domain" => $state_domain, "name" => $state_district));
             if($state_elect === NULL) {
                 $this->logger->info("Creating new $state_abb state electorate: $state_district");
-                $state_elect = new Electorate($state_domain, $state_district);
+                $state_elect = new Electorate($state_domain, $state_district, $state_descriptor);
                 $this->em->persist($state_elect);
             }
             $user->addElectorate($state_elect);
@@ -315,7 +320,7 @@ class VerifyController extends CommonController {
             $local_elect = $elect_repo->findOneBy(array("domain" => $local_domain, "name" => $council_ward));
             if($local_elect === NULL) {
                 $this->logger->info("Creating new $council local electorate: $council_ward");
-                $local_elect = new Electorate($local_domain, $council_ward);
+                $local_elect = new Electorate($local_domain, $council_ward, $local_descriptor);
                 $this->em->persist($local_elect);
             }
             $user->addElectorate($local_elect);

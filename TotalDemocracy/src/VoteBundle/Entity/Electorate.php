@@ -41,14 +41,21 @@ class Electorate {
      * The domain the electorate elects representatives for
      *
      * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Domain", inversedBy="electorates")
+     * @ORM\JoinColumn(nullable=false)
      */
     protected $domain;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=false)
      * @Expose
      */
     protected $name;
+
+    /**
+     * @ORM\Column(type="string", nullable=false)
+     * @Expose
+     */
+    protected $description;
 
     /**
      * @ORM\ManyToMany(targetEntity="VoteBundle\Entity\User", mappedBy="electorates")
@@ -59,10 +66,20 @@ class Electorate {
      * Electorate constructor.
      * @param $domain
      * @param $name
+     * @param null $description
      */
-    public function __construct($domain, $name) {
+    public function __construct($domain, $name, $description = NULL) {
         $this->domain = $domain;
         $this->name = $name;
+        if($description !== NULL) {
+            $this->description = $description;
+        } else if($domain->getLevel() === "federal") {
+            $this->description = "Federal Division";
+        } else if($domain->getLevel() === "state") {
+            $this->description = "State District";
+        } else {
+            $this->description = "Local Ward/Division";
+        }
     }
 
     /**
@@ -105,6 +122,20 @@ class Electorate {
      */
     public function setName($name) {
         $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription() {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $description
+     */
+    public function setDescription($description) {
+        $this->description = $description;
     }
 
     /**

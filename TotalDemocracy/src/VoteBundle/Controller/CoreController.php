@@ -21,9 +21,8 @@ use VoteBundle\Exception\BadRequestException;
 n) Can you make my karel@jnana.com.au account an admin account and delete all my other accounts karelb@me.com, contact@ecodirectory.com.au and contact@eserai.com?
 
 h) Make a separate menu item “Volunteer" with “Volunteer address”. When they click activation link in email it takes them to Volunteer first ("Volunteer address" is mandatory if they didn’t verify and optional if they verified), then take them to settings with member tick box (only if they have verified), phone number and password
-j) When logged in and verified change name “Verify" to ‘Verify or update address”
 g) BUG verification link in email not working, there is extra string before the address
-you need to scrap these from aec because State District, Local Government Area and Local Ward/Division may be called something else in different states.
+test scraping of electorate descriptions:
     Gregory James McFarlane 2096 Freshwater (Wilson st)
 
 confirmation details need to be pre-filled

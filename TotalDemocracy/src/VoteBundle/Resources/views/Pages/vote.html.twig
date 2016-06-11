@@ -8,16 +8,16 @@
         <p>You are registered to vote in:
             <ul>
                 {% if federal is defined %}
-                    <li>Federal Division: {{ federal.name }}</li>
+                    <li>{{ federal.description }}: {{ federal.name }}</li>
                 {% endif %}
                 {% if state is defined %}
-                    <li>State District: {{ state.name }}</li>
+                    <li>{{ state.description }}: {{ state.name }}</li>
                 {% endif %}
                 {% if local is defined %}
                     <li>Local Government Area: {{ local.domain.name }}</li>
                 {% endif %}
                 {% if local is defined %}
-                    <li>Local Ward/Division: {{ local.name }}</li>
+                    <li>{{ local.description }}: {{ local.name }}</li>
                 {% endif %}
             </ul>
         </p>

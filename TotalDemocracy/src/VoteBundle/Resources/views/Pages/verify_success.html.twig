@@ -6,10 +6,10 @@
 
     <p>You are registered to vote in:
         <ul>
-            <li>Federal Division: {{ federal.name }}</li>
-            <li>State District: {{ state.name }}</li>
+            <li>{{ federal.description }}: {{ federal.name }}</li>
+            <li>{{ state.description }}: {{ state.name }}</li>
             <li>Local Government Area: {{ local.domain.name }}</li>
-            <li>Local Ward/Division: {{ local.name }}</li>
+            <li>{{ local.description }}: {{ local.name }}</li>
         </ul>
     </p>
 

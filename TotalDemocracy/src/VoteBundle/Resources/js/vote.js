@@ -55,7 +55,7 @@ $(document).ready(function() {
         window.location.search = encoded;
     }
 
-    $('.domain-select').change(function() {
+    $('.domain-select').prop("disabled", false).change(function() {
         $select = $(this);
         refreshFilter($select.data().level, $select.val());
     });

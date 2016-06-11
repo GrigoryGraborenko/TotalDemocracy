@@ -46,6 +46,7 @@ class ProfileController extends FOSRestController {
             ,"isMember" => $user->getIsMember()
             ,"phone" => $user->getPhone()
             ,"volunteer" => $volunteer
+            ,"user" => $user
         );
 
         if($volunteer && $volunteer->getHomeSuburb()) {

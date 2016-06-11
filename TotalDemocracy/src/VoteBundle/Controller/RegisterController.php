@@ -213,6 +213,7 @@ class RegisterController extends FOSRestController {
             ,"isMember" => $new_user->getIsMember()
             ,"phone" => $new_user->getPhone()
             ,"volunteer" => NULL
+            ,"user" => $new_user
         );
 
         return $this->render('VoteBundle:Pages:register_finish.html.twig', $output);

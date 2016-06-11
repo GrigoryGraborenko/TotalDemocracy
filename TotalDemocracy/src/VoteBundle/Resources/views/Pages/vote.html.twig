@@ -31,7 +31,7 @@
             <label>Show: </label>
 
             {% for type, level in domains_levels %}
-                <select class="form-control domain-select" data-level="{{ type }}">
+                <select class="form-control domain-select" data-level="{{ type }}" disabled>
                     {% for id, domain in level.domains %}
                         <option
                                 {% if id == "" %}

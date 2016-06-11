@@ -19,17 +19,10 @@ n) Can you make my karel@jnana.com.au account an admin account and delete all my
 
 h) Make a separate menu item “Volunteer" with “Volunteer address”. When they click activation link in email it takes them to Volunteer first ("Volunteer address" is mandatory if they didn’t verify and optional if they verified), then take them to settings with member tick box (only if they have verified), phone number and password
 g) BUG verification link in email not working, there is extra string before the address
-test scraping of electorate descriptions:
-    Gregory James McFarlane 2096 Freshwater (Wilson st)
 
-confirmation details need to be pre-filled
-ensure that vote filters work properly - need to disable until JS loads, get rid of hanging query string
-ARE YOU ACTUALLY REMOVING OLD ELECTORATES?
- *
  * Verification success and electorate listings should be prettier
  * Make sure that rego and verify both can be switched off for maintenance
  * Admin backend for candidates or volunteers
- * Remember details on rego confirm
  *
  * Some way to log out of "new user" mode
  * Abstain vote?
@@ -41,7 +34,6 @@ ARE YOU ACTUALLY REMOVING OLD ELECTORATES?
  * Load up email with social links
  * Flag users if imported from nationbuilder
  * Add concept of "user verified but mismatch"
- * Better verified page, with proper info from users
  * Checkbox for "live here"
  * what about metadata on electoral roll import?
 

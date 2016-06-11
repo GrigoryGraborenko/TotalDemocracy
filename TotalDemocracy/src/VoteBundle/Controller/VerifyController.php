@@ -41,7 +41,7 @@ class VerifyController extends CommonController {
 
         $user = $this->getPotentialUser($this->em);
         if($user === NULL) {
-            throw new ErrorRedirectException("homepage", "No user available");
+            throw new ErrorRedirectException("error_page", "No user available");
         }
 
         $base_url = "https://oevf.aec.gov.au/";
@@ -91,7 +91,7 @@ class VerifyController extends CommonController {
         )));
 
         if($response->getStatusCode() !== 200) {
-            throw new ErrorRedirectException("homepage", "Cannot load verification page");
+            throw new ErrorRedirectException("error_page", "Cannot load verification page");
         }
 
         $cookie = explode(";", $response->getHeader("Set-Cookie")[0])[0];

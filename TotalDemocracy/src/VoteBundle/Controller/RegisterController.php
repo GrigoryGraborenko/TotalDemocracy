@@ -47,7 +47,7 @@ class RegisterController extends FOSRestController {
 
         $user = $this->getUser();
         if($user !== NULL) {
-            throw new ErrorRedirectException('homepage', "Cannot register twice");
+            throw new ErrorRedirectException('error_page', "Cannot register twice");
         }
 
         $recaptcha = $this->getParameter("recaptcha");
@@ -90,7 +90,7 @@ class RegisterController extends FOSRestController {
 
         $user = $this->getUser();
         if($user !== NULL) {
-            throw new ErrorRedirectException('homepage', "Cannot register twice", "email-error");
+            throw new ErrorRedirectException('error_page', "Cannot register twice", "email-error");
         }
 
         $input = $request->request->all();
@@ -189,15 +189,15 @@ class RegisterController extends FOSRestController {
     public function signupFinishAction(Request $request, $email, $confirm_token) {
 
         if($this->getUser() !== NULL) {
-            throw new ErrorRedirectException('homepage', "Cannot register twice");
+            throw new ErrorRedirectException('error_page', "Cannot register twice");
         }
 
         $new_user = $this->em->getRepository('VoteBundle:User')->findOneBy(array("emailCanonical" => $email, "confirmationToken" => $confirm_token, "enabled" => false));
         if($new_user === NULL) {
-            throw new ErrorRedirectException('homepage', "Email or confirmation token is incorrect");
+            throw new ErrorRedirectException('error_page', "Email or confirmation token is incorrect");
         }
         if($new_user->isEnabled()) {
-            throw new ErrorRedirectException('homepage', "Cannot register twice");
+            throw new ErrorRedirectException('error_page', "Cannot register twice");
         }
 
         if($new_user->getSuburb()) {
@@ -247,7 +247,7 @@ class RegisterController extends FOSRestController {
 
         $user = $this->getUser();
         if($user !== NULL) {
-            throw new ErrorRedirectException('homepage', "Cannot register twice");
+            throw new ErrorRedirectException('error_page', "Cannot register twice");
         }
 
         $url_params = array("email" => $email, "confirm_token" => $confirm_token);
@@ -257,7 +257,7 @@ class RegisterController extends FOSRestController {
         if( (!array_key_exists("password", $input)) ||
             (!array_key_exists("phone", $input))
             ) {
-            throw new ErrorRedirectException('homepage', "Incorrect parameters specified");
+            throw new ErrorRedirectException('error_page', "Incorrect parameters specified");
         }
 
         $password = $input['password'];

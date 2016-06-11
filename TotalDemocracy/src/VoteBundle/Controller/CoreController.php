@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use JMS\DiExtraBundle\Annotation as DI;
 
@@ -13,10 +14,6 @@ use VoteBundle\Exception\BadRequestException;
 
 /*
  * TODO FIXES:
- *
- *
- * completely remove homepage
- *
  *
 n) Can you make my karel@jnana.com.au account an admin account and delete all my other accounts karelb@me.com, contact@ecodirectory.com.au and contact@eserai.com?
 
@@ -72,12 +69,25 @@ class CoreController extends FOSRestController {
      */
     public function indexAction(Request $request) {
 
-        return $this->render('VoteBundle:Pages:home.html.twig', array());
+        return new RedirectResponse("http://www.peopledecide.org.au");
+//        return $this->render('VoteBundle:Pages:home.html.twig', array());
+    }
+
+    /**
+     * @Route("/error", name="error_page")
+     */
+    public function errorAction(Request $request) {
+
+        return $this->render('VoteBundle:Errors:logic_error.html.twig', array());
     }
 
     /**
      * @Route("/api/login", name="api_login")
      * @Method("POST");
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws BadRequestException
      */
     public function loginJSONAction(Request $request) {
 

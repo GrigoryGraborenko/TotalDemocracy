@@ -37,7 +37,7 @@ class ProfileController extends FOSRestController {
 
         $user = $this->getUser();
         if($user === NULL) {
-            throw new ErrorRedirectException("homepage", "Not logged in");
+            throw new ErrorRedirectException("error_page", "Not logged in");
         }
 
         $volunteer = $user->getVolunteer();
@@ -99,7 +99,7 @@ class ProfileController extends FOSRestController {
 
         $user = $this->getUser();
         if($user === NULL) {
-            throw new ErrorRedirectException("homepage", "Not logged in");
+            throw new ErrorRedirectException("error_page", "Not logged in");
         }
         $input = $request->request->all();
 
@@ -172,7 +172,7 @@ class ProfileController extends FOSRestController {
 
         $user = $this->getUser();
         if($user === NULL) {
-            throw new ErrorRedirectException("homepage", "Not logged in");
+            throw new ErrorRedirectException("error_page", "Not logged in");
         }
 
         $input = $request->request->all();
@@ -216,7 +216,7 @@ class ProfileController extends FOSRestController {
 
         $user = $this->getUser();
         if($user === NULL) {
-            throw new ErrorRedirectException("homepage", "Not logged in");
+            throw new ErrorRedirectException("error_page", "Not logged in");
         }
 
         $input = $request->request->all();
@@ -263,7 +263,7 @@ class ProfileController extends FOSRestController {
 
         $user = $this->getUser();
         if($user === NULL) {
-            throw new ErrorRedirectException("homepage", "Not logged in");
+            throw new ErrorRedirectException("error_page", "Not logged in");
         }
 
         $is_admin = $this->get("security.authorization_checker")->isGranted("ROLE_ADMIN");

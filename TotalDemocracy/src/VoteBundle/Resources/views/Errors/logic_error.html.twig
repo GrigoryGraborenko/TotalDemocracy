@@ -1,0 +1,17 @@
+{% extends "::base.html.twig" %}
+
+{% block content %}
+
+    <h1>Error</h1>
+
+    {% if app.session.flashbag.has('error-redirect') %}
+        <h4>
+            {% for error in app.session.flashbag.get('error-redirect') %}
+                {{ error }}
+            {% endfor %}
+        </h4>
+    {% endif %}
+
+    <p>Go back to the <a href="{{ path('vote') }}">vote page</a></p>
+
+{% endblock %}

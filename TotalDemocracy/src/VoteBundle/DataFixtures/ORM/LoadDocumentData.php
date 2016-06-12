@@ -35,7 +35,7 @@ class LoadDocumentData extends AbstractFixture implements OrderedFixtureInterfac
                                 ,array(), array("user-bob"));
         $this->createDocument(  'domain-state-new-south-wales', "Sydney Bill", "More Sydney.");
         $this->createDocument(  'domain-local-brisbane-city', "Bike Path", "Build a bike path around the city."
-                                ,array("user-bob", "user-sally"), array("user-terry"));
+                                ,array("user-harry", "user-sally"), array("user-terry"));
 
         $manager->flush();
     }

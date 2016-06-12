@@ -195,6 +195,11 @@ class ProfileController extends FOSRestController {
             throw new ErrorRedirectException("profile", "Please enter a new password", "error-password");
         }
 
+        $is_valid = $this->get("vote.user")->isPasswordValid($password);
+        if($is_valid !== true) {
+            throw new ErrorRedirectException("profile", $is_valid, "error-password");
+        }
+
         $user->setPlainPassword($password);
         $user_manager = $this->get('fos_user.user_manager');
         $user_manager->updatePassword($user);

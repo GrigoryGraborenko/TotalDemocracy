@@ -8,6 +8,7 @@
 
 namespace VoteBundle\Tests\Controller;
 
+use Symfony\Component\DomCrawler\Crawler;
 use VoteBundle\Tests\BaseFunctionalTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Carbon\Carbon;
@@ -43,7 +44,62 @@ class VoteTest extends BaseFunctionalTestCase {
 
     }
 
-    // TODO: test actual voting!
+    // tests voting for a bill, then changing your mind and voting no instead
+    public function testVote() {
+
+        $this->login(); // defaults to bob, who is "verified"
+
+        $doc = $this->em->getRepository("VoteBundle:Document")->findOneBy(array("name" => "Bike Path"));
+        $doc_id = $doc->getId();
+
+        $crawler = $this->client->request('GET', "/");
+        $doc_nodes = $crawler->filter(".pd-document-internal[data-doc-block='$doc_id']");
+        $this->assertCount(1, $doc_nodes, "Should be one document node");
+
+        $starting_yes = 2;
+        $starting_no = 1;
+
+        $yes_count = intval($doc_nodes->filter(".yes-count")->html());
+        $no_count = intval($doc_nodes->filter(".no-count")->html());
+        $this->assertEquals($starting_yes, $yes_count, "Should be $starting_yes yes votes");
+        $this->assertEquals($starting_no, $no_count, "Should be $starting_no no votes");
+
+        $this->client->request('POST', "/vote-on", array("id" => $doc_id, "vote" => "true"));
+        $response = $this->client->getResponse();
+        $this->assertEquals(200, $response->getStatusCode(), "Failed to vote");
+
+        $output = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey("success", $output, "Should have returned successful vote");
+        $this->assertArrayHasKey("total_yes", $output, "Should have returned number of yes votes");
+        $this->assertArrayHasKey("total_no", $output, "Should have returned number of no votes");
+        $this->assertEquals($starting_yes + 1, $output["total_yes"], "Yes vote did not increase by one");
+        $this->assertEquals($starting_no, $output["total_no"], "No vote changed");
+
+        $crawler = $this->client->request('GET', "/");
+        $doc_nodes = $crawler->filter(".pd-document-internal[data-doc-block='$doc_id']");
+        $yes_count = intval($doc_nodes->filter(".yes-count")->html());
+        $no_count = intval($doc_nodes->filter(".no-count")->html());
+        $this->assertCount(1, $doc_nodes, "Should be one document node");
+        $this->assertEquals($starting_yes + 1, $yes_count, "Should be $starting_yes + 1 yes votes");
+        $this->assertEquals($starting_no, $no_count, "Should be $starting_no no votes");
+
+        $this->client->request('POST', "/vote-on", array("id" => $doc_id, "vote" => "false"));
+        $response = $this->client->getResponse();
+        $this->assertEquals(200, $response->getStatusCode(), "Failed to vote");
+
+        $output = json_decode($response->getContent(), true);
+        $this->assertEquals($starting_yes, $output["total_yes"], "Yes vote changed");
+        $this->assertEquals($starting_no + 1, $output["total_no"], "No vote did not increase by one");
+
+        $crawler = $this->client->request('GET', "/");
+        $doc_nodes = $crawler->filter(".pd-document-internal[data-doc-block='$doc_id']");
+        $yes_count = intval($doc_nodes->filter(".yes-count")->html());
+        $no_count = intval($doc_nodes->filter(".no-count")->html());
+        $this->assertCount(1, $doc_nodes, "Should be one document node");
+        $this->assertEquals($starting_yes, $yes_count, "Should be $starting_yes yes votes");
+        $this->assertEquals($starting_no + 1, $no_count, "Should be $starting_no + 1 no votes");
+
+    }
 
     public function filterProvider() {
 

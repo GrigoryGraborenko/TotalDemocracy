@@ -1,9 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: james
- * Date: 13/08/2015
- * Time: 3:53 PM
+ * User: Grisha
  */
 
 namespace VoteBundle\Entity;

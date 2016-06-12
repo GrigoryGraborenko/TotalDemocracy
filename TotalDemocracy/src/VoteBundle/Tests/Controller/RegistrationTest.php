@@ -186,34 +186,6 @@ class RegistrationTest extends BaseFunctionalTestCase {
     }
 
     /**
-     * @param $email
-     * @param string $password
-     * @param bool $should_succeed
-     */
-    private function attemptLogin($email, $password = "password", $should_succeed = true) {
-
-        $crawler = $this->client->request('GET', "/login");
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), "Failed to load login confirm page");
-
-        $form = $crawler->selectButton('Login')->form();
-        $this->assertNotNull($form, 'Could not find form');
-
-        $this->client->submit($form, array(
-            '_username'        => $email
-            ,'_password'    => $password
-        ));
-
-        $response = $this->client->getResponse();
-        $this->assertEquals(302, $response->getStatusCode(), "Did not redirect after login attempt");
-        if($should_succeed) {
-            $this->assertStringEndsNotWith("login", $response->headers->get('location'), "Failed to login in");
-        } else {
-            $this->assertStringEndsWith("login", $response->headers->get('location'), "Failed to login in");
-        }
-
-    }
-
-    /**
      * @return array
      */
     private function checkMenuNames($expected) {

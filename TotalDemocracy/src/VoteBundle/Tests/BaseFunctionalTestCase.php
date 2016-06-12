@@ -61,9 +61,7 @@ abstract class BaseFunctionalTestCase extends WebTestCase {
 
         $this->session = $this->container->get('session');
 
-        $userManager = $this->container->get('fos_user.user_manager');
-        $user = $userManager->findUserBy(array('username' => $username));
-        $this->user = $user;
+        $user = $this->em->getRepository("VoteBundle:User")->findOneBy(array("username" => $username));
 
         $firewall = 'main';
         $token = new UsernamePasswordToken($user, $password, $firewall, array($is_admin?'ROLE_ADMIN':'ROLE_USER'));
@@ -158,6 +156,36 @@ abstract class BaseFunctionalTestCase extends WebTestCase {
 
         // isolate tests to ensure that carbon::now is always real
         Carbon::setTestNow();
+    }
+
+    /**
+     * @param $email
+     * @param string $password
+     * @param bool $should_succeed
+     * @return null|object
+     */
+    protected function attemptLogin($email, $password = "password", $should_succeed = true) {
+
+        $crawler = $this->client->request('GET', "/login");
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), "Failed to load login confirm page");
+
+        $form = $crawler->selectButton('Login')->form();
+        $this->assertNotNull($form, 'Could not find form');
+
+        $this->client->submit($form, array(
+            '_username'        => $email
+            ,'_password'       => $password
+        ));
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(302, $response->getStatusCode(), "Did not redirect after login attempt");
+        if($should_succeed) {
+            $this->assertStringEndsNotWith("login", $response->headers->get('location'), "Failed to login in");
+            return $this->em->getRepository("VoteBundle:User")->findOneBy(array("email" => $email));
+        } else {
+            $this->assertStringEndsWith("login", $response->headers->get('location'), "Failed to login in");
+            return NULL;
+        }
     }
 
 }

@@ -15,10 +15,25 @@ use VoteBundle\Exception\BadRequestException;
 /*
  * TODO FIXES:
  *
+
+don't show closed bills
+check that status is correct - failed is a possibility
+make sure that you scrape the finished ones too - otherwise they may never close
+filter out appropriation bills - create unvotable bills
+
+Make sure that this is on the github project
+
+TotalDemocracy is part of the eserai participatory democracy system
+http://www.jnana.com.au/eserai_licence
+
+remove three last volunteer fields
+
+on verification success, put the volunteer/member/phone form under list of electorates
+on verify failure, have a "skip" button that takes you to a verify failure page, that still has volunteer links in it
+
 n) Can you make my karel@jnana.com.au account an admin account and delete all my other accounts karelb@me.com, contact@ecodirectory.com.au and contact@eserai.com?
 
 h) Make a separate menu item “Volunteer" with “Volunteer address”. When they click activation link in email it takes them to Volunteer first ("Volunteer address" is mandatory if they didn’t verify and optional if they verified), then take them to settings with member tick box (only if they have verified), phone number and password
-g) BUG verification link in email not working, there is extra string before the address
 
  * Verification success and electorate listings should be prettier
  * Make sure that rego and verify both can be switched off for maintenance

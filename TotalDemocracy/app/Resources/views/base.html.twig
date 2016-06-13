@@ -8,7 +8,9 @@
         {#<link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />#}
         <link rel="icon" type="image/x-icon" href="http://d3n8a8pro7vhmx.cloudfront.net/peopledecide/sites/6/favicon_images/original/pd-favicon.jpg?1462100046"/>
 
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/black-tie/jquery-ui.css">
 
 
@@ -20,64 +22,62 @@
         <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     </head>
-    <body style="padding-top: 50px;">
+    <body>
+			
+        <div class="header">
+            <img src="http://d3n8a8pro7vhmx.cloudfront.net/themes/5718bc692213934f74000001/attachments/original/1465530376/peopledecide-logo-620px.png?1465530376">
+        </div>
+        <div class="container">
+			
+			{% set routename = app.request.attributes.get('_route') %}
+            <nav class="navbar navbar-inverse"> <!--navbar-fixed-top-->
 
-        {% set routename = app.request.attributes.get('_route') %}
-        <nav class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    {#<a class="navbar-brand" href="{{ path('homepage') }}">Voting Platform</a>#}
-                    <a class="navbar-brand" href="{{ path('homepage') }}">
-                        {#<img width="160" src="http://d3n8a8pro7vhmx.cloudfront.net/themes/5718bc692213934f74000001/attachments/original/1464235174/PeopleDecide-Logo.png?1464235174">#}
-                        <img width="160" src="/img/simple_banner.png">
-                    </a>
-                </div>
-                <div id="navbar" class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        {% if app.user is null %}
-                            <li {% if routename == 'signup' %}class="active"{% endif %}><a href="{{ path("signup") }}">Register</a></li>
-                        {% endif %}
-                        {% if app.session.get('new_user_id') or app.user is not null %}
-                            <li {% if routename == 'verify' %}class="active"{% endif %}><a href="{{ path("verify") }}">Verify</a></li>
-                        {% endif %}
-                        <li {% if routename == 'vote' %}class="active"{% endif %}><a href="{{ path("vote") }}">Vote</a></li>
-                        {% if app.user is not null %}
-                            <li {% if routename == 'profile' %}class="active"{% endif %}><a href="{{ path("profile") }}">Settings</a></li>
-                        {% endif %}
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        {% if app.user %}
-                            <p class="navbar-text">Logged in as <b>{{ app.user.email }}</b></p>
-                            <li><a href="{{ path("fos_user_security_logout") }}">Logout</a></li>
-                        {% else %}
-                            <li {% if routename == 'fos_user_security_login' %}class="active"{% endif %}>
-                                <a href="{{ path("fos_user_security_login") }}">Login</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div><!--/.nav-collapse -->
-            </div>
-        </nav>
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        {#<a class="navbar-brand" href="{{ path('homepage') }}">Voting Platform</a>#}
+                        <a class="navbar-brand" href="{{ path('homepage') }}">
+                            {#<img src="img/home.png">#}<img src="img/home.png">
+                        </a>
+                    </div>
+                    <div id="navbar" class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            {% if app.user is null %}
+                                <li {% if routename == 'signup' %}class="active"{% endif %}><a href="{{ path("signup") }}">Register</a></li>
+                            {% endif %}
+                            {% if app.session.get('new_user_id') or app.user is not null %}
+                                <li {% if routename == 'verify' %}class="active"{% endif %}><a href="{{ path("verify") }}">Verify</a></li>
+                            {% endif %}
+                            <li {% if routename == 'vote' %}class="active"{% endif %}><a href="{{ path("vote") }}">Vote</a></li>
+                            {% if app.user is not null %}
+                                <li {% if routename == 'profile' %}class="active"{% endif %}><a href="{{ path("profile") }}">Settings</a></li>
+                            {% endif %}
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            {% if app.user %}
+                                <p class="navbar-text">Logged in as <b>{{ app.user.email }}</b></p>
+                                <li><a href="{{ path("fos_user_security_logout") }}">Logout</a></li>
+                            {% else %}
+                                <li {% if routename == 'fos_user_security_login' %}class="active"{% endif %}>
+                                    <a href="{{ path("fos_user_security_login") }}">Login</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div><!--/.nav-collapse -->
+            </nav>
+        </div>
 
         <div class="container wrapper">
             {% block content %}{% endblock %}
             <div class="push"></div>
         </div>
         <div class="footer">
-            <div class="container">
-                <p></p>
-                {#<p><a href="{{ path('terms') }}">Terms & Conditions</a></p>#}
-                <p><a href="http://www.karelboele.com/terms-conditions">Terms & Conditions</a></p>
-                <p><a href="http://www.karelboele.com/privacy-policy">Privacy Policy</a></p>
-                <p><a href="http://www.karelboele.com/rules">Rules</a></p>
-
-                {#karelboele.com/privacy-policy karelboele.com/rules karelboele.com/terms-conditions#}
+            <div style="padding-top:25px;" class="container">
+                <p><a href="http://www.karelboele.com/terms-conditions">Terms & Conditions</a> &nbsp; | &nbsp; <a href="http://www.karelboele.com/privacy-policy">Privacy Policy</a> &nbsp; | &nbsp; <a href="http://www.karelboele.com/rules">Rules</a></p>
             </div>
         </div>
 

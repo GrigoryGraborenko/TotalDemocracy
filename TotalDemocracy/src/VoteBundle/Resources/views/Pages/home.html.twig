@@ -2,10 +2,6 @@
 
 {% block content %}
 
-    <b style="font-size: 60px">
-        <span style="color: #0088ff">People</span><span style="color: #ff3333">Decide</span>
-    </b>
-
     {% if app.session.flashbag.has('error-redirect') %}
         <h4>
             {% for error in app.session.flashbag.get('error-redirect') %}
@@ -13,6 +9,32 @@
             {% endfor %}
         </h4>
     {% endif %}
+	
+<h1>How it works</h1>
+
+<h3>People</h3>
+<p>The people will be able to consider and cast their vote on all major proposals. In the People Decide system your voice becomes more powerful than ever. In our Participatory Democracy, decisions are not wedged to a particular outcome by vested interests; and there's no need for conscious votes - the majority rules.</p>
+<p>People Decide representatives are contracted by law to vote with voters on Bills in Parliament and decisions in Council. When 1 or more voters in their electorate and a majority of more than 50% votes in a particular way. At this point the decision gets up. There's no more debate, the people have decided.</p>
+
+<h3>Website &amp; App</h3>
+<p>The publishing of laws, decisions and the results of voting will be streamed through our website and app. Everything in the People Decide system revolves around this unique online process. The website and app allow you, or anyone who is interested, to become informed about developments in the law making arena.</p>
+<p>You will be able to read Bills and decisions in simplified and extensive versions so you can inform yourself fully of expert, objective opinions as well as read stakeholders' statements on the matters of the day. Passed Bills and voting results of previous debates will also be archived and available for research.</p>
+<p>You will also be kept up-to-date on the process and development of debates, Bills and decisions you are interested in.</p>
+<p>When the time comes, your vote can be cast in your own home, at your convenience, with controls to ensure the system cannot be breached.</p>
+
+<h3>Informed Voices</h3>
+<p>MPs, Senators and Councillors submit Bills and decisions to Parliament or Council.</p>
+<p>Voters will be required to read a summary on a Bill or decision before they vote. This will be developed collaboratively by voters using open-source software.
+<p>The Senate will be able to review Bills and listen to experts.</p>
+<p>Bills and decisions must be considered for at least six weeks. If a government or council needs to get an emergency Bill or decision through it must have a sunset clause of maximum 90 days otherwise People Decide representatives vote against it.</p>
+<p>The greatest thing about this is that it has the potential to completely change and improve our society! The more responsibility people have the more they have to consider their decisions! The more people learn the more informed they become. </p>
+<p>This system educates by building more awareness, depth of knowledge and engagement. If a Bill gets in that voters don’t want they can’t blame the politicians any more. Voters who voted will consider their vote more carefully next time. Voters that did not vote will consider voting.</p>
+<p>When people make a decision that is tangible, and they can see the outcome, we believe they will spend more time considering their decisions.</p>
+
+<h3>Government</h3>
+<p>Debate proposals but are required to vote with the majority.</p>
+<p>It is the job of MPs, Senators and Councillors to educate the public on, and create awareness about Bills and decisions. The Bills are submitted by these same MPs, Senators and Councillors.</p>
+<p>Until voters voting on single issue Bills and decisions proves itself, MPs, Senators and Councillors will vote on Supply, Confidence and Appropriation Bills, and Tariffs.</p>
 
 {% endblock %}
 

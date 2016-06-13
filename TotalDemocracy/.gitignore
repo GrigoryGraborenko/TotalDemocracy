@@ -16,3 +16,6 @@
 /vendor/
 /web/bundles/
 /web/img/temp/
+/web/assetic/
+/web/css/
+/web/js/

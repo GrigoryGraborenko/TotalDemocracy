@@ -1,9 +1,13 @@
 
 .color-red {
-    color: #ff0000;
+    color: #E94634;
 }
 .color-green {
     color: #00bb00;
+}
+
+.color-blue {
+	color: #0080C8;
 }
 
 * {
@@ -11,16 +15,127 @@
 }
 html, body {
     height: 100%;
+	font-family: 'Open Sans', sans-serif;
+	background: #f2f2f2 url('https://d3n8a8pro7vhmx.cloudfront.net/peopledecide/pages/482/attachments/original/1461420299/bg10.jpg?1461420299') repeat-x 0 150px;
+}
+.header {
+    clear: both;
+	height: 150px;
+	padding: 25px 10% 25px 10%;
+	background-color: #fff;
+}
+.header img {
+    width: 50%;
 }
 .wrapper {
-    min-height: 100%;
+    /*min-height: 100%;
     height: auto !important;
-    height: 100%;
-    margin: 0 auto -120px; /* the bottom margin is the negative value of the footer's height */
+    height: 100%;*/
+    margin: 20px 10% 0 10%; /* the bottom margin is the negative value of the footer's height */
+	padding: 20px;
+	background-color: #fff;
+}
+.navbar.navbar-inverse {
+	background-color: #333;
+	top: auto;
+	border: none;
+	font-size: 1.05em;
+	color: #fff;
+}
+.nav.navbar-nav li a {
+	color: #fff;
+}
+.nav.navbar-nav li a:hover {
+	background-color: #0080C8;
+}
+.navbar-inverse .navbar-nav>.active>a {
+	background-color: #0080C8;
+}
+.navbar-inverse .navbar-brand:focus,.navbar-inverse .navbar-brand:hover{
+	border-bottom: #fff 1px solid;
+}
+.divider {
+	border-top: #e2e2e2 1px solid;
+	margin-top: 20px;
+	padding-top: 5px;
+}
+.bill-title {
+	font-weight: 700;
+	font-size: 1.2em;
+}
+.yes-count {
+	color: #00bb00;
+}
+.no-count {
+	color: #E94634;
+}
+.yes-count, .no-count {
+	font-size: 1.0em;
+}
+h6 {
+	text-transform: uppercase;
 }
 .footer, .push {
     height: 120px; /* .push must be the same height as .footer */
 }
 .footer {
-    background-color: rgb(220, 220, 220);
+    margin-top: 30px;
+	background-color: rgba(51,51,51,1.00);
+	color: #ccc;
+}
+.footer a:hover {
+    text-decoration: none;
+	color: #fff;
+}
+
+
+/* Responsive Structure 
+----------------------------------------------- */ 
+
+@media (max-width: 1920px) { 
+
+	body.mobile {
+		-webkit-text-size-adjust: 100%;
+	} /* problematic browsers fix*/
+	
+	.header img {
+    	width: 50%;
+	}
+
+} 
+
+@media (max-width: 1280px) {
+	
+	.header img {
+    	width: 65%;
+	}
+
+}	
+
+@media (max-width: 800px) {	
+
+	body {
+		-webkit-text-size-adjust: 100%;
+	} /* Iphone browser fix*/
+	
+	.header img {
+    	width: 75%;
+	}	
+
+}
+
+@media (max-width: 640px) {
+	
+	.header img {
+    	width: 90%;
+	}
+
+}
+
+@media (max-width: 480px) {
+	
+	.header img {
+    	width: 100%;
+	}
+	
 }

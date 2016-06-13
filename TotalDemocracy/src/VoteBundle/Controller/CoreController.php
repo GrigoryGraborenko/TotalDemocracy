@@ -20,12 +20,6 @@ don't show closed bills
 check that status is correct - failed is a possibility
 make sure that you scrape the finished ones too - otherwise they may never close
 filter out appropriation bills - create unvotable bills
-
-Make sure that this is on the github project
-
-TotalDemocracy is part of the eserai participatory democracy system
-http://www.jnana.com.au/eserai_licence
-
 remove three last volunteer fields
 
 on verification success, put the volunteer/member/phone form under list of electorates

@@ -265,12 +265,12 @@ class RegisterController extends FOSRestController {
         if($is_volunteer) {
             if( array_key_exists("homePostcode", $input) &&
                 array_key_exists("homeSuburb", $input) &&
-                array_key_exists("homeStreetNumber", $input) &&
                 array_key_exists("homeStreet", $input) &&
-                array_key_exists("homeStreetNumber", $input) &&
-                array_key_exists("whenAvailable", $input) &&
-                array_key_exists("whenToCall", $input) &&
-                array_key_exists("bestCommunication", $input)) {
+                array_key_exists("homeStreetNumber", $input)
+//                array_key_exists("whenAvailable", $input) &&
+//                array_key_exists("whenToCall", $input) &&
+//                array_key_exists("bestCommunication", $input)
+            ) {
 
                 $volunteer = new Volunteer($new_user, $input["homePostcode"], $input["homeSuburb"], $input["homeStreetNumber"], $input["homeStreet"]
                     ,array_key_exists("willPollBooth", $input), array_key_exists("willDoorKnock", $input), array_key_exists("willSignage", $input)
@@ -279,9 +279,9 @@ class RegisterController extends FOSRestController {
                 if(array_key_exists("willOther", $input) && array_key_exists("willOtherText", $input) && ($input["willOtherText"] !== "")) {
                     $volunteer->setWillOther($input["willOtherText"]);
                 }
-                $volunteer->setWhenAvailable($input["whenAvailable"]);
-                $volunteer->setWhenToCall($input["whenToCall"]);
-                $volunteer->setBestCommunication($input["bestCommunication"]);
+//                $volunteer->setWhenAvailable($input["whenAvailable"]);
+//                $volunteer->setWhenToCall($input["whenToCall"]);
+//                $volunteer->setBestCommunication($input["bestCommunication"]);
 
                 $this->em->persist($volunteer);
                 $new_user->setVolunteer($volunteer);

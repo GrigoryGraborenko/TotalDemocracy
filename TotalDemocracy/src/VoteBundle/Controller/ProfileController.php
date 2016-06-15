@@ -116,12 +116,13 @@ class ProfileController extends FOSRestController {
             if( (!array_key_exists("homePostcode", $input)) ||
                 (!array_key_exists("homeSuburb", $input)) ||
                 (!array_key_exists("homeStreet", $input)) ||
-                (!array_key_exists("homeStreetNumber", $input)) ||
-                (!array_key_exists("whenAvailable", $input)) ||
-                (!array_key_exists("whenToCall", $input)) ||
-                (!array_key_exists("bestCommunication", $input))
+                (!array_key_exists("homeStreetNumber", $input)) //||
+//                (!array_key_exists("whenAvailable", $input)) ||
+//                (!array_key_exists("whenToCall", $input)) ||
+//                (!array_key_exists("bestCommunication", $input))
             ) {
-                throw new ErrorRedirectException("profile", "Incorrect parameters");
+                //throw new ErrorRedirectException("profile", "Incorrect parameters");
+                throw new ErrorRedirectException("profile", "Need to enter an address if volunteering");
             }
             $volunteer = $user->getVolunteer();
             if($volunteer === NULL) {
@@ -141,9 +142,9 @@ class ProfileController extends FOSRestController {
             $volunteer->setWillHouseParty(array_key_exists("willHouseParty", $input));
             $volunteer->setWillEnvelopes(array_key_exists("willEnvelopes", $input));
 
-            $volunteer->setWhenAvailable($input["whenAvailable"]);
-            $volunteer->setWhenToCall($input["whenToCall"]);
-            $volunteer->setBestCommunication($input["bestCommunication"]);
+//            $volunteer->setWhenAvailable($input["whenAvailable"]);
+//            $volunteer->setWhenToCall($input["whenToCall"]);
+//            $volunteer->setBestCommunication($input["bestCommunication"]);
 
             if(array_key_exists("willOther", $input) && array_key_exists("willOtherText", $input) && ($input["willOtherText"] !== "")) {
                 $volunteer->setWillOther($input["willOtherText"]);

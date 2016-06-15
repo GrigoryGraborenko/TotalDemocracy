@@ -40,6 +40,7 @@ class ProfileTest extends BaseFunctionalTestCase {
 
         $input = array(
             'phone'         => $new_phone
+//            ,'isVolunteer'    => "on"
         );
         if($new_member) {
             $input['isMember'] = "on";

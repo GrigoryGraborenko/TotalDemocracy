@@ -16,11 +16,9 @@ use VoteBundle\Exception\BadRequestException;
  * TODO FIXES:
  *
 
-don't show closed bills
 check that status is correct - failed is a possibility
 make sure that you scrape the finished ones too - otherwise they may never close
 filter out appropriation bills - create unvotable bills
-remove three last volunteer fields
 
 on verification success, put the volunteer/member/phone form under list of electorates
 on verify failure, have a "skip" button that takes you to a verify failure page, that still has volunteer links in it

@@ -38,6 +38,11 @@ class RegistrationTest extends BaseFunctionalTestCase {
         $this->attemptLogin($new_user->getEmail(), $password, true);
     }
 
+//    public function testVolunteerRegistration() {
+//        $new_user = $this->attemptRegistration("test@test.com", true);
+//        $this->attemptConfirmation($new_user, "longpassword", true, true);
+//    }
+
     // test order of verification, registration, confirmation
 
     public function testMenus() {
@@ -154,7 +159,7 @@ class RegistrationTest extends BaseFunctionalTestCase {
      * @param $password
      * @param bool $expect_success
      */
-    private function attemptConfirmation($user, $password, $expect_success = true) {
+    private function attemptConfirmation($user, $password, $expect_success = true, $is_volunteer = false) {
 
         $this->assertFalse($user->isEnabled(), "User should not be enabled");
 
@@ -171,10 +176,19 @@ class RegistrationTest extends BaseFunctionalTestCase {
             $password = "password";
         }
 
-        $this->client->submit($form, array(
+        $input = array(
             'password'      => $password
             ,'phone'        => "123456787"
-        ));
+        );
+        if($is_volunteer) {
+            $input['isVolunteer'] = "on";
+            $input['homePostcode'] = "4000";
+            $input['homeSuburb'] = "BRISBANE CITY (QLD)";
+            $input['homeStreet'] = "CHARLOTTE ST";
+            $input['homeStreetNumber'] = "1";
+        }
+
+        $this->client->submit($form, $input);
 
         $this->em->refresh($user);
 

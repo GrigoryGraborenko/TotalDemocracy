@@ -30,6 +30,9 @@ class DocumentRepository extends EntityRepository {
             ->addSelect("SUM(CASE WHEN v.isSupporter = false THEN 1 ELSE 0 END) as opponents")
             ->addGroupBy("d")
 
+            ->andWhere("d.state = :state")
+            ->setParameter("state", "open")
+
             ->addOrderBy("d.dateCreated", "DESC")
             ->addOrderBy("d.whenCreated", "DESC")
         ;

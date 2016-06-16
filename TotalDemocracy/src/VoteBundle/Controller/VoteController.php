@@ -117,6 +117,7 @@ class VoteController extends CommonController {
 
             $doc['doc'] = $doc[0];
             $can_vote_doc = in_array($doc['doc']->getDomain()->getId(), $user_domain_ids);
+            $doc['is_voteable'] = $doc['doc']->getType() !== "appropriations";
             $doc['can_vote'] = $can_vote_doc;
 
             if(!$can_vote_doc) {
@@ -162,6 +163,9 @@ class VoteController extends CommonController {
         $doc = $doc_repo->find($input['id']);
         if($doc === NULL) {
             throw new BadRequestException("Cannot find document");
+        }
+        if($doc->getType() === "appropriations") {
+            throw new BadRequestException("Cannot vote on appropriations bills yet");
         }
         $domain = $doc->getDomain();
         $in_domain = false;

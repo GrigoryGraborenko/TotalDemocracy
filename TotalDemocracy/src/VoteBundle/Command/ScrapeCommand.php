@@ -362,7 +362,12 @@ class ScrapeCommand extends ContainerAwareCommand {
 
                 $document = $doc_repo->findOneBy(array("domain" => $domain, "externalID" => $doc_id));
                 if($document === NULL) {
-                    $document = new Document($domain, "bill", $title, $summary, $date);
+                    if(strpos($title, "Appropriation ") === 0) {
+                        $type = "appropriations";
+                    } else {
+                        $type = "bill";
+                    }
+                    $document = new Document($domain, $type, $title, $summary, $date);
                     $document->setExternalID($doc_id);
                     $this->em->persist($document);
                     $num_new++;
@@ -465,7 +470,14 @@ class ScrapeCommand extends ContainerAwareCommand {
             }
             $document = $doc_repo->findOneBy(array("domain" => $domain, "externalID" => $doc_id));
             if($document === NULL) {
-                $document = new Document($domain, "bill", $title, "No summary available", $date);
+
+                if(strpos($title, "Appropriation ") === 0) {
+                    $type = "appropriations";
+                } else {
+                    $type = "bill";
+                }
+
+                $document = new Document($domain, $type, $title, "No summary available", $date);
                 $document->setExternalID($doc_id);
                 $this->em->persist($document);
                 $num_new++;

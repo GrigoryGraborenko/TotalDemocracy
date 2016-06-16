@@ -45,7 +45,7 @@ class Document {
      * @ORM\Column(type="string")
      * @Expose
      */
-    protected $type;
+    protected $type; // bill, application, appropriations
 
     /**
      * @ORM\Column(type="string")

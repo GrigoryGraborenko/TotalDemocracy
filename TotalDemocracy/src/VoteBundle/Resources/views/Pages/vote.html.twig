@@ -59,10 +59,16 @@
 
     {% for info in doc_list %}
         <div data-doc-block="{{ info.doc.id }}" class="pd-document-internal">
-            <h3>{{ info.doc.name }} [<span class="yes-count">{{ info.supporters }}</span> voted yes, <span class="no-count">{{ info.opponents }}</span> voted no]</h3>
+            <h3>{{ info.doc.name }}</h3>
             <h6>{{ info.doc.domain.name }}{% if info.doc.externalURL is not null %} - <a href="{{ info.doc.externalURL }}">View details</a>{% endif %}</h6>
+            {% if info.is_voteable %}
+                <h6><b><i><span class="yes-count">{{ info.supporters }}</span> votes yes, <span class="no-count">{{ info.opponents }}</span> votes no</i></b></h6>
+            {% else %}
+                <h6><b><i>Cannot vote on this type of bill yet</i></b></h6>
+            {% endif %}
+
             <p>{{ info.doc.summary }}</p>
-            {% if info.can_vote %}
+            {% if info.can_vote and info.is_voteable %}
                 <button class="btn btn-success vote-on" data-id="{{ info.doc.id }}" data-vote="true" {% if info.yes_vote %}disabled{% endif %}>Yes</button>
                 <button class="btn btn-danger vote-on" data-id="{{ info.doc.id }}" data-vote="false" {% if info.no_vote %}disabled{% endif %}>No</button>
             {% endif %}

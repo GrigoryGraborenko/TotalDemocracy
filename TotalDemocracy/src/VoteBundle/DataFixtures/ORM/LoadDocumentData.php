@@ -31,6 +31,7 @@ class LoadDocumentData extends AbstractFixture implements OrderedFixtureInterfac
 
         $this->createDocument(  'domain-federal-australia', "Prison Abolition Act", "Immediately shut down all prisons and punish with community service."
                                 ,array("user-bob", "user-sally"));
+        $this->createDocument(  'domain-federal-australia', "Appropriations Bill 2016", "Fund government for another year.", array(), array(), "appropriations");
         $this->createDocument(  'domain-state-queensland', "Heritage Protection Bill", "Heavy fines for demolition companies that knock down heritage listed buildings."
                                 ,array(), array("user-bob"));
         $this->createDocument(  'domain-state-new-south-wales', "Sydney Bill", "More Sydney.");
@@ -46,11 +47,12 @@ class LoadDocumentData extends AbstractFixture implements OrderedFixtureInterfac
      * @param $text
      * @param array $supporters
      * @param array $opponents
+     * @param string $type
      */
-    private function createDocument($domain_ref, $name, $text, $supporters = array(), $opponents = array()) {
+    private function createDocument($domain_ref, $name, $text, $supporters = array(), $opponents = array(), $type = "bill") {
 
         $domain = $this->getReference($domain_ref);
-        $doc = new Document($domain, "bill", $name, $text, Carbon::now("UTC"));
+        $doc = new Document($domain, $type, $name, $text, Carbon::now("UTC"));
         $this->manager->persist($doc);
 
         foreach($supporters as $supporter) {

@@ -18,12 +18,9 @@ use VoteBundle\Exception\BadRequestException;
 
 check that status is correct - failed is a possibility
 make sure that you scrape the finished ones too - otherwise they may never close
-filter out appropriation bills - create unvotable bills
 
 on verification success, put the volunteer/member/phone form under list of electorates
 on verify failure, have a "skip" button that takes you to a verify failure page, that still has volunteer links in it
-
-n) Can you make my karel@jnana.com.au account an admin account and delete all my other accounts karelb@me.com, contact@ecodirectory.com.au and contact@eserai.com?
 
 h) Make a separate menu item “Volunteer" with “Volunteer address”. When they click activation link in email it takes them to Volunteer first ("Volunteer address" is mandatory if they didn’t verify and optional if they verified), then take them to settings with member tick box (only if they have verified), phone number and password
 
@@ -47,7 +44,6 @@ h) Make a separate menu item “Volunteer" with “Volunteer address”. When th
 p) On the voting page people will want to be able to opt-in to email notifications for new or updated Bills for their filter combination, eg: notify me when new or updated Federal Bills with keyword environment in them. *
  *
  * TODO:
- * Migrations
  * Special case for users with no email?
  * Admin for promoting users to candidate
  * Allowing uploads of electoral roll

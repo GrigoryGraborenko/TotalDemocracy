@@ -108,6 +108,11 @@ class User extends BaseUser {
     protected $isMember;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $permanentLoginToken;
+
+    /**
      * User constructor.
      */
     public function __construct() {
@@ -337,6 +342,20 @@ class User extends BaseUser {
      */
     public function setIsMember($isMember) {
         $this->isMember = $isMember;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPermanentLoginToken() {
+        return $this->permanentLoginToken;
+    }
+
+    /**
+     * @param mixed $permanentLoginToken
+     */
+    public function setPermanentLoginToken($permanentLoginToken) {
+        $this->permanentLoginToken = $permanentLoginToken;
     }
 
 }

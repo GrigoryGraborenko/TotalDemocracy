@@ -5,7 +5,7 @@ namespace VoteBundle\Controller;
 use Carbon\Carbon;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,10 +17,17 @@ use JMS\DiExtraBundle\Annotation as DI;
  * Class APIController
  * @package VoteBundle\Controller
  */
-class APIController extends Controller {
+class APIController extends FOSRestController {
 
     /** @DI\Inject("doctrine.orm.entity_manager") */
     protected $em;
+
+    private function respondJSON($output) {
+        $view = $this->view($output, 200);
+        $view->setFormat('json');
+        $view->setHeader("Access-Control-Allow-Origin", '*');
+        return $this->handleView($view);
+    }
 
     /**
      * @Route("/api/login", name="api_login")
@@ -58,9 +65,7 @@ class APIController extends Controller {
 
 //        $this->get("logger")->info("INPUT: " . json_encode($input));
 
-        $response = new JsonResponse($output);
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-        return $response;
+        return $this->respondJSON($output);;
     }
 
     /**
@@ -78,9 +83,7 @@ class APIController extends Controller {
             "success" => true
         );
 
-        $response = new JsonResponse($output);
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-        return $response;
+        return $this->respondJSON($output);;
     }
 
     /**
@@ -101,9 +104,7 @@ class APIController extends Controller {
 
         $output = array("docs" => $docs_list);
 
-        $response = new JsonResponse($output);
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-        return $response;
+        return $this->respondJSON($output);;
     }
 
     /**

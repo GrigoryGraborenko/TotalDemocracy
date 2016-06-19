@@ -17,6 +17,9 @@ services:
     vote.user:
         class: VoteBundle\Service\UserService
         arguments: ["@doctrine.orm.entity_manager", "@vote.option", "@validator"]
+    vote.document:
+        class: VoteBundle\Service\DocumentService
+        arguments: ["@doctrine.orm.entity_manager"]
     vote.js:
         class: VoteBundle\Service\JSService
         arguments: ["@doctrine.orm.entity_manager", "@service_container", "@logger"]

@@ -82,8 +82,8 @@ $(document).ready(function() {
         }).done(function(data) {
 
             $head_div = $('div[data-doc-block="' + data.doc_id + '"]');
-            $head_div.find(".yes-count").html(data.total_yes);
-            $head_div.find(".no-count").html(data.total_no);
+            $head_div.find(".yes-count").html(data.total_yes + " Yes");
+            $head_div.find(".no-count").html(data.total_no + " No");
 
         }).error(function(response) {
 

@@ -16,6 +16,7 @@ use VoteBundle\Exception\BadRequestException;
  * TODO FIXES:
  *
 
+REDIRECT TO HTTPS!
 check that status is correct - failed is a possibility
 make sure that you scrape the finished ones too - otherwise they may never close
 
@@ -23,6 +24,18 @@ on verification success, put the volunteer/member/phone form under list of elect
 on verify failure, have a "skip" button that takes you to a verify failure page, that still has volunteer links in it
 
 h) Make a separate menu item “Volunteer" with “Volunteer address”. When they click activation link in email it takes them to Volunteer first ("Volunteer address" is mandatory if they didn’t verify and optional if they verified), then take them to settings with member tick box (only if they have verified), phone number and password
+
+b) If I vote I cannot cancel my vote
+f) When someone searches all federal bills nothing comes up maybe you can put a message there saying "There is an election on and parliament has been dissolved."
+g) On the register finish page and settings page when the volunteer drop-down occurs please put phone number field at the top under the member button.
+h) Once someone has saved volunteer information do not collapse volunteer drop-down again, only allow unticking and ticking of volunteer button.
+i) The verified enrollment page needs to have member and volunteer options on it because I talk them through it when I am doorknocking and we want to collect that if someone verification email has gone into spam.
+k) Not sure what to do about someone who can't be verified but want to volunteer.
+a) When you are verified and all is good, and you go to update your address, if the new address doesn't verify it still allows you to vote. If someone has been taken off the roll which does happen, overseas for 5 years etc they are not allowed to vote so we need to ensure that we don't allow them to vote if the updated address doesn't verify.
+b) The enrollment verification page needs the member/volunteer options, **this is the one thing I hope you can do now (if possible)  because then I can use it for most of Tuesday when I next go door-knocking.
+c) I am thinking the solution for someone who can't vote but wants to volunteer is have a volunteer tick box at the bottom of the verification page that shows phone number when clicked, it saves the first instance of the address and auto-populates the enrollment verified/finish verification page.
+d) My verification email went into spam something to raise with Phil soon.
+A solution for capturing people who can't verify but want to volunteer. Instead of a volunteer button on the verification page they click the volunteer button on nationbuilder and it takes them to an unlisted page on peopledecide.org? This doesn't have to be done now.
 
  * Verification success and electorate listings should be prettier
  * Make sure that rego and verify both can be switched off for maintenance
@@ -73,85 +86,6 @@ class CoreController extends FOSRestController {
     public function errorAction(Request $request) {
 
         return $this->render('VoteBundle:Errors:logic_error.html.twig', array());
-    }
-
-    /**
-     * @Route("/api/login", name="api_login")
-     * @Method("POST");
-     *
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws BadRequestException
-     */
-    public function loginJSONAction(Request $request) {
-
-        $input = $request->request->all();
-        $this->get("logger")->info("INPUT: " . json_encode($input));
-        if((!array_key_exists("username", $input)) || (!array_key_exists("password", $input))) {
-            throw new BadRequestException("Incorrect parameters");
-        }
-
-        $user = $this->em->getRepository('VoteBundle:User')->findOneBy(array("username" => $input["username"]));
-        if($user === NULL) {
-            throw new BadRequestException('Incorrect Username/Password');
-        }
-        $factory = $this->get('security.encoder_factory');
-        $encoder = $factory->getEncoder($user);
-        if($encoder->isPasswordValid($user->getPassword(), $input['password'], $user->getSalt()) !== true) {
-            throw new BadRequestException('Incorrect Username/Password');
-        }
-
-        $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
-        $this->get('security.token_storage')->setToken($token);
-
-        $output = array(
-            "success" => true
-            ,"token" => $this->get("session")->getId()
-        );
-
-//        $this->get("logger")->info("INPUT: " . json_encode($input));
-
-        $view = $this->view($output, 200);
-        $view->setFormat('json');
-        return $this->handleView($view);
-    }
-
-    /**
-     * @Route("/api/logout", name="api_logout")
-     * @Method("POST");
-     */
-    public function logoutJSONAction(Request $request) {
-
-        $user = $this->getUser();
-        if($user === NULL) {
-            throw new BadRequestException('Not logged in');
-        }
-
-        $output = array(
-            "success" => true
-        );
-
-        $view = $this->view($output, 200);
-        $view->setFormat('json');
-        return $this->handleView($view);
-    }
-
-    /**
-     * @Route("/api/documents/{max_amount}", name="api_documents", defaults={"max_amount" = 6})
-     * @Method("GET");
-     */
-    public function publicDocumentAction(Request $request, $max_amount) {
-
-        $doc_repo = $this->em->getRepository('VoteBundle:Document');
-
-        $max_amount = min($max_amount, 64);
-
-        $all_docs = $doc_repo->getDocumentsWithVoteTotals($max_amount);
-        $output = array("docs" => $all_docs);
-
-        $response = $this->render("VoteBundle:API:documents.html.twig", $output);
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-        return $response;
     }
 
     /**

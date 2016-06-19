@@ -31,8 +31,6 @@ class VoteController extends CommonController {
 
         $input = $request->query->all();
 
-        $doc_repo = $this->em->getRepository('VoteBundle:Document');
-        $vote_repo = $this->em->getRepository('VoteBundle:UserDocumentVote');
         $domain_repo = $this->em->getRepository('VoteBundle:Domain');
 
         $output = array(
@@ -102,34 +100,7 @@ class VoteController extends CommonController {
         }
         $output["filter"] = $filter;
 
-        // this will find all documents that belong to this list of domains, along with their tallies
-        $docs_list = $doc_repo->getDocumentsWithVoteTotals(NULL, $selected_domains, $filter);
-
-        $user_domain_ids = array();
-        if($output['can_vote'] && ($user !== NULL)) {
-            foreach($user->getElectorates() as $electorate) {
-                $user_domain_ids[] = $electorate->getDomain()->getId();
-            }
-        }
-
-        // can optimize this later - make one single call to the DB with a list of doc ID's and a user ID
-        foreach($docs_list as &$doc) {
-
-            $doc['doc'] = $doc[0];
-            $can_vote_doc = in_array($doc['doc']->getDomain()->getId(), $user_domain_ids);
-            $doc['is_voteable'] = $doc['doc']->getType() !== "appropriations";
-            $doc['can_vote'] = $can_vote_doc;
-
-            if(!$can_vote_doc) {
-                continue;
-            }
-
-            $vote = $vote_repo->findOneBy(array("user" => $user->getId(), "document" => $doc['doc']->getId()));
-            $doc['vote'] = $vote;
-            $doc['yes_vote'] = $vote && $vote->getIsSupporter();
-            $doc['no_vote'] = $vote && (!$vote->getIsSupporter());
-        }
-        unset($doc); // delete dangling reference, because PHP can be a very silly language
+        $docs_list = $this->get("vote.document")->getDocumentsWithVotes($selected_domains, $filter, $user);
 
         $output["doc_list"] = $docs_list;
         $output['domains_levels'] = $levels;

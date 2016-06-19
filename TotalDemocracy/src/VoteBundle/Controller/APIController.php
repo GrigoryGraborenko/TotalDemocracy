@@ -5,9 +5,10 @@ namespace VoteBundle\Controller;
 use Carbon\Carbon;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use FOS\RestBundle\Controller\FOSRestController;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 
 use JMS\DiExtraBundle\Annotation as DI;
@@ -16,7 +17,7 @@ use JMS\DiExtraBundle\Annotation as DI;
  * Class APIController
  * @package VoteBundle\Controller
  */
-class APIController extends FOSRestController {
+class APIController extends Controller {
 
     /** @DI\Inject("doctrine.orm.entity_manager") */
     protected $em;
@@ -57,9 +58,9 @@ class APIController extends FOSRestController {
 
 //        $this->get("logger")->info("INPUT: " . json_encode($input));
 
-        $view = $this->view($output, 200);
-        $view->setFormat('json');
-        return $this->handleView($view);
+        $response = new JsonResponse($output);
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 
     /**
@@ -77,9 +78,9 @@ class APIController extends FOSRestController {
             "success" => true
         );
 
-        $view = $this->view($output, 200);
-        $view->setFormat('json');
-        return $this->handleView($view);
+        $response = new JsonResponse($output);
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 
     /**
@@ -100,13 +101,9 @@ class APIController extends FOSRestController {
 
         $output = array("docs" => $docs_list);
 
-        $view = $this->view($output, 200);
-        $view->setFormat('json');
-        return $this->handleView($view);
-
-//        $response = $this->render("VoteBundle:API:documents.html.twig", $output);
-//        $response->headers->set('Access-Control-Allow-Origin', '*');
-//        return $response;
+        $response = new JsonResponse($output);
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 
     /**

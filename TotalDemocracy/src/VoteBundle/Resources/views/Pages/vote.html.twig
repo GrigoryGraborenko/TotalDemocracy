@@ -58,7 +58,7 @@
     </form>
 
     {% for info in doc_list %}
-        <div class="divider" data-doc-block="{{ info.doc.id }}">
+        <div class="divider pd-document-internal" data-doc-block="{{ info.doc.id }}">
             <h3 class="bill-title">{{ info.doc.name }}
                 {% if info.is_voteable %}
                     &nbsp; | &nbsp; <span class="yes-count">{{ info.supporters }} Yes</span> &nbsp; | &nbsp; <span class="no-count">{{ info.opponents }} No</span> &nbsp; |

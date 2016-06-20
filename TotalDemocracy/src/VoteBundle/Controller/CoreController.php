@@ -7,7 +7,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use JMS\DiExtraBundle\Annotation as DI;
 
 use VoteBundle\Exception\BadRequestException;
@@ -24,6 +23,14 @@ on verification success, put the volunteer/member/phone form under list of elect
 on verify failure, have a "skip" button that takes you to a verify failure page, that still has volunteer links in it
 
 h) Make a separate menu item “Volunteer" with “Volunteer address”. When they click activation link in email it takes them to Volunteer first ("Volunteer address" is mandatory if they didn’t verify and optional if they verified), then take them to settings with member tick box (only if they have verified), phone number and password
+ - store a record of failed verify attempts
+ - after 2 failed attempts, show a volunteer instead button, unless tracking, then always (ticked by default)
+ - verify failure page, with volunteer section
+ - populate with first failed attempt's address
+ - phone num at top (under two tickboxes)
+federal election message - These are the active bills currently up for vote
+ OR
+"active" or "closed" bills filter that has inactive disabled for now
 
 b) If I vote I cannot cancel my vote
 f) When someone searches all federal bills nothing comes up maybe you can put a message there saying "There is an election on and parliament has been dissolved."

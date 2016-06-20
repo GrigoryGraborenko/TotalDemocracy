@@ -34,9 +34,9 @@ security:
 
     access_control:
 
-        - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/css, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/img, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/js, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: %httpProtocol% }
+        - { path: ^/css, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: %httpProtocol% }
+        - { path: ^/img, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: %httpProtocol% }
+        - { path: ^/js, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: %httpProtocol% }
 
         - { path: ^/admin/, role: ROLE_ADMIN, requires_channel: %httpProtocol% }

@@ -44,7 +44,7 @@ class APIController extends FOSRestController {
 
         $input = $request->request->all();
 //        $this->get("logger")->info("INPUT: " . json_encode($input));
-        if((!array_key_exists("username", $input)) || (!array_key_exists("password", $input))) {
+        if((!array_key_exists("username", $input)) || (!array_key_exists("password", $input)) || (!array_key_exists("load_documents", $input))) {
             throw new BadRequestException("Incorrect parameters");
         }
 
@@ -64,9 +64,16 @@ class APIController extends FOSRestController {
         $output = array(
             "success" => true
             ,"token" => $this->get("session")->getId()
+            ,"user" => array(
+                "email" => $user->getEmail()
+            )
         );
 
-//        $this->get("logger")->info("INPUT: " . json_encode($input));
+        if($input["load_documents"] === true) {
+            $output['docs'] = $this->get("vote.document")->getDocumentsWithVotes(NULL, NULL, $user);
+        }
+
+//        $this->get("logger")->info("LOGIN OUTPUT: " . json_encode($output));
 
         return $this->respondJSON($output);;
     }
@@ -82,11 +89,15 @@ class APIController extends FOSRestController {
             throw new BadRequestException('Not logged in');
         }
 
+        $this->container->get('security.token_storage')->setToken(null);
+        $this->container->get('session')->invalidate();
+
         $output = array(
             "success" => true
         );
+//        $this->get("logger")->info("LOGOUT OUTPUT: " . json_encode($output));
 
-        return $this->respondJSON($output);;
+        return $this->respondJSON($output);
     }
 
     /**
@@ -104,10 +115,20 @@ class APIController extends FOSRestController {
 
         $docs_list = $this->get("vote.document")->getDocumentsWithVotes(NULL, NULL, $user);
 
+        $output = array("success" => true, "docs" => $docs_list);
 
-        $output = array("docs" => $docs_list);
+//        $this->get("logger")->info("DOC REQUEST");
 
-        return $this->respondJSON($output);;
+        if($user !== NULL) {
+            $this->get("logger")->info("Already logged in");
+
+            $output["token"] = $this->get("session")->getId();
+            $output["user"] = array(
+                "email" => $user->getEmail()
+            );
+        }
+
+        return $this->respondJSON($output);
     }
 
     /**

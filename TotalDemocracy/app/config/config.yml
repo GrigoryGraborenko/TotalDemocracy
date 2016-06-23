@@ -117,6 +117,9 @@ assetic:
         stylesheets:
             inputs:
                 - '@VoteBundle/Resources/css/main.css'
+        core:
+            inputs:
+                - '@VoteBundle/Resources/js/core.js'
         address_autocomplete:
             inputs:
                 - '@VoteBundle/Resources/js/address_autocomplete.js'

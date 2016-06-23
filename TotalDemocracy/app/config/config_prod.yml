@@ -2,7 +2,7 @@ imports:
     - { resource: config.yml }
 
 parameters:
-    httpProtocol: https
+    httpProtocol: http
 
 #framework:
 #    validation:

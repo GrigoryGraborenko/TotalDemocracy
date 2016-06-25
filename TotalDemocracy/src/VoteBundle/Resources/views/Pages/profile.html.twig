@@ -17,7 +17,7 @@
             <h3 class="panel-title">Details</h3>
         </div>
         <div class="panel-body">
-            <form action="{{ path("profile_update") }}" method="post" class="form-horizontal">
+            <form action="{{ path("profile_update") }}" method="post" class="form-horizontal once-only">
 
                 {{ include('VoteBundle:Profile:user_details.html.twig') }}
 
@@ -33,7 +33,7 @@
             <h3 class="panel-title">Password</h3>
         </div>
         <div class="panel-body">
-            <form action="{{ path("password_update") }}" method="post" class="form-horizontal">
+            <form action="{{ path("password_update") }}" method="post" class="form-horizontal once-only">
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="password-input">Enter old password</label>
@@ -86,7 +86,7 @@
             <div class="panel-body">
                 <p>
                     {% if tracking_time_left is defined %}
-                        <form action="{{ path("profile_untrack") }}" method="post">
+                        <form action="{{ path("profile_untrack") }}" method="post" class="once-only">
                             <span>Currently tracking new registrations on this device with <b>{{ tracking_time_left }}</b> in the context of <b>{{ tracking_context }}</b></span>
                             <button class="btn btn-warning" type="submit">CANCEL</button>
                         </form>
@@ -96,7 +96,7 @@
                 </p>
 
                 <p>
-                    <form action="{{ path("profile_track") }}" method="post" class="form-inline">
+                    <form action="{{ path("profile_track") }}" method="post" class="form-inline once-only">
                         <div class="form-group">
                             <span>Track new registrations from this device for </span>
                             <select class="form-control" name="time">
@@ -142,7 +142,7 @@
             var $suburb_select = $("#suburb-select");
             var $street_input = $("#street-input");
             var $all_street_inputs = $(".street-inputs");
-            var $home_address_div = $("#home-address-div");
+            var $home_address_div = $(".volunteer-details");
             var $volunteer_input = $("#volunteer-input");
 
             var is_volunteer = $volunteer_input.checked;

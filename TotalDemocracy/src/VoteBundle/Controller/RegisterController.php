@@ -208,11 +208,6 @@ class RegisterController extends FOSRestController {
             ,"token" => $confirm_token
             ,"password_min_length" => $pass_min_length
             ,"phone_min_length" => $phone_min_length
-
-            ,"isVolunteer" => $new_user->getIsVolunteer()
-            ,"isMember" => $new_user->getIsMember()
-            ,"phone" => $new_user->getPhone()
-            ,"volunteer" => NULL
             ,"user" => $new_user
         );
 

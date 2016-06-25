@@ -51,7 +51,7 @@ class DocumentService {
         $docs_list = $doc_repo->getDocumentsWithVoteTotals(NULL, $selected_domains, $filter);
 
         $user_domain_ids = array();
-        if(($user !== NULL) && ($user->getWhenVerified() !== NULL)) {
+        if(($user !== NULL) && ($user->getWhenVerified() !== NULL) && ($user->isEnabled())) {
             foreach($user->getElectorates() as $electorate) {
                 $user_domain_ids[] = $electorate->getDomain()->getId();
             }

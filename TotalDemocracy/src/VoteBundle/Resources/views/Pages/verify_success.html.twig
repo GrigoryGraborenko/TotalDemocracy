@@ -2,27 +2,98 @@
 
 {% block content %}
 
-    <h1>Verification Success!</h1>
+    <div class="col-sm-offset-2 col-sm-10">
 
-    <p>You are registered to vote in:
-        <ul>
-            <li>{{ federal.description }}: {{ federal.name }}</li>
-            <li>{{ state.description }}: {{ state.name }}</li>
-            <li>Local Government Area: {{ local.domain.name }}</li>
-            <li>{{ local.description }}: {{ local.name }}</li>
-        </ul>
-    </p>
+        {% if skip is defined %}
+            <h1>Verification skipped</h1>
+            <p>You can always verify later - simply click the verify menu and fill in the details.</p>
+            <p>Would you consider volunteering for People Decide and help make participatory democracy a reality?</p>
+        {% else %}
+            <p>You are registered to vote in:
+                <ul>
+                    <li>{{ federal.description }}: {{ federal.name }}</li>
+                    <li>{{ state.description }}: {{ state.name }}</li>
+                    <li>Local Government Area: {{ local.domain.name }}</li>
+                    <li>{{ local.description }}: {{ local.name }}</li>
+                </ul>
+            </p>
 
-    {% if is_user_enabled %}
-        <p>
-            You can start voting right away.
-        </p>
-        <p>
-            <a href="{{ path("vote") }}" class="btn btn-success">Vote</a>
-        </p>
-    {% else %}
-        <p>You can start voting once you complete your registration. Please check your email for further instructions.
-        </p>
-    {% endif %}
+            {% if user.enabled %}
+                <p>
+                    You can start voting right away.
+                </p>
+            {% else %}
+                <p>You can start voting once you complete your registration. Please check your email for further instructions.
+                </p>
+            {% endif %}
+
+        {% endif %}
+        <b>
+            <a href="{{ path("vote") }}" >Go to the vote page</a>
+        </b>
+    </div>
+
+    <form action="{{ path("post_verify_volunteer") }}" method="post" class="form-horizontal">
+        {% set phone_optional = true %}
+        {{ include('VoteBundle:Profile:user_details.html.twig') }}
+
+        <div class="volunteer-section collapse{% if user.isVolunteer or user.isMember %} in{% endif %}">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4">
+                    <button id="finish-submit" class="btn btn-success" type="submit">Update</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+{% endblock %}
+
+{% block javascripts %}
+
+    {% javascripts '@address_autocomplete' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <script>
+        $(document).ready(function() {
+
+            var $postcode_input = $("#postcode-input");
+            var $suburb_select = $("#suburb-select");
+            var $street_input = $("#street-input");
+            var $all_street_inputs = $(".street-inputs");
+//            var $phone_input = $("#phone-input");
+            var $home_address_div = $(".volunteer-details");
+            var $volunteer_button = $(".volunteer-section");
+
+            var address_verify = createAddressAutoComplete($postcode_input, $suburb_select, $street_input, $all_street_inputs);
+
+            var $volunteer_input = $("#volunteer-input");
+            var $check_inputs = $("#volunteer-input,#member-input");
+
+            $volunteer_input.change(function() {
+                $home_address_div.collapse(this.checked ? "show" : "hide");
+            });
+
+            $check_inputs.change(function() {
+                var visible = $check_inputs.is(":checked");
+                $volunteer_button.collapse(visible ? "show" : "hide");
+            });
+
+            $("form").submit(function(evnt) {
+                if($volunteer_input.is(":checked")) {
+                    var check = address_verify();
+                    if(check !== true) {
+                        $("#volunteer-error-text").html(check);
+                        evnt.preventDefault();
+                        return;
+                    }
+                }
+                $(this).find(':button[type=submit]').attr('disabled', 'disabled');
+            });
+
+        });
+
+    </script>
 
 {% endblock %}

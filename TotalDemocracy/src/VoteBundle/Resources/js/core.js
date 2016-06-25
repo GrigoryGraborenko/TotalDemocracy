@@ -3,7 +3,7 @@
  */
 
 $(document).ready(function(){
-    $("form").submit(function () {
+    $("form.once-only").submit(function () {
         $(this).find(':button[type=submit]').attr('disabled', 'disabled');
     });
 });

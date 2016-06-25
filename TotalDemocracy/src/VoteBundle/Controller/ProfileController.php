@@ -5,13 +5,13 @@ namespace VoteBundle\Controller;
 use Carbon\Carbon;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 
 use JMS\DiExtraBundle\Annotation as DI;
 
+use VoteBundle\Controller\CommonController;
 use VoteBundle\Entity\ServerEvent;
 use VoteBundle\Entity\Volunteer;
 
@@ -21,7 +21,7 @@ use VoteBundle\Exception\ErrorRedirectException;
  * Class ProfileController
  * @package VoteBundle\Controller
  */
-class ProfileController extends FOSRestController {
+class ProfileController extends CommonController {
 
     /** @DI\Inject("doctrine.orm.entity_manager") */
     protected $em;
@@ -42,11 +42,7 @@ class ProfileController extends FOSRestController {
 
         $volunteer = $user->getVolunteer();
         $output = array(
-            "isVolunteer" => $user->getIsVolunteer()
-            ,"isMember" => $user->getIsMember()
-            ,"phone" => $user->getPhone()
-            ,"volunteer" => $volunteer
-            ,"user" => $user
+            "user" => $user
         );
 
         if($volunteer && $volunteer->getHomeSuburb()) {
@@ -89,16 +85,23 @@ class ProfileController extends FOSRestController {
     }
 
     /**
-     * @Route("/settings/update", name="profile_update")
+     * @Route("/settings/update", name="profile_update", defaults={"via_profile"=true})
+     * @Route("/volunteer", name="post_verify_volunteer", defaults={"via_profile"=false})
      * @Method("POST")
      *
      * @param Request $request
      * @return RedirectResponse
      * @throws ErrorRedirectException
      */
-    public function profileUpdateAction(Request $request) {
+    public function profileUpdateAction(Request $request, $via_profile) {
 
-        $user = $this->getUser();
+        if($via_profile) {
+            $endpoint = "profile";
+            $user = $this->getUser();
+        } else {
+            $endpoint = "vote";
+            $user = $this->getPotentialUser($this->em);
+        }
         if($user === NULL) {
             throw new ErrorRedirectException("error_page", "Not logged in");
         }
@@ -107,7 +110,7 @@ class ProfileController extends FOSRestController {
 //        $this->get("logger")->info("INPUT: " .json_encode($input));
 
         if(!array_key_exists("phone", $input)) {
-            throw new ErrorRedirectException("profile", "Incorrect parameters");
+            throw new ErrorRedirectException($endpoint, "Incorrect parameters");
         }
 
         $is_volunteer = array_key_exists("isVolunteer", $input);
@@ -122,7 +125,7 @@ class ProfileController extends FOSRestController {
 //                (!array_key_exists("bestCommunication", $input))
             ) {
                 //throw new ErrorRedirectException("profile", "Incorrect parameters");
-                throw new ErrorRedirectException("profile", "Need to enter an address if volunteering");
+                throw new ErrorRedirectException($endpoint, "Need to enter an address if volunteering");
             }
             $volunteer = $user->getVolunteer();
             if($volunteer === NULL) {
@@ -159,7 +162,7 @@ class ProfileController extends FOSRestController {
 
         $this->em->flush();
 
-        return new RedirectResponse($this->generateUrl('profile'));
+        return new RedirectResponse($this->generateUrl($endpoint));
     }
 
     /**

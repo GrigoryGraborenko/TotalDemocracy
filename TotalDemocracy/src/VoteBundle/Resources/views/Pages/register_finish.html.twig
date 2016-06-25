@@ -4,7 +4,7 @@
 
     <h1>Complete Registration</h1>
 
-    <form action="{{ path("signup_confirm", { "email": email, "confirm_token": token }) }}" method="post" class="form-horizontal">
+    <form action="{{ path("signup_confirm", { "email": email, "confirm_token": token }) }}" method="post" class="form-horizontal once-only">
 
         {{ include('VoteBundle:Profile:user_details.html.twig') }}
 
@@ -52,7 +52,7 @@
             var $all_street_inputs = $(".street-inputs");
             var $phone_input = $("#phone-input");
             var $error = $("#error-text");
-            var $home_address_div = $("#home-address-div");
+            var $home_address_div = $(".volunteer-details");
 
             var address_verify = createAddressAutoComplete($postcode_input, $suburb_select, $street_input, $all_street_inputs);
 

@@ -4,7 +4,6 @@ namespace VoteBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-//use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 
 use JMS\DiExtraBundle\Annotation as DI;
@@ -154,6 +153,37 @@ class VerifyController extends CommonController {
             $this->get('session')->getFlashBag()->set("previous_input", $input);
             throw new ErrorRedirectException("verify", $output);
         }
+
+        return $this->render("VoteBundle:Pages:verify_success.html.twig", $output);
+    }
+
+    /**
+     * @Route("/test", name="finish_verify_test")
+     */
+    public function testVerificationAction(Request $request) {
+
+        $user = $this->getUser();
+        $elects = $user->getElectorates();
+
+        $output = array(
+            "user" => $user
+            ,"federal" => $elects[0]
+            ,"state" => $elects[1]
+            ,"local" => $elects[2]
+        );
+
+        return $this->render("VoteBundle:Pages:verify_success.html.twig", $output);
+    }
+
+    /**
+     * @Route("/verify-skip", name="skip_verify")
+     */
+    public function verifySkipAction(Request $request) {
+
+        $output = array(
+            "user" => $this->getUser()
+            ,"skip" => true
+        );
 
         return $this->render("VoteBundle:Pages:verify_success.html.twig", $output);
     }
@@ -333,12 +363,10 @@ class VerifyController extends CommonController {
 //            }
 
             $output = array(
-                "is_user_enabled" => $user->isEnabled()
+                "user" => $user
                 ,"federal" => $fed_elect
                 ,"state" => $state_elect
                 ,"local" => $local_elect
-//                ,"council" => $council
-//                ,"ward" => $council_ward
             );
         } else if(($success_nodes->count() > 0) && (($success_nodes->html() === "Please contact the AEC on 13 23 26 for assistance") || ($success_nodes->html() === "Your enrolment could not be confirmed. Please check the information you have entered"))) {
             return array(false, "Could not find you on the electoral role. Try with/without your middle name, or a previous address.");

@@ -6,38 +6,40 @@
 
     <div class="panel panel-default">
         <div class="panel-body">
-            <form class="form-horizontal" action="{{ path("finish_verify") }}" method="post">
+            <form class="form-horizontal once-only" action="{{ path("finish_verify") }}" method="post">
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="names-input">Given Names</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-5">
                         <input class="form-control" type="text" id="names-input" name="givenNames" value="{{ givenNames }}" placeholder="First and middle names">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="surname-input">Surname</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-5">
                         <input class="form-control" type="text" id="surname-input" name="surname" value="{{ surname }}" placeholder="Last name">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="dob-date">Date of Birth:</label>
-                    <div class="col-sm-4 form-inline">
+                    <div class="col-sm-6 form-inline">
                         <select class="form-control" id="dob-date" name="dobDate">
-                            <option value=""></option>
+                            <option value="">Select date...</option>
                             {% for i in 1..31 %}
                                 <option value="{{ i }}" {% if dobDate is defined and dobDate == i %}selected{% endif %}>{{ i }}</option>
                             {% endfor %}
                         </select>
+                        <label> Month: </label>
                         <select class="form-control" id="dob-month" name="dobMonth">
-                            <option value=""></option>
+                            <option value="">Select month...</option>
                             {% for i in 1..12 %}
                                 <option value="{{ i }}" {% if dobMonth is defined and dobMonth == i %}selected{% endif %}>{{ month_names[i - 1] }}</option>
                             {% endfor %}
                         </select>
+                        <label> Year: </label>
                         <select class="form-control" id="dob-year" name="dobYear">
-                            <option value=""></option>
+                            <option value="">Select year...</option>
                             {% for year in years %}
                                 <option value="{{ year }}" {% if dobYear is defined and dobYear == year %}selected{% endif %}>{{ year }}</option>
                             {% endfor %}
@@ -47,14 +49,14 @@
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="postcode-input">Postcode</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-5">
                         <input class="form-control" type="text" id="postcode-input" name="postcode" value="{{ postcode }}" placeholder="Postcode">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="suburb-input">Suburb/Locality</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-5">
                         <select class="form-control" id="suburb-select" name="suburb" disabled>
                             <option>- None Selected -</option>
                         </select>
@@ -63,27 +65,27 @@
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="street-number-input">Street Number</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-5">
                         <input class="form-control street-inputs" type="text" id="street-number-input" name="streetNumber" value="{{ streetNumber }}" disabled placeholder="Unit/Number or Number">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="street-input">Street Name</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-5">
                         <input class="form-control street-inputs" type="text" id="street-input" name="street" value="{{ street }}" disabled placeholder="Name">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="verify-image">Verification Image</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-5">
                         <img id="verify-image" src="{{ image }}">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="verify-input">Verification Code</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-5">
                         <input class="form-control" type="text" id="verify-input" name="verify" placeholder="Four character verification code">
                     </div>
                 </div>
@@ -97,12 +99,12 @@
                 </h4>
 
                 <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-4">
+                    <div class="col-sm-offset-2 col-sm-5">
                         <span>When you click verify you are asking us to submit your details to the Australian Electoral Commission website to verify and save your enrollment details on our system.</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-4">
+                    <div class="col-sm-offset-2 col-sm-5">
                         <button class="btn btn-success" type="submit" id="verify-submit" >{{ verify_button_text }}</button>
                     </div>
                 </div>

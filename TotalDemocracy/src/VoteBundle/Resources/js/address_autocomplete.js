@@ -9,11 +9,13 @@ function createAddressAutoComplete($postcode_input, $suburb_select, $street_inpu
 
     $postcode_input.on("input", function() {
         var post = $(this).val();
-        $suburb_select.empty().append('<option value="">- None Selected -</option>').prop("disabled", true);
+        $suburb_select.empty().prop("disabled", true);
         $all_street_inputs.prop("disabled", true);
         if((post.length < 4) || (post.length > 4)) {
+            $suburb_select.append('<option value="">- Enter Valid Postcode First -</option>');
             return;
         }
+        $suburb_select.append('<option value="">Please Wait, Loading...</option>');
 
         $.ajax({
             url: Routing.generate('verify_autocomplete')
@@ -26,7 +28,7 @@ function createAddressAutoComplete($postcode_input, $suburb_select, $street_inpu
                 return;
             }
             acceptable_suburbs = data.suburbs;
-            $suburb_select.prop("disabled", false);
+            $suburb_select.prop("disabled", false).empty().append('<option value="">- Select Suburb -</option>');
             $all_street_inputs.prop("disabled", false);
 
             data.suburbs.forEach(function(sub) {

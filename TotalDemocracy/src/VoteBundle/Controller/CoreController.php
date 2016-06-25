@@ -32,6 +32,8 @@ federal election message - These are the active bills currently up for vote
  OR
 "active" or "closed" bills filter that has inactive disabled for now
 
+make sure to record parent domain when creating elec
+
 b) If I vote I cannot cancel my vote
 f) When someone searches all federal bills nothing comes up maybe you can put a message there saying "There is an election on and parliament has been dissolved."
 g) On the register finish page and settings page when the volunteer drop-down occurs please put phone number field at the top under the member button.
@@ -43,6 +45,9 @@ b) The enrollment verification page needs the member/volunteer options, **this i
 c) I am thinking the solution for someone who can't vote but wants to volunteer is have a volunteer tick box at the bottom of the verification page that shows phone number when clicked, it saves the first instance of the address and auto-populates the enrollment verified/finish verification page.
 d) My verification email went into spam something to raise with Phil soon.
 A solution for capturing people who can't verify but want to volunteer. Instead of a volunteer button on the verification page they click the volunteer button on nationbuilder and it takes them to an unlisted page on peopledecide.org? This doesn't have to be done now.
+
+Verify error msg doesn't show on short screens, need to scroll down
+Unify filters - way too complex right now
 
  * Verification success and electorate listings should be prettier
  * Make sure that rego and verify both can be switched off for maintenance

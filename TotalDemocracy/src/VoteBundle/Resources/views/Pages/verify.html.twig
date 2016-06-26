@@ -107,6 +107,11 @@
                     <div class="col-sm-offset-2 col-sm-5">
                         <button class="btn btn-success" type="submit" id="verify-submit" >{{ verify_button_text }}</button>
                     </div>
+                    {% if can_skip is defined %}
+                        <div class="col-sm-5">
+                            <a class="btn btn-warning" href="{{ path("skip_verify") }}" >Skip</a>
+                        </div>
+                    {% endif %}
                 </div>
 
             </form>

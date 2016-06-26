@@ -7,7 +7,6 @@
         {% if skip is defined %}
             <h1>Verification skipped</h1>
             <p>You can always verify later - simply click the verify menu and fill in the details.</p>
-            <p>Would you consider volunteering for People Decide and help make participatory democracy a reality?</p>
         {% else %}
             <p>You are registered to vote in:
                 <ul>
@@ -33,19 +32,20 @@
         </b>
     </div>
 
-    <form action="{{ path("post_verify_volunteer") }}" method="post" class="form-horizontal">
-        {% set phone_optional = true %}
-        {{ include('VoteBundle:Profile:user_details.html.twig') }}
+    {% if not user.enabled %}
+        <form action="{{ path("post_verify_volunteer") }}" method="post" class="form-horizontal">
+            {% set phone_optional = true %}
+            {{ include('VoteBundle:Profile:user_details.html.twig') }}
 
-        <div class="volunteer-section collapse{% if user.isVolunteer or user.isMember %} in{% endif %}">
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-4">
-                    <button id="finish-submit" class="btn btn-success" type="submit">Update</button>
+            <div class="volunteer-section collapse{% if user.isVolunteer or user.isMember %} in{% endif %}">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-4">
+                        <button id="finish-submit" class="btn btn-success" type="submit">Update</button>
+                    </div>
                 </div>
             </div>
-        </div>
-
-    </form>
+        </form>
+    {% endif %}
 
 {% endblock %}
 
@@ -58,18 +58,21 @@
     <script>
         $(document).ready(function() {
 
+            var $volunteer_input = $("#volunteer-input");
+            var $check_inputs = $("#volunteer-input,#member-input");
+            if($volunteer_input.length <= 0) {
+                return;
+            }
+
             var $postcode_input = $("#postcode-input");
             var $suburb_select = $("#suburb-select");
             var $street_input = $("#street-input");
             var $all_street_inputs = $(".street-inputs");
-//            var $phone_input = $("#phone-input");
             var $home_address_div = $(".volunteer-details");
             var $volunteer_button = $(".volunteer-section");
 
             var address_verify = createAddressAutoComplete($postcode_input, $suburb_select, $street_input, $all_street_inputs);
 
-            var $volunteer_input = $("#volunteer-input");
-            var $check_inputs = $("#volunteer-input,#member-input");
 
             $volunteer_input.change(function() {
                 $home_address_div.collapse(this.checked ? "show" : "hide");

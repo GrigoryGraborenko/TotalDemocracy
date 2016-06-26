@@ -17,6 +17,7 @@ use VoteBundle\Exception\ErrorRedirectException;
 
 use VoteBundle\Entity\Electorate;
 use VoteBundle\Entity\Domain;
+use VoteBundle\Entity\ServerEvent;
 
 /**
  * Class VerifyController
@@ -136,6 +137,28 @@ class VerifyController extends CommonController {
         $session->set('verify.VCID', $crawler->filter('#LBD_VCID_c_verifyenrolment_ctl00_contentplaceholderbody_captchaverificationcode')->attr("value"));
         $session->set('verify.cookie', $cookie);
 
+
+        $event_repo = $this->em->getRepository('VoteBundle:ServerEvent');
+
+        // check to see if this device is being tracked by a volunteer
+        $cookies = $request->cookies->all();
+        if(array_key_exists("tracking_token", $cookies)) {
+            $events = $event_repo->findByJson("registration.track", $cookies['tracking_token'], false);
+            if(count($events) > 0) {
+                $track_event = $events[0];
+                $close_time = Carbon::instance($track_event->getDateCreated())->addHours($track_event->getAmount());
+                if(Carbon::now("UTC")->lte($close_time)) {
+                    $output["can_skip"] = true;
+                }
+            }
+        }
+
+        // check to see if there were three failures
+        $num_failures = count($event_repo->findBy(array("name" => "verify.failure", "user" => $user)));
+        if($num_failures >= 3) {
+            $output["can_skip"] = true;
+        }
+
         return $this->render("VoteBundle:Pages:verify.html.twig", $output);
     }
 
@@ -148,29 +171,21 @@ class VerifyController extends CommonController {
         $input = $request->request->all();
 
         list($is_success, $output) = $this->finishVerification($input);
+        $user = $this->getPotentialUser($this->em);
 
         if(!$is_success) {
+
+            $event = new ServerEvent("verify.failure", $user, array_merge($input, array("error" => $output)));
+            $this->em->persist($event);
+            $this->em->flush();
+
             $this->get('session')->getFlashBag()->set("previous_input", $input);
             throw new ErrorRedirectException("verify", $output);
         }
 
-        return $this->render("VoteBundle:Pages:verify_success.html.twig", $output);
-    }
-
-    /**
-     * @Route("/test", name="finish_verify_test")
-     */
-    public function testVerificationAction(Request $request) {
-
-        $user = $this->getUser();
-        $elects = $user->getElectorates();
-
-        $output = array(
-            "user" => $user
-            ,"federal" => $elects[0]
-            ,"state" => $elects[1]
-            ,"local" => $elects[2]
-        );
+        $event = new ServerEvent("verify.success", $user, $input);
+        $this->em->persist($event);
+        $this->em->flush();
 
         return $this->render("VoteBundle:Pages:verify_success.html.twig", $output);
     }
@@ -180,8 +195,13 @@ class VerifyController extends CommonController {
      */
     public function verifySkipAction(Request $request) {
 
+        $user = $this->getPotentialUser($this->em);
+        if($user === NULL) {
+            throw new ErrorRedirectException("error_page", "No user available");
+        }
+
         $output = array(
-            "user" => $this->getUser()
+            "user" => $user
             ,"skip" => true
         );
 

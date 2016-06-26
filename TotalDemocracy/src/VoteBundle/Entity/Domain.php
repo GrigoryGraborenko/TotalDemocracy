@@ -68,6 +68,17 @@ class Domain {
     protected $documents;
 
     /**
+     * @ORM\ManyToOne(targetEntity="VoteBundle\Entity\Domain", inversedBy="children")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="set null")
+     */
+    protected $parent;
+
+    /**
+     * @ORM\OneToMany(targetEntity="VoteBundle\Entity\Domain", mappedBy="parent")
+     */
+    protected $children;
+
+    /**
      * Domain constructor.
      * @param $level
      * @param $name
@@ -146,6 +157,27 @@ class Domain {
      */
     public function getDocuments() {
         return $this->documents;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getParent() {
+        return $this->parent;
+    }
+
+    /**
+     * @param mixed $parent
+     */
+    public function setParent($parent) {
+        $this->parent = $parent;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChildren() {
+        return $this->children;
     }
 
 }

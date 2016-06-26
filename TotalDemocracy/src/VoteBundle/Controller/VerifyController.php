@@ -365,6 +365,7 @@ class VerifyController extends CommonController {
             if($local_domain === NULL) {
                 $this->logger->info("Creating new local domain: $council");
                 $local_domain = new Domain("local", $council);
+                $local_domain->setParent($state_domain);
                 $this->em->persist($local_domain);
             }
             $local_elect = $elect_repo->findOneBy(array("domain" => $local_domain, "name" => $council_ward));
@@ -374,6 +375,10 @@ class VerifyController extends CommonController {
                 $this->em->persist($local_elect);
             }
             $user->addElectorate($local_elect);
+
+            // TODO: remove this, only for retroactive fix
+            $local_domain->setParent($state_domain);
+            $state_domain->setParent($fed_domain);
 
             $this->em->flush();
 

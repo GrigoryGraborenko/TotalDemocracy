@@ -40,6 +40,7 @@
         "stof/doctrine-extensions-bundle": "*",
         "doctrine/doctrine-fixtures-bundle": "dev-master",
         "guzzlehttp/guzzle": "~6.0",
+        "adoy/oauth2": "*",
 
         "smalot/pdfparser": "*"
     },

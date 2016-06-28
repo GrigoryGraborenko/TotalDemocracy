@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use JMS\DiExtraBundle\Annotation as DI;
+use OAuth2\Client;
 
 use VoteBundle\Exception\BadRequestException;
 
@@ -147,6 +148,55 @@ class APIController extends FOSRestController {
         $response = $this->render("VoteBundle:API:documents.html.twig", $output);
         $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
+    }
+
+    /**
+     * @Route("/oauth/nationbuilder", name="oauth_nationbuilder")
+     */
+    public function oauthAction(Request $request) {
+
+//        $test_token = $this->getParameter('nationbuilder.testToken');
+//        if($test_token != NULL) {
+
+//            $this->get('logger')->info("Authenticating with test token");
+//
+//            $session = $request->getSession();
+//            $session->set('oauth_token', $client_test_token);
+//
+//            return $this->redirectToRoute('homepage');
+//        }
+
+        $client_id = $this->getParameter('nationbuilder.clientID');
+        $client_secret = $this->getParameter('nationbuilder.secret');
+        $base_url = $this->getParameter('nationbuilder.baseURL');
+        $send_url = $base_url . 'oauth/authorize';
+
+        $client = new Client($client_id, $client_secret);
+        $redirectUrl = $request->getSchemeAndHttpHost() . $this->get('router')->generate('oauth_nationbuilder_callback');
+
+        $authUrl = $client->getAuthenticationUrl($send_url, $redirectUrl);
+
+//        $this->get('logger')->info("Redirecting to $authUrl");
+
+        return new RedirectResponse($authUrl);
+    }
+
+    /**
+     * @Route("/oauth/nationbuilder/callback", name="oauth_nationbuilder_callback")
+     */
+    public function oauthCallbackAction(Request $request) {
+
+        $this->get('logger')->debug("oauth redirected successfully");
+
+        $input_query = $request->query->all();
+
+        if(array_key_exists('code', $input_query)) {
+            $session = $request->getSession();
+            $session->set('nationbuilder.api_token', $input_query['code']);
+            $this->get('logger')->debug("oauth token set successfully");
+        }
+
+        return $this->redirectToRoute('vote');
     }
 
 }

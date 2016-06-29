@@ -170,7 +170,17 @@ class VerifyController extends CommonController {
 
         $input = $request->request->all();
 
-        list($is_success, $output) = $this->finishVerification($input);
+        $cookies = $request->cookies->all();
+        $track_event = NULL;
+        if(array_key_exists("tracking_token", $cookies)) {
+            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
+            if(count($events) > 0) {
+                $track_event = $events[0];
+            }
+        }
+
+
+        list($is_success, $output) = $this->finishVerification($input, $track_event);
         $user = $this->getPotentialUser($this->em);
 
         if(!$is_success) {
@@ -210,9 +220,10 @@ class VerifyController extends CommonController {
 
     /**
      * @param $input
+     * @param null $tracking_event
      * @return array
      */
-    private function finishVerification($input) {
+    private function finishVerification($input, $tracking_event = NULL) {
 
         $user = $this->getPotentialUser($this->em);
         if($user === NULL) {
@@ -376,12 +387,20 @@ class VerifyController extends CommonController {
             }
             $user->addElectorate($local_elect);
 
-            // TODO: remove this, only for retroactive fix
+            // TODO: remove these two lines, only for retroactive fix
             $local_domain->setParent($state_domain);
             $state_domain->setParent($fed_domain);
 
             $this->em->flush();
 
+            if($tracking_event !== NULL) {
+                $json = $tracking_event->getJsonArray();
+                if(array_key_exists("nationbuilder.api_token", $json)) {
+                    $nationbuilder = $this->get("vote.nationbuilder");
+                    $nationbuilder->setToken($json["nationbuilder.api_token"]);
+                    $nationbuilder->syncPerson($user);
+                }
+            }
             // don't remove after verification so that new users can see all the domains they can vote in
 //            if($session->has("new_user_id")) {
 //                $session->remove("new_user_id");

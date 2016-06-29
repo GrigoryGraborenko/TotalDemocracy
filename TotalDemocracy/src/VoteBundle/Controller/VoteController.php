@@ -35,6 +35,7 @@ class VoteController extends CommonController {
 
         $output = array(
             "can_vote" => false
+            ,"is_verified" => false
         );
 
         $levels = array(
@@ -49,7 +50,12 @@ class VoteController extends CommonController {
             if($user->getWhenVerified() === NULL) {
                 $output['cannot_vote_message'] = '<a href="' . $this->generateUrl("verify") . '">Verify</a> on the electoral role to vote';
             } else {
-                $output['can_vote'] = true;
+                $output['is_verified'] = true;
+                if($user->isEnabled()) {
+                    $output['can_vote'] = true;
+                } else {
+                    $output['cannot_vote_message'] = 'Confirm your email address to vote, check your inbox.';
+                }
                 $output['user'] = $user;
                 foreach($user->getElectorates() as $electorate) {
                     $domain = $electorate->getDomain();
@@ -119,6 +125,9 @@ class VoteController extends CommonController {
             throw new BadRequestException("Not signed in");
         }
         if($user->getWhenVerified() === NULL) {
+            throw new BadRequestException("Not verified on the electoral roll");
+        }
+        if(!$user->isEnabled()) {
             throw new BadRequestException("Not verified on the electoral roll");
         }
 

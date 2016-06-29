@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 
 use JMS\DiExtraBundle\Annotation as DI;
+use OAuth2\Client;
 
 use VoteBundle\Controller\CommonController;
 use VoteBundle\Entity\ServerEvent;
@@ -49,19 +50,25 @@ class ProfileController extends CommonController {
             $this->get("vote.js")->output("suburb", $volunteer->getHomeSuburb());
         }
 
+        $session = $request->getSession();
+        if($session->has("nationbuilder.api_token")) {
+            $output['nationbuilder_login'] = true;
+        }
+
         $is_admin = $this->get("security.authorization_checker")->isGranted("ROLE_ADMIN");
         $output['is_admin'] = $is_admin;
         $new_cookie = NULL;
         if($is_admin) {
 
-            $since = Carbon::now("UTC")->subDays(1);
-            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findEvents("registration.track", $user->getId(), $since, false);
+//            $since = Carbon::now("UTC")->subDays(1);
+            //$events = $this->em->getRepository('VoteBundle:ServerEvent')->findEvents("registration.track", $user->getId(), $since, false);
+            $event = $this->em->getRepository('VoteBundle:ServerEvent')->findOneBy(array("name" => "registration.track", "user" => $user, "processed" => false));
 
-            if(count($events) > 0) {
-                $event = $events[0];
+            if($event !== NULL) {
                 $close_time = Carbon::instance($event->getDateCreated())->addHours($event->getAmount());
                 if(Carbon::now("UTC")->gt($close_time)) {
                     $event->setProcessed(true);
+                    $event->removeKeyJson("nationbuilder.api_token");
                     $this->em->flush();
                 } else {
                     $json = $event->getJsonArray();
@@ -71,6 +78,12 @@ class ProfileController extends CommonController {
                     $output['tracking_time_left'] = "$diff_hours hours and $diff_min minutes left";
                     $output['tracking_token'] = $json['token'];
                     $output['tracking_context'] = $json['context'];
+
+                    if(array_key_exists("nationbuilder.api_token", $json) && (!$output['nationbuilder_login'])) {
+                        $output['nationbuilder_login'] = true;
+                        $session->set("nationbuilder.api_token", $json["nationbuilder.api_token"]);
+                    }
+
                     $new_cookie = new Cookie("tracking_token", $json['token'], time() + $diff_min_total * 60);
                 }
             }
@@ -243,6 +256,7 @@ class ProfileController extends CommonController {
         $old_events = $event_repo->findBy(array("user" => $user, "name" => "registration.track", "processed" => false));
         foreach($old_events as $old_event) {
             $old_event->setProcessed(true);
+            $old_event->removeKeyJson("nationbuilder.api_token");
         }
 
         $hours = intval($input['time']);
@@ -253,6 +267,10 @@ class ProfileController extends CommonController {
             "token" => $token
             ,"context" => $input['context']
         );
+        $session = $request->getSession();
+        if($session->has("nationbuilder.api_token")) {
+            $json["nationbuilder.api_token"] = $session->get("nationbuilder.api_token");
+        }
 
         $event = new ServerEvent("registration.track", $this->getUser(), $json, $hours);
         $this->em->persist($event);
@@ -285,10 +303,95 @@ class ProfileController extends CommonController {
         $old_events = $event_repo->findBy(array("user" => $user, "name" => "registration.track", "processed" => false));
         foreach($old_events as $old_event) {
             $old_event->setProcessed(true);
+            $old_event->removeKeyJson("nationbuilder.api_token");
         }
         $this->em->flush();
 
         return new RedirectResponse($this->generateUrl('profile'));
+    }
+
+    /**
+     * @Route("/oauth/nationbuilder", name="oauth_nationbuilder")
+     */
+    public function oauthAction(Request $request) {
+
+        $user = $this->getUser();
+        if($user === NULL) {
+            throw new ErrorRedirectException("error_page", "Access denied");
+        }
+
+        $test_token = $this->getParameter('nationbuilder.testToken');
+        if($test_token != NULL) {
+            $session = $request->getSession();
+            $session->set('nationbuilder.api_token', $test_token);
+            return $this->redirectToRoute('profile');
+        }
+
+        $client_id = $this->getParameter('nationbuilder.clientID');
+        $client_secret = $this->getParameter('nationbuilder.secret');
+        $base_url = $this->getParameter('nationbuilder.baseURL');
+        $send_url = $base_url . 'oauth/authorize';
+
+        $client = new Client($client_id, $client_secret);
+        $redirectUrl = $request->getSchemeAndHttpHost() . $this->get('router')->generate('oauth_nationbuilder_callback');
+
+        $authUrl = $client->getAuthenticationUrl($send_url, $redirectUrl);
+
+//        $this->get('logger')->info("Redirecting to $authUrl");
+
+        return new RedirectResponse($authUrl);
+    }
+
+    /**
+     * @Route("/oauth/nationbuilder/callback", name="oauth_nationbuilder_callback")
+     */
+    public function oauthCallbackAction(Request $request) {
+
+        $this->get('logger')->debug("oauth redirected successfully");
+        $user = $this->getUser();
+        if($user === NULL) {
+            throw new ErrorRedirectException("error_page", "Access denied");
+        }
+
+        $input_query = $request->query->all();
+
+        $session = $request->getSession();
+        if(array_key_exists('code', $input_query)) {
+            $session->set('nationbuilder.api_token', $input_query['code']);
+            $this->get('logger')->debug("oauth token set successfully");
+
+            $event = $this->em->getRepository('VoteBundle:ServerEvent')->findOneBy(array("name" => "registration.track", "user" => $user, "processed" => false));
+            if($event !== NULL) {
+                $event->updateJson("nationbuilder.api_token", $input_query['code']);
+                $this->em->flush();
+            }
+
+            $session->getFlashBag()->set("oauth", "success");
+        } else {
+            $session->getFlashBag()->set("oauth", "failure");
+        }
+
+        return $this->redirectToRoute('profile');
+    }
+
+    /**
+     * @Route("/oauth/nationbuilder/cancel", name="oauth_nationbuilder_cancel")
+     */
+    public function oauthCancelAction(Request $request) {
+
+        $user = $this->getUser();
+        if($user === NULL) {
+            throw new ErrorRedirectException("error_page", "Access denied");
+        }
+
+        $event = $this->em->getRepository('VoteBundle:ServerEvent')->findOneBy(array("name" => "registration.track", "user" => $user, "processed" => false));
+        if($event !== NULL) {
+            $event->removeKeyJson("nationbuilder.api_token");
+            $this->em->flush();
+        }
+        $request->getSession()->remove('nationbuilder.api_token');
+
+        return $this->redirectToRoute('profile');
     }
 
 }

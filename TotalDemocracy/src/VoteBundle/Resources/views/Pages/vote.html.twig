@@ -4,7 +4,10 @@
 
     <h1>Vote</h1>
 
-    {% if can_vote %}
+    {% if cannot_vote_message is defined %}
+        <p class="color-red">{{ cannot_vote_message | raw }}</p>
+    {% endif %}
+    {% if is_verified %}
         <p>You are registered to vote in:
             <ul>
                 {% if federal is defined %}
@@ -22,8 +25,6 @@
             </ul>
         </p>
         <p>These details are correct as of {{ user.whenVerified | date("d/m/Y") }}</p>
-    {% else %}
-        <p class="color-red">{{ cannot_vote_message | raw }}</p>
     {% endif %}
 
     <form id="filter-form" class="form-inline once-only">

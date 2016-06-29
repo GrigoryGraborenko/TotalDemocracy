@@ -167,6 +167,16 @@ class RegisterController extends FOSRestController {
         $event = new ServerEvent("registration", $user, array("ip" => $request->getClientIp()));
         $event->setParent($track_event);
         $this->em->persist($event);
+
+        if($track_event) {
+            $json = $track_event->getJsonArray();
+            if(array_key_exists("nationbuilder.api_token", $json)) {
+                $nationbuilder = $this->get("vote.nationbuilder");
+                $nationbuilder->setToken($json["nationbuilder.api_token"]);
+                $nationbuilder->syncPerson($user);
+            }
+        }
+
         $this->em->flush();
 
         $session->set("new_user_id", $user->getId());

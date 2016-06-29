@@ -227,5 +227,26 @@ class ServerEvent {
         return json_decode($this->json, true);
     }
 
+    /**
+     * @param $key
+     * @param $value
+     */
+    public function updateJson($key, $value) {
+        $json = json_decode($this->json, true);
+        $json[$key] = $value;
+        $this->json = json_encode($json);
+    }
+
+    /**
+     * @param $key
+     */
+    public function removeKeyJson($key) {
+        $json = json_decode($this->json, true);
+        if(!array_key_exists($key, $json)) {
+            return;
+        }
+        unset($json[$key]);
+        $this->json = json_encode($json);
+    }
 
 }

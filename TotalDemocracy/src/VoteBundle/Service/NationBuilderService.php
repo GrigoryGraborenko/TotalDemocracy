@@ -131,7 +131,6 @@ class NationBuilderService {
 
     }
 
-
     /**
      * NationBuilderService constructor.
      * @param $session
@@ -155,6 +154,13 @@ class NationBuilderService {
         } else {
             $this->api_token = NULL;
         }
+    }
+
+    /**
+     * @param $token
+     */
+    public function setToken($token) {
+        $this->api_token = $token;
     }
 
     /**

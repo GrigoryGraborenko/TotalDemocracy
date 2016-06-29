@@ -123,7 +123,11 @@
                     </form>
                 </p>
                 <p>
-                    <a class="btn btn-success" href="{{ path("oauth_nationbuilder") }}">Authenticate with NationBuilder</a>
+                    {% if nationbuilder_login is not defined %}
+                        <a class="btn btn-success" href="{{ path("oauth_nationbuilder") }}">Authenticate with NationBuilder</a>
+                    {% else %}
+                        <a class="btn btn-warning" href="{{ path("oauth_nationbuilder_cancel") }}">Cancel Authentication with NationBuilder</a>
+                    {% endif %}
                 </p>
             </div>
         </div>

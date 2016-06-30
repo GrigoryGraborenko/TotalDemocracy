@@ -104,6 +104,10 @@ class NationBuilderService {
         if($user->getDOB() !== NULL) {
             $sync_user['birthdate'] = $user->getDOB()->format("Y-m-d");
         }
+//        if($user->getVolunteer() !== NULL) {
+//            $person['tags'] = array(
+//            );
+//        }
 
         if($person === NULL) {
             $person_data = $sync_user;
@@ -116,7 +120,7 @@ class NationBuilderService {
 //                }
 //            }
         }
-        $this->logger->info("REFRESH: " . json_encode($person_data));
+//        $this->logger->info("REFRESH: " . json_encode($person_data));
 
         if($person_data === NULL) {
             return;
@@ -127,7 +131,7 @@ class NationBuilderService {
         } else {
             $result = $this->sendData("people/" . $person['id'], array('person' => $person_data), "PUT");
         }
-        $this->logger->info("RESULT: " . json_encode($result));
+        $this->logger->debug("Nationbuilder Sync Result: " . json_encode($result));
 
     }
 

@@ -324,6 +324,13 @@ class ProfileController extends CommonController {
         if($test_token != NULL) {
             $session = $request->getSession();
             $session->set('nationbuilder.api_token', $test_token);
+
+            $event = $this->em->getRepository('VoteBundle:ServerEvent')->findOneBy(array("name" => "registration.track", "user" => $user, "processed" => false));
+            if($event !== NULL) {
+                $event->updateJson("nationbuilder.api_token", $test_token);
+                $this->em->flush();
+            }
+
             return $this->redirectToRoute('profile');
         }
 

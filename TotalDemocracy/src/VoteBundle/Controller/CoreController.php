@@ -19,8 +19,6 @@ REDIRECT TO HTTPS!
 check that status is correct - failed is a possibility
 make sure that you scrape the finished ones too - otherwise they may never close
 
-make sure to record parent domain when creating elec
-
 federal election message - These are the active bills currently up for vote
  OR
 "active" or "closed" bills filter that has inactive disabled for now
@@ -32,12 +30,9 @@ f) When someone searches all federal bills nothing comes up maybe you can put a 
 g) On the register finish page and settings page when the volunteer drop-down occurs please put phone number field at the top under the member button.
 h) Once someone has saved volunteer information do not collapse volunteer drop-down again, only allow unticking and ticking of volunteer button.
 i) The verified enrollment page needs to have member and volunteer options on it because I talk them through it when I am doorknocking and we want to collect that if someone verification email has gone into spam.
-k) Not sure what to do about someone who can't be verified but want to volunteer.
 a) When you are verified and all is good, and you go to update your address, if the new address doesn't verify it still allows you to vote. If someone has been taken off the roll which does happen, overseas for 5 years etc they are not allowed to vote so we need to ensure that we don't allow them to vote if the updated address doesn't verify.
-b) The enrollment verification page needs the member/volunteer options, **this is the one thing I hope you can do now (if possible)  because then I can use it for most of Tuesday when I next go door-knocking.
 c) I am thinking the solution for someone who can't vote but wants to volunteer is have a volunteer tick box at the bottom of the verification page that shows phone number when clicked, it saves the first instance of the address and auto-populates the enrollment verified/finish verification page.
 d) My verification email went into spam something to raise with Phil soon.
-A solution for capturing people who can't verify but want to volunteer. Instead of a volunteer button on the verification page they click the volunteer button on nationbuilder and it takes them to an unlisted page on peopledecide.org? This doesn't have to be done now.
 
 Verify error msg doesn't show on short screens, need to scroll down
 Unify filters - way too complex right now

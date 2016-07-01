@@ -39,7 +39,7 @@ class ServerEvent {
 
     /**
      * @ORM\ManyToOne(targetEntity="VoteBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      */
     protected $user;
 

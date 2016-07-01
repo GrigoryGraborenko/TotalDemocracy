@@ -85,6 +85,11 @@ class ElectoralRollImport {
     protected $DOB;
 
     /**
+     * @ORM\Column(type="boolean", nullable=false, options={"default" = false})
+     */
+    protected $fromOCR;
+
+    /**
      * ElectoralRollImport constructor.
      * @param $surname
      * @param $givenNames
@@ -261,6 +266,20 @@ class ElectoralRollImport {
      */
     public function setDOB($DOB) {
         $this->DOB = $DOB;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFromOCR() {
+        return $this->fromOCR;
+    }
+
+    /**
+     * @param mixed $fromOCR
+     */
+    public function setFromOCR($fromOCR) {
+        $this->fromOCR = $fromOCR;
     }
 
 }

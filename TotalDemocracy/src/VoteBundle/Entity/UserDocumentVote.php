@@ -39,6 +39,7 @@ class UserDocumentVote {
      * The user this vote belongs to
      *
      * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\User", inversedBy="votes")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $user;
 

@@ -16,7 +16,7 @@
 html, body {
 	height: 100%;
 	font-family: 'Open Sans', sans-serif;
-	background: #f2f2f2 url('https://d3n8a8pro7vhmx.cloudfront.net/peopledecide/pages/482/attachments/original/1461420299/bg10.jpg?1461420299') repeat-x 0 150px;
+	background: #f2f2f2 url('/img/bg10.jpg') repeat-x 0 150px;
 }
 .header {
 	clear: both;

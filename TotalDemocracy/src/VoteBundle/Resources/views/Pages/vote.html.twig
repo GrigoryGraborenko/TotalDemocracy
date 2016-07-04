@@ -28,27 +28,43 @@
     {% endif %}
 
     <form id="filter-form" class="form-inline once-only">
+
+        {#<div class="form-group">#}
+            {#<label>Show: </label>#}
+
+            {#{% for type, level in domains_levels %}#}
+                {#<select class="form-control domain-select" data-level="{{ type }}" disabled>#}
+                    {#{% for id, domain in level.domains %}#}
+                        {#<option#}
+                                {#{% if id == "" %}#}
+                                    {#disabled#}
+                                {#{% else %}#}
+                                    {#{% if id != level.default %}#}
+                                        {#value="{{ id }}"#}
+                                    {#{% else %}#}
+                                        {#value=""#}
+                                    {#{% endif %}#}
+                                    {#{% if id == level.selected %}selected{% endif %}#}
+                                {#{% endif %}>{{ domain.name }}</option>#}
+                    {#{% endfor %}#}
+                {#</select>#}
+            {#{% endfor %}#}
+        {#</div>#}
+
         <div class="form-group">
             <label>Show: </label>
-
-            {% for type, level in domains_levels %}
-                <select class="form-control domain-select" data-level="{{ type }}" disabled>
-                    {% for id, domain in level.domains %}
-                        <option
-                                {% if id == "" %}
-                                    disabled
-                                {% else %}
-                                    {% if id != level.default %}
-                                        value="{{ id }}"
-                                    {% else %}
-                                        value=""
-                                    {% endif %}
-                                    {% if id == level.selected %}selected{% endif %}
-                                {% endif %}>{{ domain.name }}</option>
-                    {% endfor %}
-                </select>
-            {% endfor %}
-
+            <select id="domain-select" name="domain" class="form-control domain-select" disabled>
+                {% for filter, label in filters %}
+                    <option
+                    {% if filter == "" %}
+                        disabled
+                    {% else %}
+                        value="{{ filter }}"
+                        {% if filter == current_filter %}selected{% endif %}
+                    {% endif %}
+                    >{{ label }}</option>
+                {% endfor %}
+            </select>
         </div>
         <div class="form-group">
             <label>Search: </label>
@@ -58,23 +74,46 @@
 
     </form>
 
-    {% for info in doc_list %}
-        <div class="divider pd-document-internal" data-doc-block="{{ info.doc.id }}">
-            <h3 class="bill-title">{{ info.doc.name }}
-                {% if info.is_voteable %}
-                    &nbsp; | &nbsp; <span class="yes-count">{{ info.supporters }} Yes</span> &nbsp; | &nbsp; <span class="no-count">{{ info.opponents }} No</span> &nbsp; |
-                {% else %}
-                    &nbsp; | &nbsp; <span class="no-count">Cannot vote on this type of bill yet</span>
-                {% endif %}
-            </h3>
-            <h6>{{ info.doc.domain.name }}{% if info.doc.externalURL is not null %} - <a href="{{ info.doc.externalURL }}">View details</a>{% endif %}</h6>
-            <p>{{ info.doc.summary }}</p>
-            {% if info.can_vote and info.is_voteable %}
-                <button class="btn btn-success vote-on" data-id="{{ info.doc.id }}" data-vote="true" {% if info.yes_vote %}disabled{% endif %}>Yes</button>
-                <button class="btn btn-danger vote-on" data-id="{{ info.doc.id }}" data-vote="false" {% if info.no_vote %}disabled{% endif %}>No</button>
-            {% endif %}
-        </div>
+
+    {% for level, doc_level in doc_levels %}
+        {% if doc_level|length > 0 %}
+            <h2>{{ level | capitalize }}</h2>
+            {% for info in doc_level %}
+                <div class="divider pd-document-internal" data-doc-block="{{ info.doc.id }}">
+                    <h3 class="bill-title">{{ info.doc.name }}
+                        {% if info.is_voteable %}
+                            &nbsp; | &nbsp; <span class="yes-count">{{ info.supporters }} Yes</span> &nbsp; | &nbsp; <span class="no-count">{{ info.opponents }} No</span> &nbsp; |
+                        {% else %}
+                            &nbsp; | &nbsp; <span class="no-count">Cannot vote on this type of bill yet</span>
+                        {% endif %}
+                    </h3>
+                    <h6>{{ info.doc.domain.name }}{% if info.doc.externalURL is not null %} - <a href="{{ info.doc.externalURL }}">View details</a>{% endif %}</h6>
+                    <p>{{ info.doc.summary }}</p>
+                    {% if info.can_vote and info.is_voteable %}
+                        <button class="btn btn-success vote-on" data-id="{{ info.doc.id }}" data-vote="true" {% if info.yes_vote %}disabled{% endif %}>Yes</button>
+                        <button class="btn btn-danger vote-on" data-id="{{ info.doc.id }}" data-vote="false" {% if info.no_vote %}disabled{% endif %}>No</button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
     {% endfor %}
+    {#{% for info in doc_list %}#}
+        {#<div class="divider pd-document-internal" data-doc-block="{{ info.doc.id }}">#}
+            {#<h3 class="bill-title">{{ info.doc.name }}#}
+                {#{% if info.is_voteable %}#}
+                    {#&nbsp; | &nbsp; <span class="yes-count">{{ info.supporters }} Yes</span> &nbsp; | &nbsp; <span class="no-count">{{ info.opponents }} No</span> &nbsp; |#}
+                {#{% else %}#}
+                    {#&nbsp; | &nbsp; <span class="no-count">Cannot vote on this type of bill yet</span>#}
+                {#{% endif %}#}
+            {#</h3>#}
+            {#<h6>{{ info.doc.domain.name }}{% if info.doc.externalURL is not null %} - <a href="{{ info.doc.externalURL }}">View details</a>{% endif %}</h6>#}
+            {#<p>{{ info.doc.summary }}</p>#}
+            {#{% if info.can_vote and info.is_voteable %}#}
+                {#<button class="btn btn-success vote-on" data-id="{{ info.doc.id }}" data-vote="true" {% if info.yes_vote %}disabled{% endif %}>Yes</button>#}
+                {#<button class="btn btn-danger vote-on" data-id="{{ info.doc.id }}" data-vote="false" {% if info.no_vote %}disabled{% endif %}>No</button>#}
+            {#{% endif %}#}
+        {#</div>#}
+    {#{% endfor %}#}
 
 {% endblock %}
 

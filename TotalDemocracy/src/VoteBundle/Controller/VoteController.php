@@ -38,10 +38,13 @@ class VoteController extends CommonController {
             ,"is_verified" => false
         );
 
-        $levels = array(
-            "federal" => array("description" => "Federal Laws", "default" => "all")
-            ,"state" => array("description" => "State Laws", "default" => "all")
-            ,"local" => array("description" => "Local Laws & Applications", "default" => "all")
+        $default_filter = "all";
+        $user_domains = array();
+        $filters = array(
+            "all" => "Everything"
+            ,"federal" => "Only Federal Bills"
+            ,"state" => "Only State Bills"
+            ,"local" => "Only Local Bills & Applications"
         );
 
         // if the user is verified, then the preferred defaults are the user's domains
@@ -57,48 +60,48 @@ class VoteController extends CommonController {
                     $output['cannot_vote_message'] = 'Confirm your email address to vote, check your inbox.';
                 }
                 $output['user'] = $user;
+                $filters[""] = "-------------";
+                $filters["mine"] = "Only My Bills & Applications";
+                $default_filter = "mine";
                 foreach($user->getElectorates() as $electorate) {
                     $domain = $electorate->getDomain();
-                    $levels[$domain->getLevel()]['default'] = $domain->getId();
+//                    $levels[$domain->getLevel()]['default'] = $domain->getId();
                     $output[$domain->getLevel()] = $electorate;
+
+                    if($domain->getLevel() !== "federal") {
+                        $filters[$domain->getId()] = $domain->getName();
+                    }
+                    $user_domains[] = $domain;
                 }
             }
         } else {
             $output["cannot_vote_message"] = 'Must <a href="' . $this->generateUrl("fos_user_security_login") . '">log in</a> or <a href="' . $this->generateUrl("signup") . '">sign up</a> to be able to vote';
         }
 
-        $selected_domains = array();
-        foreach($levels as $type => &$level) {
-
-            $domains = $domain_repo->findBy(array("level" => $type));
-            if((count($domains) === 1) && ($level['default'] !== "none")) {
-                $level['default'] = "all";
-            }
-            if(array_key_exists($type, $input) && ((count($domains) > 1) || ($input[$type] === "none"))) {
-                $level['selected'] = $input[$type];
-            } else {
-                $level['selected'] = $level['default'];
-            }
-
-            $domain_options = array(
-                "all" => array("name" => ("All " . $level['description']))
-                ,"none" => array("name" => ("No " . $level['description']))
-            );
-            if(count($domains) > 1) {
-                $domain_options[""] = array("name" => "-----------");
-                foreach($domains as $domain) {
-                    if($level['selected'] === $domain->getId()) {
-                        $selected_domains[] = $domain;
-                    }
-                    $domain_options[$domain->getId()] = array("name" => $domain->getName());
-                }
-            }
-            if($level['selected'] === "all") {
-                $selected_domains = array_merge($selected_domains, $domains);
-            }
-            $level['domains'] = $domain_options;
+        if(array_key_exists("domain", $input)) {
+            $current_filter = $input["domain"];
+        } else {
+            $current_filter = $default_filter;
         }
-        unset($level); // delete dangling reference, because PHP can be a very silly language
+
+        $output['filters'] = $filters;
+        $output['default_filter'] = $default_filter;
+        $output['current_filter'] = $current_filter;
+
+        $this->get("vote.js")->output("default_domain", $default_filter);
+
+        if($current_filter === "all") {
+            $selected_domains = $domain_repo->findAll();
+        } else if(($current_filter === "federal") || ($current_filter === "state") || ($current_filter === "local")) {
+            $selected_domains = $domain_repo->findBy(array("level" => $current_filter));
+        } else if($current_filter === "mine") {
+            $selected_domains = $user_domains;
+        } else {
+            $single_domain = $domain_repo->find($current_filter);
+            if($single_domain) {
+                $selected_domains = array($single_domain);
+            }
+        }
 
         $filter = NULL;
         if(array_key_exists("filter", $input)) {
@@ -108,8 +111,11 @@ class VoteController extends CommonController {
 
         $docs_list = $this->get("vote.document")->getDocumentsWithVotes($selected_domains, $filter, $user);
 
-        $output["doc_list"] = $docs_list;
-        $output['domains_levels'] = $levels;
+        $doc_levels = array("federal" => array(), "state" => array(), "local" => array());
+        foreach($docs_list as $doc_info) {
+            $doc_levels[$doc_info['doc']->getDomain()->getLevel()][] = $doc_info;
+        }
+        $output["doc_levels"] = $doc_levels;
 
         return $this->render('VoteBundle:Pages:vote.html.twig', $output);
     }

@@ -23,6 +23,8 @@ federal election message - These are the active bills currently up for vote
  OR
 "active" or "closed" bills filter that has inactive disabled for now
 
+CRON JOB
+
 Add timeout for partially registered users - maybe 30 mins?
 
 b) If I vote I cannot cancel my vote

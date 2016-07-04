@@ -30,6 +30,7 @@ var encodeURLParams = function(params) {
 
 $(document).ready(function() {
 
+    /*
     function refreshFilter(name, value) {
 
         var params = decodeURLParams();
@@ -53,12 +54,34 @@ $(document).ready(function() {
             return;
         }
         window.location.search = encoded;
+    }*/
+
+    function refreshFilter() {
+
+        var new_filter = $("#filter-input").val();
+        var new_domain = $("#domain-select").val();
+        var params = {};
+        if(g_InitialData.default_domain !== new_domain) {
+            params.domain = new_domain;
+        }
+        if(new_filter !== "") {
+            params.filter = new_filter;
+        }
+
+        var encoded = encodeURLParams(params);
+        if(encoded === "") {
+            window.location = window.location.pathname;
+            return;
+        }
+        window.location.search = encoded;
     }
 
-    $('.domain-select').prop("disabled", false).change(function() {
-        $select = $(this);
-        refreshFilter($select.data().level, $select.val());
-    });
+
+    $('.domain-select').prop("disabled", false);
+    //$('.domain-select').prop("disabled", false).change(function() {
+    //    $select = $(this);
+    //    refreshFilter($select.data().level, $select.val());
+    //});
 
     $("#filter-form").submit(function() {
         refreshFilter();

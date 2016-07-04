@@ -111,47 +111,39 @@ class VoteTest extends BaseFunctionalTestCase {
         $local = $em->getRepository("VoteBundle:Domain")->findOneBy(array("level" => "local", "name" => "BRISBANE CITY"))->getId();
 
         return array(
-            array("all", "all", "all", NULL, false)
-            ,array(NULL, NULL, NULL, NULL, false)
-            ,array(NULL, NULL, NULL, "bill", false)
-            ,array("none", "none", "none", NULL, false)
-            ,array("none", $state, "none", NULL, false)
-            ,array("none", $state, $local, NULL, false)
-            ,array("none", $state, $local, "bill", false)
-            ,array("none", $state, $local, "rsgtrsgdfgg", false)
-            ,array("all", "all", "all", "rsgtrsgdfgg", false)
-            ,array("none", "none", $local, NULL, false)
-            ,array(NULL, NULL, $local, NULL, false)
-            ,array("all", "all", "all", NULL, true)
-            ,array(NULL, NULL, NULL, NULL, true)
-            ,array(NULL, NULL, NULL, "bill", true)
-            ,array("none", "none", "none", NULL, true)
-            ,array("none", $state, "none", NULL, true)
-            ,array("none", $state, $local, NULL, true)
-            ,array("none", $state, $local, "bill", true)
-            ,array("none", $state, $local, "rsgtrsgdfgg", true)
-            ,array("all", "all", "all", "rsgtrsgdfgg", true)
-            ,array("none", "none", $local, NULL, true)
-            ,array(NULL, NULL, $local, NULL, true)
+            array("all", NULL, false)
+            ,array(NULL, NULL, false)
+            ,array("federal", NULL, false)
+            ,array("state", NULL, false)
+            ,array("local", NULL, false)
+            ,array(NULL, "bill", false)
+            ,array("local", "bill", false)
+            ,array(NULL, "rsgtrsgdfgg", false)
+            ,array("all", "rsgtrsgdfgg", false)
+            ,array($state, NULL, false)
+
+            ,array("all", NULL, true)
+            ,array(NULL, NULL, true)
+            ,array("mine", NULL, true)
+            ,array(NULL, "bill", true)
+            ,array($state, NULL, true)
+            ,array($local, NULL, true)
+            ,array($state, "bill", true)
+            ,array(NULL, "rsgtrsgdfgg", true)
+            ,array($local, "rsgtrsgdfgg", true)
         );
     }
 
     /**
      * @dataProvider filterProvider
      */
-    public function testFilters($federal, $state, $local, $filter, $is_logged_in) {
+    public function testFilters($domain_filter, $filter, $is_logged_in) {
 
         $documents = $this->em->getRepository("VoteBundle:Document")->findAll();
 
         $params = array();
-        if($federal !== NULL) {
-            $params[] = "federal=$federal";
-        }
-        if($state !== NULL) {
-            $params[] = "state=$state";
-        }
-        if($local !== NULL) {
-            $params[] = "local=$local";
+        if($domain_filter !== NULL) {
+            $params[] = "domain=$domain_filter";
         }
         if($filter !== NULL) {
             $filter = strtolower($filter);
@@ -164,13 +156,15 @@ class VoteTest extends BaseFunctionalTestCase {
             $url = "/";
         }
 
-        $default_domains = array();
+        $user_domains = array();
         if($is_logged_in) {
+            $default_domain = "mine";
             $user = $this->login();
             foreach($user->getElectorates() as $electorate) {
-                $default_domains[] = $electorate->getDomain()->getId();
+                $user_domains[] = $electorate->getDomain()->getId();
             }
         } else {
+            $default_domain = "all";
             $user = NULL;
         }
 
@@ -183,26 +177,24 @@ class VoteTest extends BaseFunctionalTestCase {
             $doc_ids[] = $doc_div->getAttribute("data-doc-block");
         }
 
+        if($domain_filter === NULL) {
+            $domain_filter = $default_domain;
+        }
+
         foreach($documents as $doc) {
 
             $domain = $doc->getDomain();
-            $excluded = false;
-            $is_not_default = !in_array($domain->getId(), $default_domains);
-            if(($federal !== NULL) && ($domain->getLevel() === "federal") && ($federal === "none")) {
-                $excluded = true;
+
+            if($domain_filter === "all") {
+                $excluded = false;
+            } else if (($domain_filter === "federal") || ($domain_filter === "state") || ($domain_filter === "local")) {
+                $excluded = ($domain_filter !== $domain->getLevel());
+            } else if($domain_filter === "mine") {
+                $excluded = !in_array($domain->getId(), $user_domains);
+            } else {
+                $excluded = ($domain_filter !== $domain->getId());
             }
-            if(($domain->getLevel() === "state") &&
-                    ((($state === NULL) && ($user !== NULL) && $is_not_default) ||
-                    (($state !== NULL) && (($state === "none") || (($state !== $domain->getId()) && ($state !== "all") && $is_not_default)))
-                    )) {
-                $excluded = true;
-            }
-            if(($domain->getLevel() === "local") &&
-                    ((($local === NULL) && ($user !== NULL) && $is_not_default) ||
-                    (($local !== NULL) && (($local === "none") || (($local !== $domain->getId()) && ($local !== "all") && $is_not_default)))
-                )) {
-                $excluded = true;
-            }
+
             if(($filter !== NULL) && (strpos(strtolower($doc->getName()), $filter) === false) && (strpos(strtolower($doc->getSummary()), $filter) === false)) {
                 $excluded = true;
             }

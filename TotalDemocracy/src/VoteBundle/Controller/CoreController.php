@@ -27,6 +27,11 @@ CRON JOB
 
 Add timeout for partially registered users - maybe 30 mins?
 
+facebook sign-in
+css fix for smaller devices - test on various widths
+comm with greg about roll
+trim all inputs
+
 b) If I vote I cannot cancel my vote
 f) When someone searches all federal bills nothing comes up maybe you can put a message there saying "There is an election on and parliament has been dissolved."
 g) On the register finish page and settings page when the volunteer drop-down occurs please put phone number field at the top under the member button.

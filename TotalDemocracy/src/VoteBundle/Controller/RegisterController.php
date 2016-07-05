@@ -96,7 +96,7 @@ class RegisterController extends FOSRestController {
         if(!array_key_exists("email", $input)) {
             throw new ErrorRedirectException('signup', "Email not specified", "email-error");
         }
-        $email = $input["email"];
+        $email = trim($input["email"]);
 
         $session = $this->get("session");
         $session->getFlashBag()->set("email", $email);

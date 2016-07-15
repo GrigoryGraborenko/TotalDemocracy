@@ -108,9 +108,24 @@ class User extends BaseUser {
     protected $isMember;
 
     /**
+     * @ORM\Column(type="boolean", nullable=false, options={"default" = false})
+     */
+    protected $emailOptOut;
+
+    /**
      * @ORM\Column(type="string", nullable=true)
      */
     protected $permanentLoginToken;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $whenFromNationBuilder;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $whenSentToNationBuilder;
 
     /**
      * User constructor.
@@ -356,6 +371,34 @@ class User extends BaseUser {
      */
     public function setPermanentLoginToken($permanentLoginToken) {
         $this->permanentLoginToken = $permanentLoginToken;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWhenFromNationBuilder() {
+        return $this->whenFromNationBuilder;
+    }
+
+    /**
+     * @param mixed $whenFromNationBuilder
+     */
+    public function setWhenFromNationBuilder($whenFromNationBuilder) {
+        $this->whenFromNationBuilder = $whenFromNationBuilder;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWhenSentToNationBuilder() {
+        return $this->whenSentToNationBuilder;
+    }
+
+    /**
+     * @param mixed $whenSentToNationBuilder
+     */
+    public function setWhenSentToNationBuilder($whenSentToNationBuilder) {
+        $this->whenSentToNationBuilder = $whenSentToNationBuilder;
     }
 
 }

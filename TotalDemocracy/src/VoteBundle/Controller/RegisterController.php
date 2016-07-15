@@ -156,12 +156,14 @@ class RegisterController extends FOSRestController {
             throw new ErrorRedirectException('signup', "$email is already taken, please check your inbox if this was you", "email-error");
         }
 
+        $token_gen = $this->get('fos_user.util.token_generator');
+
         // actually create and save the user
         $user = $userManager->createUser();
         $user->setEmail($email);
         $user->setUsername($email);
-        $user->setPlainPassword($this->getGUID());
-        $user->setConfirmationToken($this->get('fos_user.util.token_generator')->generateToken());
+        $user->setPlainPassword($token_gen->generateToken());
+        $user->setConfirmationToken($token_gen->generateToken());
         $this->em->persist($user);
 
         $event = new ServerEvent("registration", $user, array("ip" => $request->getClientIp()));
@@ -353,6 +355,7 @@ class RegisterController extends FOSRestController {
         $this->get("logger")->info("Registration email sent to $email with URL: $register_url ");
     }
 
+    /*
     function getGUID() {
         if (function_exists('com_create_guid')){
             return com_create_guid();
@@ -369,6 +372,6 @@ class RegisterController extends FOSRestController {
                 .chr(125);// "}"
             return $uuid;
         }
-    }
+    }*/
 
 }

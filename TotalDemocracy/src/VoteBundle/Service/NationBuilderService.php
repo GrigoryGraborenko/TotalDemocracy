@@ -10,13 +10,16 @@ namespace VoteBundle\Service;
 
 use OAuth2\Client;
 
+use VoteBundle\Entity\User;
+
 /**
  * Class NationBuilderService
  * @package VoteBundle\Service
  */
 class NationBuilderService {
 
-    private $session;
+    private $container;
+    private $em;
     private $logger;
 
     private $base_url;
@@ -136,20 +139,123 @@ class NationBuilderService {
     }
 
     /**
+     * @param $filename
+     * @param $include_existing
+     * @return array|string
+     */
+    public function readFromCSV($filename, $include_existing) {
+
+        try {
+            $handle = fopen($filename, "r");
+            if (!$handle) {
+                return "Could not open file";
+            }
+        } catch(\Exception $e) {
+            return "Could not open file";
+        }
+
+        $user_repo = $this->em->getRepository('VoteBundle:User');
+
+        $headers = NULL;
+        $people = array();
+        $scanned = 0;
+
+        $required = array(
+            "nationbuilder_id", "first_name", "middle_name", "last_name", "email", "email_opt_in"
+            ,"phone_number", "work_phone_number", "mobile_number", "tag_list", "created_at", "primary_state"
+            ,"primary_city", "primary_zip", "primary_address1", "primary_address2");
+
+        while(($line = fgets($handle)) !== false) {
+
+            $chunks = str_getcsv($line);
+            if($headers === NULL) {
+                $header_diff = array_diff($required, $chunks);
+                if(count($header_diff) > 0) {
+                    return "Headers not found: " . implode(", ", $header_diff);
+                }
+                $headers = $chunks;
+                continue;
+            }
+            $details = array();
+
+            $chunk_count = count($chunks);
+            if(count($headers) !== $chunk_count) {
+                return "Incorrect number of chunks at line $scanned, found $chunk_count, should be " . count($headers) . ": " . json_encode($chunks);
+            }
+            for($i = 0; $i < $chunk_count; $i++) {
+                $details[$headers[$i]] = $chunks[$i];
+            }
+            $scanned++;
+
+            $email = $details['email'];
+            if($email === "") {
+                continue;
+            }
+            if(!$include_existing) {
+                if($user_repo->findOneBy(array("email" => $email)) !== NULL) {
+                    continue;
+                }
+            }
+
+            $people[] = $details;
+        }
+        fclose($handle);
+
+        return $people;
+    }
+
+    /**
+     * @param $person
+     * @return null
+     */
+    public function createUserFromExport($person) {
+
+        $email = $person['email'];
+
+        $user_manager = $this->container->get("fos_user.user_manager");
+        $user = $user_manager->findUserByEmail($email);
+        if($user === NULL) {
+            $user = $user_manager->createUser();
+        }
+
+        //$this->get('fos_user.util.token_generator')
+        $token_gen = $this->container->get('fos_user.util.token_generator');
+
+        $user->setEmail($email);
+        $user->setUsername($email);
+        $user->setPlainPassword($token_gen->generateToken());
+        $user->setConfirmationToken($token_gen->generateToken());
+
+//        $this->em->persist($user);
+//        $this->em->flush();
+
+//        $user_repo = $this->em->getRepository('VoteBundle:User');
+
+//        $user = new User();
+//        $user->
+
+        return $user;
+    }
+
+    /**
      * NationBuilderService constructor.
-     * @param $session
-     * @param $logger
+     * @param $container
      * @param $baseURL
      * @param $clientID
      * @param $secret
      * @param $testToken
      */
-    public function __construct($session, $logger, $baseURL, $clientID, $secret, $testToken) {
-        $this->session = $session;
-        $this->logger = $logger;
+    public function __construct($container, $baseURL, $clientID, $secret, $testToken) {
+
+        $this->container = $container;
+        $this->em = $container->get("doctrine.orm.entity_manager");
+//        $this->user_manager = $container->get("doctrine.orm.entity_manager");
+        $this->logger = $container->get("logger");
         $this->base_url = $baseURL;
         $this->client_id = $clientID;
         $this->secret = $secret;
+
+        $session = $container->get("session");
 
         if($testToken !== NULL) {
             $this->api_token = $testToken;

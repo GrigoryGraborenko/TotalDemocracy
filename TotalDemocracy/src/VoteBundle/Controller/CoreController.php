@@ -34,15 +34,12 @@ trim all inputs
 
 b) If I vote I cannot cancel my vote
 f) When someone searches all federal bills nothing comes up maybe you can put a message there saying "There is an election on and parliament has been dissolved."
-g) On the register finish page and settings page when the volunteer drop-down occurs please put phone number field at the top under the member button.
 h) Once someone has saved volunteer information do not collapse volunteer drop-down again, only allow unticking and ticking of volunteer button.
-i) The verified enrollment page needs to have member and volunteer options on it because I talk them through it when I am doorknocking and we want to collect that if someone verification email has gone into spam.
 a) When you are verified and all is good, and you go to update your address, if the new address doesn't verify it still allows you to vote. If someone has been taken off the roll which does happen, overseas for 5 years etc they are not allowed to vote so we need to ensure that we don't allow them to vote if the updated address doesn't verify.
 c) I am thinking the solution for someone who can't vote but wants to volunteer is have a volunteer tick box at the bottom of the verification page that shows phone number when clicked, it saves the first instance of the address and auto-populates the enrollment verified/finish verification page.
 d) My verification email went into spam something to raise with Phil soon.
 
 Verify error msg doesn't show on short screens, need to scroll down
-Unify filters - way too complex right now
 
  * Verification success and electorate listings should be prettier
  * Make sure that rego and verify both can be switched off for maintenance

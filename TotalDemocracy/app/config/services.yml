@@ -25,7 +25,7 @@ services:
         arguments: ["@doctrine.orm.entity_manager", "@service_container", "@logger"]
     vote.nationbuilder:
         class: VoteBundle\Service\NationBuilderService
-        arguments: ["@session", "@logger", "%nationbuilder.baseURL%", "%nationbuilder.clientID%", "%nationbuilder.secret%", "%nationbuilder.testToken%"]
+        arguments: ["@service_container", "%nationbuilder.baseURL%", "%nationbuilder.clientID%", "%nationbuilder.secret%", "%nationbuilder.testToken%"]
     vote.pdf:
         class: VoteBundle\Service\PDFService
         arguments: ["@doctrine.orm.entity_manager", "@service_container", "@logger"]

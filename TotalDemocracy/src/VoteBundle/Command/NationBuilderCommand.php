@@ -112,8 +112,11 @@ class NationBuilderCommand extends ContainerAwareCommand {
         }
 
         foreach($people as $person) {
-            $new_user = $nb_service->createUserFromExport($person);
+            list($new_user, $volunteer) = $nb_service->createUserFromExport($person);
             $this->em->persist($new_user);
+            if($volunteer !== NULL) {
+                $this->em->persist($volunteer);
+            }
 
         }
         $this->em->flush();

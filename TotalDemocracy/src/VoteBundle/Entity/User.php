@@ -128,12 +128,18 @@ class User extends BaseUser {
     protected $whenSentToNationBuilder;
 
     /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $json;
+
+    /**
      * User constructor.
      */
     public function __construct() {
         parent::__construct();
         $this->isVolunteer = false;
         $this->isMember = false;
+        $this->emailOptOut = false;
     }
     /**
      * @return mixed
@@ -399,6 +405,59 @@ class User extends BaseUser {
      */
     public function setWhenSentToNationBuilder($whenSentToNationBuilder) {
         $this->whenSentToNationBuilder = $whenSentToNationBuilder;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJson()
+    {
+        return $this->json;
+    }
+
+    /**
+     * @param mixed $json
+     */
+    public function setJson($json)
+    {
+        $this->json = $json;
+    }
+
+    /**
+     * @param mixed $json
+     */
+    public function setJsonArray($json)
+    {
+        $this->json = json_encode($json);
+    }
+
+    /**
+     * @return array
+     */
+    public function getJsonArray() {
+        return json_decode($this->json, true);
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     */
+    public function updateJson($key, $value) {
+        $json = json_decode($this->json, true);
+        $json[$key] = $value;
+        $this->json = json_encode($json);
+    }
+
+    /**
+     * @param $key
+     */
+    public function removeKeyJson($key) {
+        $json = json_decode($this->json, true);
+        if(!array_key_exists($key, $json)) {
+            return;
+        }
+        unset($json[$key]);
+        $this->json = json_encode($json);
     }
 
 }

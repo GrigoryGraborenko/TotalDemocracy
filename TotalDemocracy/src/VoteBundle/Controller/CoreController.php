@@ -31,6 +31,13 @@ facebook sign-in
 css fix for smaller devices - test on various widths
 comm with greg about roll
 trim all inputs
+(
+phone required if volunteer or member
+loading anim on verify
+turn of street verify on volunteer
+    -> maybe only autocomplete for the first letter, do the rest client-side
+hope-o'conner
+)
 
 b) If I vote I cannot cancel my vote
 f) When someone searches all federal bills nothing comes up maybe you can put a message there saying "There is an election on and parliament has been dissolved."

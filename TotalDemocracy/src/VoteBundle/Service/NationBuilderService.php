@@ -9,8 +9,10 @@
 namespace VoteBundle\Service;
 
 use OAuth2\Client;
+use Carbon\Carbon;
 
 use VoteBundle\Entity\User;
+use VoteBundle\Entity\Volunteer;
 
 /**
  * Class NationBuilderService
@@ -27,6 +29,7 @@ class NationBuilderService {
     private $secret;
 
     private $api_token;
+    private $required_fields;
 
 //    public function
 
@@ -160,16 +163,11 @@ class NationBuilderService {
         $people = array();
         $scanned = 0;
 
-        $required = array(
-            "nationbuilder_id", "first_name", "middle_name", "last_name", "email", "email_opt_in"
-            ,"phone_number", "work_phone_number", "mobile_number", "tag_list", "created_at", "primary_state"
-            ,"primary_city", "primary_zip", "primary_address1", "primary_address2");
-
         while(($line = fgets($handle)) !== false) {
 
             $chunks = str_getcsv($line);
             if($headers === NULL) {
-                $header_diff = array_diff($required, $chunks);
+                $header_diff = array_diff($this->required_fields, $chunks);
                 if(count($header_diff) > 0) {
                     return "Headers not found: " . implode(", ", $header_diff);
                 }
@@ -183,7 +181,7 @@ class NationBuilderService {
                 return "Incorrect number of chunks at line $scanned, found $chunk_count, should be " . count($headers) . ": " . json_encode($chunks);
             }
             for($i = 0; $i < $chunk_count; $i++) {
-                $details[$headers[$i]] = $chunks[$i];
+                $details[$headers[$i]] = trim($chunks[$i]);
             }
             $scanned++;
 
@@ -210,7 +208,15 @@ class NationBuilderService {
      */
     public function createUserFromExport($person) {
 
+        $volunteer = NULL;
+        $header_diff = array_diff($this->required_fields, array_keys($person));
+        if(count($header_diff) > 0) {
+            return "Headers not found: " . implode(", ", $header_diff);
+        }
+
         $email = $person['email'];
+        $this->logger->info("PERSON " . json_encode($person));
+//        $this->logger->info("tags " . json_encode($tags));
 
         $user_manager = $this->container->get("fos_user.user_manager");
         $user = $user_manager->findUserByEmail($email);
@@ -218,13 +224,94 @@ class NationBuilderService {
             $user = $user_manager->createUser();
         }
 
-        //$this->get('fos_user.util.token_generator')
         $token_gen = $this->container->get('fos_user.util.token_generator');
 
         $user->setEmail($email);
         $user->setUsername($email);
         $user->setPlainPassword($token_gen->generateToken());
         $user->setConfirmationToken($token_gen->generateToken());
+
+        $user->setWhenFromNationBuilder(Carbon::now("UTC"));
+
+        $params = array(
+            "last_name" => "setSurname"
+            ,"primary_zip" => "setPostcode"
+            ,"primary_city" => "setSuburb"
+        );
+        foreach($params as $param => $func) {
+            $val = $person[$param];
+            if($val === "") {
+                continue;
+            }
+            $user->{$func}($val);
+        }
+        if($person['first_name'] !== "") {
+            $name = $person['first_name'];
+            if($person['middle_name'] !== "") {
+                $name .= " " . $person['middle_name'];
+            }
+            $user->setGivenNames($name);
+        }
+
+        if($person['born_at'] !== "") {
+            $dob = Carbon::createFromFormat('m/d/Y', $person['born_at']);
+            $user->setDOB($dob);
+        }
+
+        $address_chunks = explode(" ", $person['primary_address1']);
+        $number_chunks = array();
+        $street_chunks = array();
+        foreach($address_chunks as $chunk) {
+            //if(is_numeric($chunk) || (count($number_chunks) === 0)) {
+            if(strpbrk($chunk, '1234567890') !== false) {
+                $number_chunks[] = $chunk;
+            } else {
+                $street_chunks[] = $chunk;
+            }
+        }
+        $number_chunks = implode("/", $number_chunks);
+        if(count($street_chunks) > 0) {
+            $user->setStreet(implode(" ", $street_chunks));
+        }
+        if($person['primary_address2'] === "") {
+            $user->setStreetNumber($number_chunks);
+        } else if(ctype_alpha($person['primary_address2'])) {
+            $user->setStreetNumber($person['primary_address2'] . " " . $number_chunks);
+        } else {
+            $user->setStreetNumber($person['primary_address2'] . "/" . $number_chunks);
+        }
+
+        $tags = explode(", ", $person['tag_list']);
+
+        if($person['is_volunteer'] === "true") {
+
+            $user->setIsVolunteer(true);
+            if(($user->getPostcode() !== NULL) && ($user->getSuburb() !== NULL) && ($user->getStreet() !== NULL) && ($user->getStreetNumber() !== NULL)) {
+                $volunteer = new Volunteer(
+                    $user, $user->getPostcode(), $user->getSuburb(), $user->getStreet(), $user->getStreetNumber()
+                    ,in_array("how-to-vote volunteer", $tags) // poll booth
+                    ,in_array("doorknock volunteer", $tags) // door knock
+                    ,in_array("signage house", $tags) // signage
+                    ,in_array("callback volunteer", $tags) // call
+                    ,in_array("host house party", $tags) // house party
+                    ,in_array("office volunteer", $tags) // envelopes
+                );
+            }
+        }
+
+
+        /*
+        $this->willPollBooth = $willPollBooth;
+        $this->willDoorKnock = $willDoorKnock;
+        $this->willSignage = $willSignage;
+        $this->willCall = $willCall;
+        $this->willHouseParty = $willHouseParty;
+        $this->willEnvelopes = $willEnvelopes;
+         */
+
+        //function
+
+        //$user->set
 
 //        $this->em->persist($user);
 //        $this->em->flush();
@@ -234,7 +321,7 @@ class NationBuilderService {
 //        $user = new User();
 //        $user->
 
-        return $user;
+        return array($user, $volunteer);
     }
 
     /**
@@ -264,6 +351,14 @@ class NationBuilderService {
         } else {
             $this->api_token = NULL;
         }
+
+        $this->required_fields = array(
+            "nationbuilder_id", "first_name", "middle_name", "last_name", "email", "email_opt_in", "email1_is_bad"
+            ,"phone_number", "work_phone_number", "mobile_number", "tag_list", "created_at", "primary_state"
+            ,"primary_city", "primary_zip", "primary_address1", "primary_address2", "born_at", "is_volunteer"
+            ,"membership_names"
+        );
+
     }
 
     /**

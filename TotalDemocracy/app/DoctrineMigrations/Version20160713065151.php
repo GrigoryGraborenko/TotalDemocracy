@@ -20,6 +20,7 @@ class Version20160713065151 extends AbstractMigration
 
         $this->addSql('ALTER TABLE user_record ADD when_from_nation_builder DATETIME DEFAULT NULL, ADD when_sent_to_nation_builder DATETIME DEFAULT NULL');
         $this->addSql('ALTER TABLE user_record ADD email_opt_out TINYINT(1) DEFAULT \'0\' NOT NULL');
+        $this->addSql('ALTER TABLE user_record ADD json LONGTEXT DEFAULT NULL');
     }
 
     /**
@@ -32,5 +33,6 @@ class Version20160713065151 extends AbstractMigration
 
         $this->addSql('ALTER TABLE user_record DROP when_from_nation_builder, DROP when_sent_to_nation_builder');
         $this->addSql('ALTER TABLE user_record DROP email_opt_out');
+        $this->addSql('ALTER TABLE user_record DROP json');
     }
 }

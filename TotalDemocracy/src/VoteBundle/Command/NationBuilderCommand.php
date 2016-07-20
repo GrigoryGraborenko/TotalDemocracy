@@ -19,6 +19,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 use Carbon\Carbon;
 
+use VoteBundle\Entity\Task;
+
 /**
  * Class NationBuilderCommand
  * @package VoteBundle\Command
@@ -102,6 +104,10 @@ class NationBuilderCommand extends ContainerAwareCommand {
             $entries_msg .= "valid new";
         }
 
+        if(count($people) <= 0) {
+            return "No new people found";
+        }
+
 //        $this->log("Successfully read $scanned people, $entries_msg entries with emails detected.");
         $this->log("Successfully read $entries_msg entries with emails detected.");
 
@@ -111,19 +117,20 @@ class NationBuilderCommand extends ContainerAwareCommand {
             return "Aborted";
         }
 
+        $num_volunteers = 0;
         foreach($people as $person) {
             list($new_user, $volunteer) = $nb_service->createUserFromExport($person);
             $this->em->persist($new_user);
             if($volunteer !== NULL) {
                 $this->em->persist($volunteer);
+                $num_volunteers++;
             }
-
+            $task = new Task("email", "vote.email", "emailImported", 0.15, array(), $new_user);
+            $this->em->persist($task);
         }
         $this->em->flush();
 
-//        if($result !== true) {
-//            return $result;
-//        }
+        $this->log("Successfully imported " . count($people) . " people ($num_volunteers volunteers)");
 
         return true;
     }

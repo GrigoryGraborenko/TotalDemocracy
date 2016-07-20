@@ -11,7 +11,6 @@ namespace VoteBundle\Service;
 use OAuth2\Client;
 use Carbon\Carbon;
 
-use VoteBundle\Entity\User;
 use VoteBundle\Entity\Volunteer;
 
 /**
@@ -186,7 +185,8 @@ class NationBuilderService {
             $scanned++;
 
             $email = $details['email'];
-            if($email === "") {
+//            if($email === "") {
+            if(($email === "") || ($details['email1_is_bad'] === "true")) {
                 continue;
             }
             if(!$include_existing) {
@@ -262,7 +262,6 @@ class NationBuilderService {
         $number_chunks = array();
         $street_chunks = array();
         foreach($address_chunks as $chunk) {
-            //if(is_numeric($chunk) || (count($number_chunks) === 0)) {
             if(strpbrk($chunk, '1234567890') !== false) {
                 $number_chunks[] = $chunk;
             } else {
@@ -298,28 +297,9 @@ class NationBuilderService {
                 );
             }
         }
-
-
-        /*
-        $this->willPollBooth = $willPollBooth;
-        $this->willDoorKnock = $willDoorKnock;
-        $this->willSignage = $willSignage;
-        $this->willCall = $willCall;
-        $this->willHouseParty = $willHouseParty;
-        $this->willEnvelopes = $willEnvelopes;
-         */
-
-        //function
-
-        //$user->set
-
-//        $this->em->persist($user);
-//        $this->em->flush();
-
-//        $user_repo = $this->em->getRepository('VoteBundle:User');
-
-//        $user = new User();
-//        $user->
+        if(in_array("Member", $tags) || in_array("Member verified", $tags)) {
+            $user->setIsMember(true);
+        }
 
         return array($user, $volunteer);
     }

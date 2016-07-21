@@ -100,6 +100,8 @@ class VoteController extends CommonController {
             $single_domain = $domain_repo->find($current_filter);
             if($single_domain) {
                 $selected_domains = array($single_domain);
+            } else {
+                $selected_domains = array();
             }
         }
 

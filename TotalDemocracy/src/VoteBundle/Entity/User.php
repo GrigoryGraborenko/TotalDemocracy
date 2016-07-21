@@ -443,6 +443,9 @@ class User extends BaseUser {
      * @param $value
      */
     public function updateJson($key, $value) {
+        if($this->json === NULL) {
+            $this->json = "[]";
+        }
         $json = json_decode($this->json, true);
         $json[$key] = $value;
         $this->json = json_encode($json);

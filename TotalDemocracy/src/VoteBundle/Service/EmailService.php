@@ -32,6 +32,9 @@ class EmailService {
      */
     public function emailImported($params, $user) {
 
+        // todo: finish
+        return "To be completed";
+
         $email = $user->getEmail();
 
         $email = "thegrisha@gmail.com";
@@ -49,8 +52,6 @@ class EmailService {
             $fname = explode(" ", $fname)[0];
         }
         $paragraphs[] = "Dear $fname,";
-
-        // todo: finish
 
         $result = $this->sendSimpleEmail($email, $subject, NULL, $paragraphs);
 

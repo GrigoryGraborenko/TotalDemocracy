@@ -237,13 +237,20 @@ class NationBuilderService {
             "last_name" => "setSurname"
             ,"primary_zip" => "setPostcode"
             ,"primary_city" => "setSuburb"
+            ,"nationbuilder_id" => "updateJson"
+            ,"twitter_id" => "updateJson"
+            ,"facebook_username" => "updateJson"
         );
         foreach($params as $param => $func) {
             $val = $person[$param];
             if($val === "") {
                 continue;
             }
-            $user->{$func}($val);
+            if($func === "updateJson") {
+                $user->{$func}($param, $val);
+            } else {
+                $user->{$func}($val);
+            }
         }
         if($person['first_name'] !== "") {
             $name = $person['first_name'];

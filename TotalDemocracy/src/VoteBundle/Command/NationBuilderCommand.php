@@ -117,6 +117,8 @@ class NationBuilderCommand extends ContainerAwareCommand {
             return "Aborted";
         }
 
+        $rate_limit = $this->container->getParameter("mailer_rate_limit_seconds");
+
         $num_volunteers = 0;
         foreach($people as $person) {
             list($new_user, $volunteer) = $nb_service->createUserFromExport($person);
@@ -125,7 +127,7 @@ class NationBuilderCommand extends ContainerAwareCommand {
                 $this->em->persist($volunteer);
                 $num_volunteers++;
             }
-            $task = new Task("email", "vote.email", "emailImported", 0.15, array(), $new_user);
+            $task = new Task("email", "vote.email", "emailImported", $rate_limit, array(), $new_user);
             $this->em->persist($task);
         }
         $this->em->flush();

@@ -53,6 +53,9 @@ class Task {
     /** @ORM\Column(type="text", nullable=false) */
     protected $jsonParams;
 
+    /** @ORM\Column(type="text", nullable=true) */
+    protected $jsonResult;
+
     /** @ORM\Column(type="decimal", scale = 4, nullable=false) */
     protected $minSeconds;
 
@@ -169,7 +172,28 @@ class Task {
      * @return array
      */
     public function getJsonParamsArray() {
-        return json_decode($this->json, true);
+        return json_decode($this->jsonParams, true);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJsonResult() {
+        return $this->jsonResult;
+    }
+
+    /**
+     * @param mixed $jsonResult
+     */
+    public function setJsonResult($jsonResult) {
+        $this->jsonResult = $jsonResult;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJsonResultArray() {
+        return json_decode($this->jsonResult, true);
     }
 
     /**

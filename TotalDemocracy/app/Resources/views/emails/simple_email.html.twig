@@ -1,7 +1,9 @@
 {% extends "emails/base_email.html.twig" %}
 
 {% block body %}
-    <h2>{{ header }}</h2>
+    {% if header is defined %}
+        <h2>{{ header }}</h2>
+    {% endif %}
     {% for paragraph in paragraphs %}
         <p>{{ paragraph | raw }}</p>
     {% endfor %}

@@ -215,7 +215,7 @@ class NationBuilderService {
         }
 
         $email = $person['email'];
-        $this->logger->info("PERSON " . json_encode($person));
+//        $this->logger->info("PERSON " . json_encode($person));
 //        $this->logger->info("tags " . json_encode($tags));
 
         $user_manager = $this->container->get("fos_user.user_manager");

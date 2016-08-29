@@ -127,17 +127,75 @@ class NationBuilderService {
         }
 //        $this->logger->info("REFRESH: " . json_encode($person_data));
 
-        if($person_data === NULL) {
-            return;
+        if($person_data !== NULL) {
+            if($person === NULL) {
+                $result = $this->sendData("people", array('person' => $person_data), "POST");
+            } else {
+                $result = $this->sendData("people/" . $person['id'], array('person' => $person_data), "PUT");
+            }
+            $this->logger->debug("Nationbuilder Sync Result: " . json_encode($result));
         }
 
-        if($person === NULL) {
-            $result = $this->sendData("people", array('person' => $person_data), "POST");
-        } else {
-            $result = $this->sendData("people/" . $person['id'], array('person' => $person_data), "PUT");
-        }
-        $this->logger->debug("Nationbuilder Sync Result: " . json_encode($result));
+        $volunteer = $user->getVolunteer();
+        $user_tags = array();
+        if($volunteer !== NULL) {
 
+            if($volunteer->getWillPollBooth()) {
+                $user_tags[] = "how-to-vote volunteer";
+            }
+            if($volunteer->getWillDoorKnock()) {
+                $user_tags[] = "doorknock volunteer";
+            }
+            if($volunteer->getWillSignage()) {
+                $user_tags[] = "signage house";
+            }
+            if($volunteer->getWillCall()) {
+                $user_tags[] = "callback volunteer";
+            }
+            if($volunteer->getWillHouseParty()) {
+                $user_tags[] = "host house party";
+            }
+            if($volunteer->getWillEnvelopes()) {
+                $user_tags[] = "office volunteer";
+            }
+            if($volunteer->getWillOther()) {
+                $user_tags[] = "other volunteer";
+            }
+        }
+
+        $add_tags = array_diff($user_tags, $person["tags"]);
+        $remove_tags = array_values(array_diff($person["tags"], $user_tags));
+
+//        $this->logger->debug("TAG LIST " . json_encode($user_tags));
+//        $this->logger->debug("Person TAG LIST " . json_encode($person["tags"]));
+//        $this->logger->debug("aDD TAG LIST " . json_encode($add_tags));
+//        $this->logger->debug("REMOVe TAG LIST " . json_encode($remove_tags));
+
+        if(count($add_tags) > 0) {
+            $result = $this->sendData("people/" . $person['id'] . "/taggings", array('tagging' => array("tag" => $user_tags)), "PUT");
+            $this->logger->debug("Nationbuilder Tag Add Result: " . json_encode($result));
+        }
+        if(count($remove_tags) > 0) {
+
+            foreach($remove_tags as $remove) {
+                $tag = rawurlencode($remove);
+//                $result = $this->sendData("people/" . $person['id'] . "/taggings/$tag", array(), "DELETE");
+                list($success, $result) = $this->communicate("people/" . $person['id'] . "/taggings/$tag", array(), "DELETE");
+                if($success) {
+                    $this->logger->debug("Nationbuilder Tag Delete Success: " . json_encode($result));
+                } else {
+                    $this->logger->debug("Nationbuilder Tag Delete Failure: " . json_encode($result));
+                }
+            }
+
+/*
+            list($success, $result) = $this->communicate("people/" . $person['id'] . "/taggings", array('tagging' => array("tagx" => $remove_tags)), "DELETE");
+            if($success) {
+                $this->logger->debug("Nationbuilder Tag Delete Success: " . json_encode($result));
+            } else {
+                $this->logger->debug("Nationbuilder Tag Delete Failure: " . json_encode($result));
+            }*/
+        }
     }
 
     /**
@@ -371,13 +429,15 @@ class NationBuilderService {
 
         $send_url = $this->base_url . "api/v1/" . $api_call;
 
+        $this->logger->debug("Sending $method request to $send_url");
+
         $client = new Client($this->client_id, $this->secret);
         $client->setAccessToken($this->api_token);
 
         $response = $client->fetch($send_url, $params, $method);
 
-        if($response['code'] !== 200) {
-//            $this->logger->error("Could not retrieve data. Response: " . json_encode($response));
+        $expected_code = $method === "DELETE" ? 204 : 200;
+        if($response['code'] !== $expected_code) {
             return array(false, $response['result']);
         }
         return array(true, $response['result']);
@@ -400,6 +460,8 @@ class NationBuilderService {
         $token = $this->api_token;
         $send_url = $this->base_url . "api/v1/" . $api_call;
 
+        $this->logger->debug("Sending $method request to $send_url");
+
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -420,6 +482,9 @@ class NationBuilderService {
         $result = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+//        if($method === "POST") {
+//            $expected_code = 201;
+//        } else if($method === "DELETE ") {
         $expected_code = $method === "POST" ? 201 : 200;
 
         if($http_code !== $expected_code) {

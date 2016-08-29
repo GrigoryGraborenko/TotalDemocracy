@@ -53,7 +53,7 @@ class NationBuilderCommand extends ContainerAwareCommand {
                 'Can be "import".'
             )
             ->addArgument(
-                'file',
+                'arg',
                 InputArgument::REQUIRED,
                 'Filename'
             )
@@ -67,16 +67,27 @@ class NationBuilderCommand extends ContainerAwareCommand {
         $this->em = $this->container->get('doctrine')->getManager();
 
         $action = $input->getArgument('action');
-        $file = $input->getArgument('file');
+        $arg = $input->getArgument('arg');
 
         $this->log('==========================NATION_BUILDER==============================');
 
         if($action === "import") {
-            $this->log("Importing file $file...");
-            $result = $this->importFile($input, $file, false);
+            $this->log("Importing file $arg...");
+            $result = $this->importFile($input, $arg, false);
             if($result !== true) {
                 $this->log('Error: ' . $result);
             }
+        } else if($action === "sync") {
+            $user_repo = $this->em->getRepository('VoteBundle:User');
+            $user = $user_repo->findOneBy(array("email" => $arg));
+            if($user !== NULL) {
+                $this->log("Syncing user $arg...");
+                $nb_service = $this->container->get("vote.nationbuilder");
+                $nb_service->syncPerson($user);
+            } else {
+                $this->log("Cannot find user $arg");
+            }
+
         }
 
         $this->log('----------------------------------------------------------------------');

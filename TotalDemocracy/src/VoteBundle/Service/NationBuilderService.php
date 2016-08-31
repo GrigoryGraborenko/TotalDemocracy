@@ -94,6 +94,8 @@ class NationBuilderService {
      */
     public function syncPerson($user) {
 
+        $this->logger->info("Syncing user " . $user->getEmail());
+
         $person = $this->getPerson($user->getEmail());
 
         $sync_user = array(
@@ -163,8 +165,13 @@ class NationBuilderService {
             }
         }
 
-        $add_tags = array_diff($user_tags, $person["tags"]);
-        $remove_tags = array_values(array_diff($person["tags"], $user_tags));
+        if($person === NULL) {
+            $add_tags = $user_tags;
+            $remove_tags = array();
+        } else {
+            $add_tags = array_diff($user_tags, $person["tags"]);
+            $remove_tags = array_values(array_diff($person["tags"], $user_tags));
+        }
 
 //        $this->logger->debug("TAG LIST " . json_encode($user_tags));
 //        $this->logger->debug("Person TAG LIST " . json_encode($person["tags"]));

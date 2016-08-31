@@ -175,6 +175,21 @@ class ProfileController extends CommonController {
 
         $this->em->flush();
 
+        if(!$via_profile) {
+            $cookies = $request->cookies->all();
+            if(array_key_exists("tracking_token", $cookies)) {
+                $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
+                if(count($events) > 0) {
+                    $json = $events[0]->getJsonArray();
+                    if(array_key_exists("nationbuilder.api_token", $json)) {
+                        $nationbuilder = $this->get("vote.nationbuilder");
+                        $nationbuilder->setToken($json["nationbuilder.api_token"]);
+                        $nationbuilder->syncPerson($user);
+                    }
+                }
+            }
+        }
+
         return new RedirectResponse($this->generateUrl($endpoint));
     }
 

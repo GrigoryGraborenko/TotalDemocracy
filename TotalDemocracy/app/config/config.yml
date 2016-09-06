@@ -96,8 +96,10 @@ fos_user:
         confirmation:
             enabled:    true # disabled during development
     from_email:
-        address:        noreply@test.org
-        sender_name:    TestServer
+        address:        noreply@peopledecide.org
+        sender_name:    People Decide
+    service:
+        mailer: vote.email
 
 monolog:
   handlers:

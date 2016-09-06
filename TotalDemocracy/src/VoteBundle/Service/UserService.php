@@ -27,6 +27,9 @@ class UserService
     /** @var EntityManager em */
     private $em;
 
+    /** @var container */
+    private $container;
+
     /** @var Option service */
     private $option;
 
@@ -36,11 +39,13 @@ class UserService
     /**
      * UserService constructor.
      * @param $em
+     * @param $container
      * @param $option
      * @param $validator
      */
-    public function __construct($em, $option, $validator) {
+    public function __construct($em, $container, $option, $validator) {
         $this->em = $em;
+        $this->container = $container;
         $this->option = $option;
         $this->validator = $validator;
     }
@@ -76,6 +81,18 @@ class UserService
         }
 
         return true;
+    }
+
+    /**
+     * @param $user
+     */
+    public function resetPassword($user) {
+
+        $this->container->get('fos_user.mailer')->sendResettingEmailMessage($user);
+        $user->setPasswordRequestedAt(Carbon::now("UTC"));
+        $this->em->flush();
+        //$this->container->get('fos_user.user_manager')->updateUser($user);
+
     }
 
 }

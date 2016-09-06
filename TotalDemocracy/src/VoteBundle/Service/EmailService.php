@@ -8,6 +8,11 @@
 
 namespace VoteBundle\Service;
 
+use FOS\UserBundle\Mailer\MailerInterface;
+use FOS\UserBundle\Model\UserInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 /**
  * Class EmailService
  * @package VoteBundle\Service
@@ -84,6 +89,20 @@ class EmailService {
             );
         $num_recip = $mailer->send($message);
         return ($num_recip > 0);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sendResettingEmailMessage(UserInterface $user) {
+
+        $router = $this->container->get('router');
+        $url = $router->generate('fos_user_resetting_reset', array('token' => $user->getConfirmationToken()), UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $this->sendSimpleEmail($user->getEmail(), "PeopleDecide Password Reset", "", array(
+            "You have requested a password reset. To choose a new password, <a href='$url'>click on this link</a> and follow the instructions."
+            ,"If you don't remember asking for a password to be reset, please contact support."
+        ));
     }
 
 }

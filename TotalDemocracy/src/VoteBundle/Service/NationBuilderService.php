@@ -164,6 +164,13 @@ class NationBuilderService {
                 $user_tags[] = "other volunteer";
             }
         }
+        if($user->getIsMember()) {
+            if($user->getWhenVerified() !== NULL) {
+                $user_tags[] = "member verified";
+            } else {
+                $user_tags[] = "member";
+            }
+        }
 
         if($person === NULL) {
             $add_tags = $user_tags;

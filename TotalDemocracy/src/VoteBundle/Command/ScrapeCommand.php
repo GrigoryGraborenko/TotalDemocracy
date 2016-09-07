@@ -72,6 +72,7 @@ class ScrapeCommand extends ContainerAwareCommand {
         if($fed_result === true) {
             $this->log("Successfully processed federal bills");
         }
+
         $this->processQueensland();
         $this->processBrisbaneCityCouncil();
 
@@ -310,9 +311,10 @@ class ScrapeCommand extends ContainerAwareCommand {
             foreach($subnodes as $doc_node) {
 
                 $doc_crawler = new Crawler($doc_node);
-                $title_link = $doc_crawler->filter(".title a")->getNode(0);
+                $title_link = $doc_crawler->filter("h4 a")->getNode(0);
                 $extra_links = $doc_crawler->filter(".extra a");
                 if(($title_link === NULL) || (count($extra_links) <= 0)) {
+                    $this->log("Found no documents on this page");
                     break;
                 }
                 $title = $title_link->textContent;

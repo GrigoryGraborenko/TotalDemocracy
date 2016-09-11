@@ -68,13 +68,13 @@ class ScrapeCommand extends ContainerAwareCommand {
 
         $this->log('=============================SCRAPE===================================');
 
-        $fed_result = $this->processFederalAustralia();
-        if($fed_result === true) {
-            $this->log("Successfully processed federal bills");
-        }
+//        $fed_result = $this->processFederalAustralia();
+//        if($fed_result === true) {
+//            $this->log("Successfully processed federal bills");
+//        }
 
         $this->processQueensland();
-        $this->processBrisbaneCityCouncil();
+//        $this->processBrisbaneCityCouncil();
 
         $this->log('----------------------------------------------------------------------');
 
@@ -426,7 +426,9 @@ class ScrapeCommand extends ContainerAwareCommand {
             'verify' => true
         ));
 
-        $response = $client->request("GET", "https://www.parliament.qld.gov.au/work-of-assembly/bills-and-legislation/Bills-before-the-House");
+        $base_url = "https://www.parliament.qld.gov.au";
+
+        $response = $client->request("GET", "$base_url/work-of-assembly/bills-and-legislation/Bills-before-the-House");
         if($response->getStatusCode() !== 200) {
             $this->log("Could not get bills index");
             return false;
@@ -449,7 +451,12 @@ class ScrapeCommand extends ContainerAwareCommand {
             $title = $title_link->textContent;
             $url = $title_link->getAttribute("href");
 
-            $doc_fname = substr($url, strripos($url, "/") + 1);
+            if(strripos($url, "http") !== 0) {
+                $url = $base_url . $url;
+            }
+
+            $doc_fname = substr($url, strripos($url, "id=") + 3);
+//            $doc_fname = substr($url, strripos($url, "/") + 1);
             if((substr($doc_fname, 0, 1) === "B") && (substr($doc_fname, 3, 1) === "_") && (substr($doc_fname, 8, 1) === "_")) {
                 $doc_id = substr($doc_fname, 0, 8);
             } else {

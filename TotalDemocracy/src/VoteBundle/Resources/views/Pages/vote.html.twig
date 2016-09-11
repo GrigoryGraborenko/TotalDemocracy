@@ -74,6 +74,7 @@
 
     </form>
 
+    {% set max_summary_length = 300 %}
 
     {% for level, doc_level in doc_levels %}
         {% if doc_level|length > 0 %}
@@ -88,7 +89,13 @@
                         {% endif %}
                     </h3>
                     <h6>{{ info.doc.domain.name }}{% if info.doc.externalURL is not null %} - <a href="{{ info.doc.externalURL }}">View details</a>{% endif %}</h6>
-                    <p>{{ info.doc.summary }}</p>
+                    {% if info.doc.summary|length > (max_summary_length * 2) %}
+                        <p class="summary-block">
+                            <span>{{ info.doc.summary|slice(0, max_summary_length) }}</span><span class="summary-expand">...<span class="expand-link">Show More</span></span><span class="hidden summary-expand">{{ info.doc.summary|slice(max_summary_length) }} <span class="expand-link">Show Less</span></span>
+                        </p>
+                    {% else %}
+                        <p class="summary-block">{{ info.doc.summary }}</p>
+                    {% endif %}
                     {% if info.can_vote and info.is_voteable %}
                         <button class="btn btn-success vote-on" data-id="{{ info.doc.id }}" data-vote="true" {% if info.yes_vote %}disabled{% endif %}>Yes</button>
                         <button class="btn btn-danger vote-on" data-id="{{ info.doc.id }}" data-vote="false" {% if info.no_vote %}disabled{% endif %}>No</button>

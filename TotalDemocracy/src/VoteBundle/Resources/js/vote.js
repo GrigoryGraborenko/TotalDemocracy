@@ -114,4 +114,10 @@ $(document).ready(function() {
 
         });
     });
+
+    $('.expand-link').click(function() {
+        var $block = $(this).closest(".summary-block");
+        $block.find(".summary-expand").toggleClass("hidden");
+    });
+
 });

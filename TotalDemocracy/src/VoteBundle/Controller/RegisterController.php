@@ -151,7 +151,7 @@ class RegisterController extends FOSRestController {
         $prior = $userManager->findUserByEmail($email);
         if($prior !== NULL) {
             if($prior->isEnabled()) {
-                throw new ErrorRedirectException('signup', "Email has already been registered", "email-error");
+                throw new ErrorRedirectException('signup', "Email has already been registered. You might have been imported automatically from the old voting system. If so, reset your password via the login page.", "email-error");
             }
             throw new ErrorRedirectException('signup', "$email is already taken, please check your inbox if this was you", "email-error");
         }

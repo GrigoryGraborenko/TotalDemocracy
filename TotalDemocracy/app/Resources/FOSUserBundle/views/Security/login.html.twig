@@ -17,14 +17,14 @@
 
                 <div class="form-group">
                     <label class="col-sm-1 control-label" for="username"> Email: </label>
-                    <div class="col-sm-3">
+                    <div class="col-sm-5">
                         <input class="form-control" type="text" id="username" name="_username" value="{{ last_username }}" required="required" />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="col-sm-1 control-label" for="password"> Password: </label>
-                    <div class="col-sm-3">
+                    <div class="col-sm-5">
                         <input class="form-control" type="password" id="password" name="_password" required="required" />
                     </div>
                 </div>
@@ -34,9 +34,12 @@
                         <input class="btn btn-success" type="submit" id="_submit" name="_submit" value="Login" />
                     </div>
 
-                    <div class="col-sm-1">
+                    <div class="col-sm-2">
                         <a href="{{ path('fos_user_resetting_request') }}" class="btn btn-default">Forgot your password?</a>
                     </div>
+                </div>
+                <div class="col-sm-offset-1 col-sm-5">
+                    If you're coming from the old voting system, please reset your password. Click the "Forgot your password" button.
                 </div>
             </form>
         </div>

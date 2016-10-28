@@ -68,13 +68,13 @@ class ScrapeCommand extends ContainerAwareCommand {
 
         $this->log('=============================SCRAPE===================================');
 
-//        $fed_result = $this->processFederalAustralia();
-//        if($fed_result === true) {
-//            $this->log("Successfully processed federal bills");
-//        }
+        $fed_result = $this->processFederalAustralia();
+        if($fed_result === true) {
+            $this->log("Successfully processed federal bills");
+        }
 
         $this->processQueensland();
-//        $this->processBrisbaneCityCouncil();
+        $this->processBrisbaneCityCouncil();
 
         $this->log('----------------------------------------------------------------------');
 

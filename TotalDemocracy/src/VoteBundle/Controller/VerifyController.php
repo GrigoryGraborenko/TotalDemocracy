@@ -33,6 +33,8 @@ class VerifyController extends CommonController {
 
     private $verifySSL = true;
 
+    private $AECBase = "check.aec.gov.au";
+
     /**
      * @Route("/verify", name="verify")
      * @Method("GET");
@@ -44,7 +46,7 @@ class VerifyController extends CommonController {
             throw new ErrorRedirectException("error_page", "No user available");
         }
 
-        $base_url = "https://oevf.aec.gov.au/";
+        $base_url = "https://$this->AECBase";
         $output = array(
             "givenNames" => $user->getGivenNames()
             ,"surname" => $user->getSurname()
@@ -82,19 +84,23 @@ class VerifyController extends CommonController {
         $response = $client->request("GET", $base_url, array(
             'headers' => array(
                 "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-                ,"Accept-Encoding" => "gzip, deflate"
+                ,"Accept-Encoding" => "gzip, deflate, sdch, br"
                 ,"Accept-Language" => "en-US,en;q=0.8"
                 ,"Connection" => "keep-alive"
-                ,"Host" => "oevf.aec.gov.au"
+                ,"Host" => $this->AECBase
                 ,"Upgrade-Insecure-Requests" => "1"
-                ,"User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36"
+                ,"User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36"
         )));
 
         if($response->getStatusCode() !== 200) {
             throw new ErrorRedirectException("error_page", "Cannot load verification page");
         }
 
-        $cookie = explode(";", $response->getHeader("Set-Cookie")[0])[0];
+        $cookie_list = array();
+        foreach($response->getHeader("Set-Cookie") as $cookie_header) {
+            $cookie_list[] = explode(";", $cookie_header)[0];
+        }
+        $cookie = implode("; ", $cookie_list);
 
         $crawler = new Crawler($response->getBody()->getContents());
         $image_src = $base_url . $crawler->filter('.LBD_CaptchaImage')->attr("src");
@@ -122,7 +128,7 @@ class VerifyController extends CommonController {
         $client->request("GET", $image_src, array(
             'save_to' => $myFile
             ,"headers" => array(
-                "Host" => "oevf.aec.gov.au"
+                "Host" => $this->AECBase
                 ,"Cookie" => $cookie
                 ,"User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36"
             )
@@ -278,7 +284,7 @@ class VerifyController extends CommonController {
         ));
 
         $session = $this->get('session');
-        $base_url = "https://oevf.aec.gov.au/";
+        $base_url = "https://$this->AECBase";
 
         $form_params = array(
             '__LASTFOCUS' => ''
@@ -294,7 +300,7 @@ class VerifyController extends CommonController {
             ,'ctl00$ContentPlaceHolderBody$DropdownSuburb' => $input['suburb']
             ,'ctl00$ContentPlaceHolderBody$textStreetName' => $input['street']
             ,'LBD_VCID_c_verifyenrolment_ctl00_contentplaceholderbody_captchaverificationcode' => $session->get('verify.VCID')
-            ,'LBD_BackWorkaround_c_verifyenrolment_ctl00_contentplaceholderbody_captchaverificationcode' => "1"
+            ,'LBD_BackWorkaround_c_verifyenrolment_ctl00_contentplaceholderbody_captchaverificationcode' => "0"
             ,'ctl00$ContentPlaceHolderBody$textVerificationCode' => $input['verify']
             ,'ctl00$ContentPlaceHolderBody$buttonVerify' => ' Verify Enrolment '
             ,'hiddenInputToUpdateATBuffer_CommonToolkitScripts' => "0"
@@ -309,9 +315,9 @@ class VerifyController extends CommonController {
                 ,"Cache-Control" => "max-age=0"
                 ,"Connection" => "keep-alive"
                 ,"Cookie" => $session->get('verify.cookie')
-                ,"Host" => "oevf.aec.gov.au"
-                ,"Origin" => "https://oevf.aec.gov.au"
-                ,"Referer" => "https://oevf.aec.gov.au/"
+                ,"Host" => $this->AECBase
+                ,"Origin" => "https://$this->AECBase"
+                ,"Referer" => "https://$this->AECBase/"
                 ,"Upgrade-Insecure-Requests" => "1"
                 ,"User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36"
             )
@@ -431,14 +437,14 @@ class VerifyController extends CommonController {
         $input = $request->request->all();
 
         if(array_key_exists("postcode", $input)) {
-            $url = 'https://oevf.aec.gov.au/VerifyEnrolment.aspx/GetDropDownContents';
+            $url = "https://$this->AECBase/VerifyEnrolment.aspx/GetDropDownContents";
             $send_data = array(
                 "category" => "postcode"
                 ,"knownCategoryValues" => $input['postcode']
             );
             $is_postcode = true;
         } else if(array_key_exists("prefix", $input) && array_key_exists("context", $input)) {
-            $url = 'https://oevf.aec.gov.au/VerifyEnrolment.aspx/GetStreetAutoCompleteList';
+            $url = "https://$this->AECBase/VerifyEnrolment.aspx/GetStreetAutoCompleteList";
             $send_data = array(
                 "contextKey" => $input['context']
                 ,"count" => 50

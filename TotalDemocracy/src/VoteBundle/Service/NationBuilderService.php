@@ -100,14 +100,28 @@ class NationBuilderService {
 
         $sync_user = array(
             "email" => $user->getEmail()
-            ,"first_name" => $user->getGivenNames()
             ,"last_name" => $user->getSurname()
-            ,"phone" => $user->getPhone()
             ,"primary_address" => array(
                 "zip" => $user->getPostcode()
                 ,"country_code" => "AU"
             )
         );
+
+//        if(substr($user->getPhone(), 0, 1) === "0") {
+//            $sync_user["mobile_number"] = $user->getPhone();
+//        } else {
+//            $sync_user["phone"] = $user->getPhone();
+//        }
+        $sync_user["phone"] = $user->getPhone();
+
+        $names = explode(" ", $user->getGivenNames());
+        if(count($names) <= 1) {
+            $sync_user["first_name"] = $user->getGivenNames();
+            $sync_user["middle_name"] = "";
+        } else {
+            $sync_user["first_name"] = $names[0];
+            $sync_user["middle_name"] = implode(" ", array_slice($names, 1));
+        }
         if($user->getDOB() !== NULL) {
             $sync_user['birthdate'] = $user->getDOB()->format("Y-m-d");
         }

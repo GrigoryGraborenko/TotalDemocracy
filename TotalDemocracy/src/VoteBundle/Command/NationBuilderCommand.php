@@ -46,11 +46,11 @@ class NationBuilderCommand extends ContainerAwareCommand {
      */
     protected function configure() {
         $this->setName('pd:nationbuilder')
-            ->setDescription('Import from nationbuilder')
+            ->setDescription('Syncronizes with nationbuilder')
             ->addArgument(
                 'action',
                 InputArgument::REQUIRED,
-                'Can be "import".'
+                'Can be "import" or "sync".'
             )
             ->addArgument(
                 'arg',

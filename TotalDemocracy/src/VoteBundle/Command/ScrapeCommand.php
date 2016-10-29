@@ -350,7 +350,7 @@ class ScrapeCommand extends ContainerAwareCommand {
                     }
                 }
                 if(array_key_exists("Summary", $definitions)) {
-                    $summary = $definitions["Summary"];
+                    $summary = trim($definitions["Summary"]);
                     unset($definitions["Summary"]);
                 } else {
                     $summary = "No summary available";
@@ -379,12 +379,15 @@ class ScrapeCommand extends ContainerAwareCommand {
                 $document->setExternalURL($external_url);
 
                 if(array_key_exists("Status", $definitions)) {
-                    if($definitions["Status"] === "Not Proceeding") {
+                    $status = trim($definitions["Status"]);
+                    unset($definitions["Status"]);
+                    if($status === "Not Proceeding") {
                         $document->setState("suspended");
+                    } else if($status === "Act") {
+                        $document->setState("passed");
                     } else {
                         $document->setState("open");
                     }
-                    unset($definitions["Status"]);
                 }
                 $document->setCustomData($definitions);
 

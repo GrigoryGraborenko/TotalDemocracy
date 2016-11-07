@@ -83,7 +83,12 @@ class NationBuilderCommand extends ContainerAwareCommand {
             if($user !== NULL) {
                 $this->log("Syncing user $arg...");
                 $nb_service = $this->container->get("vote.nationbuilder");
-                $nb_service->syncPerson($user);
+                list($success, $result) = $nb_service->syncPerson($user);
+                if($success) {
+                    $this->log("Successful.");
+                } else {
+                    $this->log("ERROR - $result");
+                }
             } else {
                 $this->log("Cannot find user $arg");
             }

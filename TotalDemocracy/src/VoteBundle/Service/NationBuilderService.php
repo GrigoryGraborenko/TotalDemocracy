@@ -91,9 +91,11 @@ class NationBuilderService {
      * Syncs this user into the nationbuilder database
      *
      * @param $user
+     * @return array
      */
     public function syncPerson($user) {
 
+        $errors = array();
         $this->logger->info("Syncing user " . $user->getEmail());
 
         $person = $this->getPerson($user->getEmail());
@@ -107,12 +109,11 @@ class NationBuilderService {
             )
         );
 
-//        if(substr($user->getPhone(), 0, 1) === "0") {
-//            $sync_user["mobile_number"] = $user->getPhone();
-//        } else {
-//            $sync_user["phone"] = $user->getPhone();
-//        }
-        $sync_user["phone"] = $user->getPhone();
+        if(substr($user->getPhone(), 0, 1) === "0") {
+            $sync_user["mobile"] = $user->getPhone();
+        } else {
+            $sync_user["phone"] = $user->getPhone();
+        }
 
         $names = explode(" ", $user->getGivenNames());
         if(count($names) <= 1) {
@@ -148,6 +149,9 @@ class NationBuilderService {
                 $result = $this->sendData("people", array('person' => $person_data), "POST");
             } else {
                 $result = $this->sendData("people/" . $person['id'], array('person' => $person_data), "PUT");
+            }
+            if(!$result["success"]) {
+                $errors[] = $result["result"];
             }
             $this->logger->debug("Nationbuilder Sync Result: " . json_encode($result));
         }
@@ -224,6 +228,7 @@ class NationBuilderService {
                 $this->logger->debug("Nationbuilder Tag Delete Failure: " . json_encode($result));
             }*/
         }
+        return array(count($errors) <= 0, implode(", ", $errors));
     }
 
     /**
@@ -482,7 +487,7 @@ class NationBuilderService {
     private function sendData($api_call, $params, $method = "POST") {
 
         if($this->api_token === NULL) {
-            return NULL;
+            return array("success" => false, "result" => "API token not present");
         }
 
         $token = $this->api_token;
@@ -517,14 +522,15 @@ class NationBuilderService {
 
         if($http_code !== $expected_code) {
             $this->logger->info("Error code $http_code: $result");
-            return NULL;
+            return array('result' => $result, 'code' => $http_code, 'success' => false);
         }
 
         $json_decode = json_decode($result, true);
 
         return array(
             'result' => (null === $json_decode) ? $result : $json_decode,
-            'code' => $http_code
+            'code' => $http_code,
+            'success' => true
         );
     }
 

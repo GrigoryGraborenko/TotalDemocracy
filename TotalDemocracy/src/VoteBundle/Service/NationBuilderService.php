@@ -109,7 +109,7 @@ class NationBuilderService {
             )
         );
 
-        if(substr($user->getPhone(), 0, 1) === "0") {
+        if(substr($user->getPhone(), 0, 2) === "04") {
             $sync_user["mobile"] = $user->getPhone();
         } else {
             $sync_user["phone"] = $user->getPhone();

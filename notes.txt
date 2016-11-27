@@ -1,0 +1,44 @@
+SSL
+social media stuff
+
+first and middle name
+last name
+email
+mobile + home number
+dob
+address unit number
+address street number and street
+city (suburb)
+postcode
+**tags
+voter verified OR member verified
+OR
+voter OR member (if not verified)
+volunteer setting
+tags relating to volunteer tasks
+middle name (because in nationbuilder they are separate)
+sex
+facebook url
+twitter url
+origin date (creation date)
+unsubscribe status
+mobile opt in
+
+protected $willPollBooth; how-to-vote volunteer
+protected $willDoorKnock; doorknock volunteer
+protected $willSignage; signage house
+protected $willCall; callback volunteer
+protected $willHouseParty; host house party
+protected $willEnvelopes; office volunteer
+protected $willOther; other
+protected $whenAvailable; 
+protected $whenToCall;
+protected $bestCommunication;
+
+Member verified = they are verified manually
+
+membership_names = if they have this or either member or verified tags, this is manually verified
+
+email1_is_bad is useful
+
+careful of "manual" tag, manual changes on NB side

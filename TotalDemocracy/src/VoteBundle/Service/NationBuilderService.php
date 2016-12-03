@@ -111,6 +111,7 @@ class NationBuilderService {
                 ,"country_code" => "AU"
             )
         );
+//        $this->logger->info("PERSON " . json_encode($person));
 
         if(substr($user->getPhone(), 0, 2) === "04") {
             $sync_user["mobile"] = $user->getPhone();
@@ -461,6 +462,10 @@ class NationBuilderService {
      */
     private function pushAddress($user) {
 
+        if(($user->getPostcode() === NULL) && ($user->getStreet() === NULL)) {
+            return true;
+        }
+
         $unit_street = $user->getStreetUnitNumber();
         if($unit_street['unit'] !== null) {
             $unit_number = $unit_street['unit'] . ", ";
@@ -474,8 +479,8 @@ class NationBuilderService {
 
         $this->logger->info("Pushing address for user $email: '$address'");
 
-        $client = new HttpClient(array('verify' => true));
-        $response = $client->request("GET", "http://www.peopledecide.org.au/manual");
+        $client = new HttpClient(array('verify' => true, 'exceptions' => false));
+        $response = $client->request("GET", "http://www.peopledecide.org.au/manualx");
         if($response->getStatusCode() !== 200) {
             return "Could not get manual form page, status code " . $response->getStatusCode();
         }

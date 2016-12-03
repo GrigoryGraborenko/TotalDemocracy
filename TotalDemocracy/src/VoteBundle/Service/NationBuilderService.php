@@ -8,6 +8,9 @@
 
 namespace VoteBundle\Service;
 
+use GuzzleHttp\Client as HttpClient;
+use Symfony\Component\DomCrawler\Crawler;
+
 use OAuth2\Client;
 use Carbon\Carbon;
 
@@ -135,12 +138,6 @@ class NationBuilderService {
             $person_data = $sync_user;
         } else {
             $person_data = $this->recursiveDiff($sync_user, $person);
-//            $person_data = array();
-//            foreach($sync_user as $nb_key => $value) {
-//                if($value != $person[$nb_key]) {
-//                    $person_data[$nb_key] = $value;
-//                }
-//            }
         }
 //        $this->logger->info("REFRESH: " . json_encode($person_data));
 
@@ -190,9 +187,20 @@ class NationBuilderService {
             }
         }
 
+        if(($person_data !== NULL) && (array_key_exists('primary_address', $person_data))) {
+            $result = $this->pushAddress($user);
+            if($result !== true) {
+                $this->logger->info("Error pushing address: $result");
+            }
+//            if(($person !== NULL) && (array_search("manual", $person["tags"]) === false)) {
+//                $person["tags"][] = "manual";
+//            }
+        }
+
         if($person === NULL) {
             $add_tags = $user_tags;
             $remove_tags = array();
+//            $remove_tags = array("manual");
         } else {
             $add_tags = array_diff($user_tags, $person["tags"]);
             $remove_tags = array_values(array_diff($person["tags"], $user_tags));
@@ -228,6 +236,7 @@ class NationBuilderService {
                 $this->logger->debug("Nationbuilder Tag Delete Failure: " . json_encode($result));
             }*/
         }
+
         return array(count($errors) <= 0, implode(", ", $errors));
     }
 
@@ -444,6 +453,88 @@ class NationBuilderService {
      */
     public function setToken($token) {
         $this->api_token = $token;
+    }
+
+    /**
+     * @param $user
+     * @return bool|string
+     */
+    private function pushAddress($user) {
+
+        $unit_street = $user->getStreetUnitNumber();
+        if($unit_street['unit'] !== null) {
+            $unit_number = $unit_street['unit'] . ", ";
+        } else {
+            $unit_number = "";
+        }
+        $suburb_state = $user->getSuburbState();
+
+        $email = $user->getEmail();
+        $address = $unit_street['street'] . " " . $user->getStreet() . ", $unit_number" . $suburb_state['suburb'] . ", " . $suburb_state['state'] . ", " . $user->getPostcode();
+
+        $this->logger->info("Pushing address for user $email: '$address'");
+
+        $client = new HttpClient(array('verify' => true));
+        $response = $client->request("GET", "http://www.peopledecide.org.au/manual");
+        if($response->getStatusCode() !== 200) {
+            return "Could not get manual form page, status code " . $response->getStatusCode();
+        }
+
+        $crawler = new Crawler($response->getBody()->getContents());
+        $form_nodes = $crawler->filter('#manual_page_new_signup_form')->filter("input");
+        if($form_nodes->count() <= 0) {
+            return "Could not find form input";
+        }
+        $form_token = $form_nodes->eq(0)->attr("value");
+
+        $token = NULL;
+        foreach($response->getHeader("Set-Cookie") as $cookie) {
+            if(strpos($cookie, "_nbuild_token") !== 0) {
+                continue;
+            }
+            $token = explode("=", explode(";", $cookie)[0])[1];
+        }
+        if($token === NULL) {
+            return "Could not get token";
+        }
+
+        $boundary = "WebKitFormBoundaryeXjDcXxozsaBdRLz";
+//        $this->logger->info("TOKEN $token, FORM TOKEN: $form_token");
+
+        $response = $client->request("POST", "http://www.peopledecide.org.au/forms/signups", array(
+            "headers" => array(
+                "Accept" => "text/javascript"
+                ,"Content-Type" => "multipart/form-data; boundary=----$boundary"
+                ,"Cookie" => "_nbuild_token=$token"
+            )
+            ,'body' =>
+"------$boundary
+Content-Disposition: form-data; name=\"authenticity_token\"
+
+$form_token
+------$boundary
+Content-Disposition: form-data; name=\"page_id\"
+
+29
+------$boundary
+Content-Disposition: form-data; name=\"signup[email]\"
+
+$email
+------$boundary
+Content-Disposition: form-data; name=\"signup[submitted_address]\"
+
+$address
+AU
+------$boundary--"
+        ));
+        if($response->getStatusCode() !== 200) {
+            return "Could not send address page, status code " . $response->getStatusCode();
+        }
+
+//        $contents = $response->getBody()->getContents();
+//        $this->logger->info("Successfully pushed address for user " . $user->getEmail() . ": $contents");
+
+        return true;
     }
 
     /**

@@ -205,11 +205,25 @@ class User extends BaseUser {
     }
 
     /**
+     * @return array
+     */
+    public function getSuburbState() {
+
+        $split = explode("(", $this->suburb);
+        if(count($split) !== 2) {
+            return array("suburb" => $this->suburb, "state" => NULL);
+        }
+
+        return array("suburb" => trim($split[0]), "state" => str_replace(")", "", $split[1]));
+    }
+
+    /**
      * @param mixed $suburb
      */
     public function setSuburb($suburb) {
         $this->suburb = $suburb;
     }
+
 
     /**
      * @return mixed
@@ -230,6 +244,23 @@ class User extends BaseUser {
      */
     public function getStreetNumber() {
         return $this->streetNumber;
+    }
+
+    /**
+     * @return array
+     */
+    public function getStreetUnitNumber() {
+
+        $split = explode("/", $this->streetNumber);
+        if(count($split) === 2) {
+            return array("street" => $split[1], "unit" => $split[0]);
+        }
+        $split = explode("\\", $this->streetNumber);
+        if(count($split) === 2) {
+            return array("street" => $split[1], "unit" => $split[0]);
+        }
+
+        return array("street" => $this->streetNumber, "unit" => null);
     }
 
     /**

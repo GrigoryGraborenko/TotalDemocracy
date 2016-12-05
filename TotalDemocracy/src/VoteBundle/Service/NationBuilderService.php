@@ -480,7 +480,7 @@ class NationBuilderService {
         $this->logger->info("Pushing address for user $email: '$address'");
 
         $client = new HttpClient(array('verify' => true, 'exceptions' => false));
-        $response = $client->request("GET", "http://www.peopledecide.org.au/manualx");
+        $response = $client->request("GET", "http://www.peopledecide.org.au/manual");
         if($response->getStatusCode() !== 200) {
             return "Could not get manual form page, status code " . $response->getStatusCode();
         }

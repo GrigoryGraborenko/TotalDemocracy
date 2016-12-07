@@ -41,6 +41,25 @@ class NationBuilderService {
     // 3. checks fields
     // 4. sends an update if any mismatch occurred
 
+    /**
+     * @param $request
+     * @return null
+     */
+    public function getTrackingEvent($request) {
+
+        $cookies = $request->cookies->all();
+        if(array_key_exists("tracking_token", $cookies)) {
+            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
+            if(count($events) > 0) {
+                $track_event = $events[0];
+                $json = $track_event->getJsonArray();
+                $this->setToken($json["nationbuilder.api_token"]);
+                return $track_event;
+            }
+        }
+        return NULL;
+    }
+
 
     /**
      * Checks to see if a person exists. If they do, returns their details

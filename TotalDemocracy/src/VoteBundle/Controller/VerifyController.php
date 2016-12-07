@@ -31,6 +31,9 @@ class VerifyController extends CommonController {
     /** @DI\Inject("logger") */
     private $logger;
 
+    /** @DI\Inject("vote.nationbuilder") */
+    private $nb_service;
+
     private $verifySSL = true;
 
     private $AECBase = "check.aec.gov.au";
@@ -77,9 +80,7 @@ class VerifyController extends CommonController {
             $output['years'][] = $i;
         }
 
-        $client = new HttpClient(array(
-            'verify' => $this->verifySSL
-        ));
+        $client = new HttpClient(array('verify' => $this->verifySSL, 'exceptions' => false));
 
         $response = $client->request("GET", $base_url, array(
             'headers' => array(
@@ -176,14 +177,15 @@ class VerifyController extends CommonController {
 
         $input = $request->request->all();
 
-        $cookies = $request->cookies->all();
-        $track_event = NULL;
-        if(array_key_exists("tracking_token", $cookies)) {
-            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
-            if(count($events) > 0) {
-                $track_event = $events[0];
-            }
-        }
+        $track_event = $this->nb_service->getTrackingEvent($request);
+//        $cookies = $request->cookies->all();
+//        $track_event = NULL;
+//        if(array_key_exists("tracking_token", $cookies)) {
+//            $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
+//            if(count($events) > 0) {
+//                $track_event = $events[0];
+//            }
+//        }
 
 
         list($is_success, $output) = $this->finishVerification($input, $track_event);
@@ -215,6 +217,22 @@ class VerifyController extends CommonController {
         if($user === NULL) {
             throw new ErrorRedirectException("error_page", "No user available");
         }
+
+        $track_event = $this->nb_service->getTrackingEvent($request);
+        if($track_event) {
+            $this->nb_service->syncPerson($user);
+        }
+
+/*
+            if($tracking_event !== NULL) {
+                $json = $tracking_event->getJsonArray();
+                if(array_key_exists("nationbuilder.api_token", $json)) {
+                    $nationbuilder = $this->get("vote.nationbuilder");
+                    $nationbuilder->setToken($json["nationbuilder.api_token"]);
+                    $nationbuilder->syncPerson($user);
+                }
+            }
+         */
 
         $output = array(
             "user" => $user
@@ -279,9 +297,15 @@ class VerifyController extends CommonController {
 
         }
 
-        $client = new HttpClient(array(
-            'verify' => $this->verifySSL
-        ));
+        $user->setGivenNames(ucwords(strtolower($input['givenNames'])));
+        $user->setSurname(ucwords(strtolower($input['surname'])));
+        $user->setPostcode($input['postcode']);
+        $user->setSuburb(strtoupper($input['suburb']));
+        $user->setStreet(strtoupper($input['street']));
+        $user->setStreetNumber($input['streetNumber']);
+        $user->setDOB($dob);
+
+        $client = new HttpClient(array('verify' => $this->verifySSL, 'exceptions' => false));
 
         $session = $this->get('session');
         $base_url = "https://$this->AECBase";
@@ -342,14 +366,7 @@ class VerifyController extends CommonController {
 
             $state_abb = substr($input['suburb'], strpos($input['suburb'], "(") + 1, -1);
 
-            $user->setGivenNames(ucwords(strtolower($input['givenNames'])));
-            $user->setSurname(ucwords(strtolower($input['surname'])));
-            $user->setPostcode($input['postcode']);
-            $user->setSuburb(strtoupper($input['suburb']));
-            $user->setStreet(strtoupper($input['street']));
             $user->setWhenVerified(Carbon::now("UTC"));
-            $user->setStreetNumber($input['streetNumber']);
-            $user->setDOB($dob);
 
             $domain_repo = $this->em->getRepository('VoteBundle:Domain');
             $elect_repo = $this->em->getRepository('VoteBundle:Electorate');
@@ -418,9 +435,17 @@ class VerifyController extends CommonController {
                 ,"state" => $state_elect
                 ,"local" => $local_elect
             );
-        } else if(($success_nodes->count() > 0) && (($success_nodes->html() === "Please contact the AEC on 13 23 26 for assistance") || ($success_nodes->html() === "Your enrolment could not be confirmed. Please check the information you have entered"))) {
-            return array(false, "Could not find you on the electoral role. Try with/without your middle name, or a previous address.");
         } else {
+            if($user->getWhenVerified() === NULL) {
+                $this->em->flush();
+            } else {
+                $this->em->refresh($user);
+            }
+
+            if(($success_nodes->count() > 0) && (($success_nodes->html() === "Please contact the AEC on 13 23 26 for assistance") || ($success_nodes->html() === "Your enrolment could not be confirmed. Please check the information you have entered"))) {
+                return array(false, "Could not find you on the electoral role. Try with/without your middle name, or a previous address.");
+            }
+
             return array(false, "Verification code is incorrect.");
         }
 
@@ -455,11 +480,13 @@ class VerifyController extends CommonController {
             throw new BadRequestException("Incorrect Parameters");
         }
 
-        $client = new HttpClient(array(
-            'verify' => $this->verifySSL
-        ));
+        $client = new HttpClient(array('verify' => $this->verifySSL, 'exceptions' => false));
 
         $response = $client->request('POST', $url, array( 'json' => $send_data ));
+        if($response->getStatusCode() !== 200) {
+            $this->logger->error("Autocomplete Failure: " . $response->getStatusCode());
+            throw new BadRequestException("Autocomplete Failure");
+        }
 
         $suburbs = array();
         $json_response = json_decode($response->getBody()->getContents(), true);

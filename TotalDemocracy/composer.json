@@ -18,17 +18,17 @@
     },
     "require": {
         "php": ">=5.5.9",
-        "symfony/symfony": "3.0.*",
+        "symfony/symfony": "3.1.*",
         "symfony/assetic-bundle": "*",
-        "doctrine/orm": "^2.5",
-        "doctrine/doctrine-bundle": "^1.6",
-        "doctrine/doctrine-cache-bundle": "^1.2",
-        "symfony/swiftmailer-bundle": "^2.3",
-        "symfony/monolog-bundle": "^2.8",
-        "sensio/distribution-bundle": "^5.0",
-        "sensio/framework-extra-bundle": "^3.0.2",
-        "incenteev/composer-parameter-handler": "^2.0",
-        "doctrine/doctrine-migrations-bundle": "^1.0",
+        "doctrine/orm": "*",
+        "doctrine/doctrine-bundle": "*",
+        "doctrine/doctrine-cache-bundle": "*",
+        "symfony/swiftmailer-bundle": "*",
+        "symfony/monolog-bundle": "*",
+        "sensio/distribution-bundle": "*",
+        "sensio/framework-extra-bundle": "*",
+        "incenteev/composer-parameter-handler": "*",
+        "doctrine/doctrine-migrations-bundle": "*",
 
         "friendsofsymfony/user-bundle": "~2.0@dev",
         "friendsofsymfony/jsrouting-bundle": "@stable",
@@ -41,14 +41,16 @@
         "doctrine/doctrine-fixtures-bundle": "dev-master",
         "guzzlehttp/guzzle": "~6.0",
         "adoy/oauth2": "*",
+        "smalot/pdfparser": "*",
 
-        "smalot/pdfparser": "*"
+        "grigorygraborenko/recursive-admin": "master"
+
     },
     "require-dev": {
-        "sensio/generator-bundle": "^3.0",
-        "symfony/phpunit-bridge": "^2.7",
-        "liip/functional-test-bundle": "dev-master",
-        "phpunit/phpunit": "4.*"
+        "sensio/generator-bundle": "*",
+        "symfony/phpunit-bridge": "*",
+        "liip/functional-test-bundle": "*",
+        "phpunit/phpunit": "*"
     },
     "scripts": {
         "post-install-cmd": [
@@ -70,8 +72,9 @@
     },
     "config": {
         "platform": {
-            "php": "5.5.9"
+            "php": "7.0"
         }
+        ,"secure-http": false
     },
     "extra": {
         "symfony-app-dir": "app",

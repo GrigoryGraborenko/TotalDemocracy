@@ -14,6 +14,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
 
+use Grigorygraborenko\RecursiveAdmin\Annotations\Admin;
+
 /**
  * @ORM\Entity
  * @ORM\Table(name="user_record")
@@ -131,6 +133,16 @@ class User extends BaseUser {
      * @ORM\Column(type="text", nullable=true)
      */
     protected $json;
+
+    /**
+     * @Admin(read="none", write="none")
+     */
+    protected $password;
+
+    /**
+     * @Admin(read="none", write="none")
+     */
+    protected $salt;
 
     /**
      * User constructor.

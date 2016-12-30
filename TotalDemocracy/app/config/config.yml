@@ -133,3 +133,11 @@ assetic:
         vote:
             inputs:
                 - '@VoteBundle/Resources/js/vote.js'
+
+recursive_admin:
+    default_permissions:
+        entity: [ROLE_ADMIN]
+        read: [ROLE_ADMIN]
+        write: [ROLE_SUPER_ADMIN]
+        create: [ROLE_SUPER_ADMIN]
+        destroy: [ROLE_SUPER_ADMIN]

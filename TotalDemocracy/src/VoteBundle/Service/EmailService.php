@@ -8,7 +8,7 @@
 
 namespace VoteBundle\Service;
 
-use FOS\UserBundle\Mailer\MailerInterface;
+use FOS\UserBundle\Mailer\Mailer;
 use FOS\UserBundle\Model\UserInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -17,16 +17,27 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Class EmailService
  * @package VoteBundle\Service
  */
-class EmailService {
+class EmailService extends Mailer {
 
     /** @var Service Container container */
     private $container;
 
     /**
      * EmailService constructor.
-     * @param $container
+     * @param \Swift_Mailer $container
+     * @param UrlGeneratorInterface $mailer
+     * @param EngineInterface $router
+     * @param array $templating
      */
-    public function __construct($container) {
+    public function __construct($container, $mailer, $router, $templating) {
+        parent::__construct($mailer, $router, $templating, array(
+            "confirmation.template" => $container->getParameter("fos_user.registration.confirmation.template")
+            ,"resetting.template" => $container->getParameter("fos_user.resetting.email.template")
+            ,"from_email" => array(
+                "confirmation" => $container->getParameter("fos_user.registration.confirmation.from_email")
+                ,"resetting" => $container->getParameter("fos_user.resetting.email.from_email")
+            )
+        ));
         $this->container = $container;
     }
 
@@ -91,7 +102,7 @@ class EmailService {
         return ($num_recip > 0);
     }
 
-    /**
+     /**
      * {@inheritdoc}
      */
     public function sendResettingEmailMessage(UserInterface $user) {

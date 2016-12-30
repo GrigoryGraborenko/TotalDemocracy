@@ -19,7 +19,11 @@ services:
         arguments: ["@doctrine.orm.entity_manager", "@service_container", "@vote.option", "@validator"]
     vote.email:
         class: VoteBundle\Service\EmailService
-        arguments: ["@service_container"]
+        arguments:
+            - "@service_container"
+            - "@mailer"
+            - "@router"
+            - "@templating"
     vote.document:
         class: VoteBundle\Service\DocumentService
         arguments: ["@doctrine.orm.entity_manager"]

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c7931a1a4695633f5696c4ae15693e42",
-    "content-hash": "9c73d4bd700b0368fafd78cd89f8a964",
+    "hash": "2c1768b63605921f519a67dfcfcd739b",
+    "content-hash": "8849edfb3412f8dabe4569d32d12343c",
     "packages": [
         {
             "name": "adoy/oauth2",
@@ -1422,12 +1422,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/GrigoryGraborenko/recursive-admin.git",
-                "reference": "efcc8748ab6d2938121eff5555952de269fd062d"
+                "reference": "df04ee364140c91e698eff60890a462aba79f618"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GrigoryGraborenko/recursive-admin/zipball/efcc8748ab6d2938121eff5555952de269fd062d",
-                "reference": "efcc8748ab6d2938121eff5555952de269fd062d",
+                "url": "https://api.github.com/repos/GrigoryGraborenko/recursive-admin/zipball/df04ee364140c91e698eff60890a462aba79f618",
+                "reference": "df04ee364140c91e698eff60890a462aba79f618",
                 "shasum": ""
             },
             "type": "library",
@@ -1454,7 +1454,7 @@
                 "recursive",
                 "symfony"
             ],
-            "time": "2017-01-06 05:56:17"
+            "time": "2017-01-06 05:46:36"
         },
         {
             "name": "guzzlehttp/guzzle",

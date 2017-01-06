@@ -56,6 +56,9 @@
                             {% if app.user is not null %}
                                 <li {% if routename == 'profile' %}class="active"{% endif %}><a href="{{ path("profile") }}">Settings</a></li>
                             {% endif %}
+                            {% if authorization_checker.isGranted("ROLE_ADMIN") %}
+                                <li><a href="{{ path("sr-admin-home") }}">Admin</a></li>
+                            {% endif %}
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
                             {% if app.user %}

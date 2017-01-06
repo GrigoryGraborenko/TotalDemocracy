@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0043be058b239f4e9f09fc5346a75f32",
-    "content-hash": "ed717ecd47422e359239756bdef8b01e",
+    "hash": "2c1768b63605921f519a67dfcfcd739b",
+    "content-hash": "8849edfb3412f8dabe4569d32d12343c",
     "packages": [
         {
             "name": "adoy/oauth2",
@@ -89,16 +89,16 @@
         },
         {
             "name": "doctrine/annotations",
-            "version": "v1.3.0",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/annotations.git",
-                "reference": "30e07cf03edc3cd3ef579d0dd4dd8c58250799a5"
+                "reference": "bd4461328621bde0ae6b1b2675fbc6aca4ceb558"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/annotations/zipball/30e07cf03edc3cd3ef579d0dd4dd8c58250799a5",
-                "reference": "30e07cf03edc3cd3ef579d0dd4dd8c58250799a5",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/bd4461328621bde0ae6b1b2675fbc6aca4ceb558",
+                "reference": "bd4461328621bde0ae6b1b2675fbc6aca4ceb558",
                 "shasum": ""
             },
             "require": {
@@ -153,7 +153,7 @@
                 "docblock",
                 "parser"
             ],
-            "time": "2016-10-24 11:45:47"
+            "time": "2016-12-30 15:59:45"
         },
         {
             "name": "doctrine/cache",
@@ -1267,12 +1267,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfSymfony/FOSUserBundle.git",
-                "reference": "694e6d36588f128e8ee0abe622bdcb4c102bd75e"
+                "reference": "f60dd67c3f0259718c4c98702632470ce6926398"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSUserBundle/zipball/694e6d36588f128e8ee0abe622bdcb4c102bd75e",
-                "reference": "694e6d36588f128e8ee0abe622bdcb4c102bd75e",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSUserBundle/zipball/f60dd67c3f0259718c4c98702632470ce6926398",
+                "reference": "f60dd67c3f0259718c4c98702632470ce6926398",
                 "shasum": ""
             },
             "require": {
@@ -1285,6 +1285,7 @@
                 "symfony/twig-bundle": "^2.7 || ^3.0"
             },
             "conflict": {
+                "doctrine/doctrine-bundle": "<1.3",
                 "symfony/doctrine-bridge": "<2.7"
             },
             "require-dev": {
@@ -1334,7 +1335,7 @@
             "keywords": [
                 "User management"
             ],
-            "time": "2016-12-27 09:35:48"
+            "time": "2017-01-05 10:11:08"
         },
         {
             "name": "gedmo/doctrine-extensions",
@@ -1420,8 +1421,14 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "git://github.com/grigorygraborenko/recursive-admin.git",
-                "reference": "master"
+                "url": "https://github.com/GrigoryGraborenko/recursive-admin.git",
+                "reference": "e02a9d300c6a3bc52314115f0db647346a45e8aa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/GrigoryGraborenko/recursive-admin/zipball/e02a9d300c6a3bc52314115f0db647346a45e8aa",
+                "reference": "e02a9d300c6a3bc52314115f0db647346a45e8aa",
+                "shasum": ""
             },
             "type": "library",
             "autoload": {
@@ -1429,7 +1436,25 @@
                     "Grigorygraborenko\\RecursiveAdmin": "src"
                 }
             },
-            "time": "2016-12-26 22:57:54"
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Grigory Graborenko",
+                    "role": "Developer"
+                }
+            ],
+            "description": "An automatic, recursive-on-associations admin panel for symfony/doctrine with customization options",
+            "homepage": "https://github.com/GrigoryGraborenko/recursive-admin",
+            "keywords": [
+                "admin",
+                "react",
+                "recursive",
+                "symfony"
+            ],
+            "time": "2016-12-30 22:17:34"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2381,16 +2406,16 @@
         },
         {
             "name": "ocramius/package-versions",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Ocramius/PackageVersions.git",
-                "reference": "4b2bfc8128db95b533303942b0d5b332bffa07c6"
+                "reference": "51e867c70f0799790b3e82276875414ce13daaca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Ocramius/PackageVersions/zipball/4b2bfc8128db95b533303942b0d5b332bffa07c6",
-                "reference": "4b2bfc8128db95b533303942b0d5b332bffa07c6",
+                "url": "https://api.github.com/repos/Ocramius/PackageVersions/zipball/51e867c70f0799790b3e82276875414ce13daaca",
+                "reference": "51e867c70f0799790b3e82276875414ce13daaca",
                 "shasum": ""
             },
             "require": {
@@ -2398,7 +2423,8 @@
                 "php": "~7.0"
             },
             "require-dev": {
-                "composer/composer": "^1.2.0",
+                "composer/composer": "^1.3",
+                "ext-zip": "*",
                 "phpunit/phpunit": "^5.4.7"
             },
             "type": "composer-plugin",
@@ -2424,7 +2450,7 @@
                 }
             ],
             "description": "Composer plugin that provides efficient querying for installed package versions (no runtime IO)",
-            "time": "2016-07-25 07:13:56"
+            "time": "2016-12-30 09:49:15"
         },
         {
             "name": "ocramius/proxy-manager",
@@ -2782,16 +2808,16 @@
         },
         {
             "name": "sensio/distribution-bundle",
-            "version": "v5.0.15",
+            "version": "v5.0.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensiolabs/SensioDistributionBundle.git",
-                "reference": "d294b0665cf09c799e9c1993d5c776a5bf55cb85"
+                "reference": "4e98a1a6d3935d05414bd11e421a2047c93619f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sensiolabs/SensioDistributionBundle/zipball/d294b0665cf09c799e9c1993d5c776a5bf55cb85",
-                "reference": "d294b0665cf09c799e9c1993d5c776a5bf55cb85",
+                "url": "https://api.github.com/repos/sensiolabs/SensioDistributionBundle/zipball/4e98a1a6d3935d05414bd11e421a2047c93619f7",
+                "reference": "4e98a1a6d3935d05414bd11e421a2047c93619f7",
                 "shasum": ""
             },
             "require": {
@@ -2830,7 +2856,7 @@
                 "configuration",
                 "distribution"
             ],
-            "time": "2016-12-06 07:29:27"
+            "time": "2017-01-04 13:35:35"
         },
         {
             "name": "sensio/framework-extra-bundle",
@@ -2946,16 +2972,16 @@
         },
         {
             "name": "smalot/pdfparser",
-            "version": "v0.9.26",
+            "version": "v0.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smalot/pdfparser.git",
-                "reference": "5c1eaff9fb407779b5e05ea4f851be6f7d2a14f6"
+                "reference": "c20bfd40e3d7f40ff4083de5971b2a9e7a839dd5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smalot/pdfparser/zipball/5c1eaff9fb407779b5e05ea4f851be6f7d2a14f6",
-                "reference": "5c1eaff9fb407779b5e05ea4f851be6f7d2a14f6",
+                "url": "https://api.github.com/repos/smalot/pdfparser/zipball/c20bfd40e3d7f40ff4083de5971b2a9e7a839dd5",
+                "reference": "c20bfd40e3d7f40ff4083de5971b2a9e7a839dd5",
                 "shasum": ""
             },
             "require": {
@@ -2973,19 +2999,24 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-3.0"
+                "LGPLv3"
             ],
             "authors": [
                 {
                     "name": "Sebastien MALOT",
-                    "email": "sebastien@malot.fr",
-                    "homepage": "http://www.malot.fr",
-                    "role": "Developer"
+                    "email": "sebastien@malot.fr"
                 }
             ],
             "description": "Pdf parser library. Can read and extract information from pdf file.",
             "homepage": "http://www.pdfparser.org",
-            "time": "2016-11-05 07:58:33"
+            "keywords": [
+                "extract",
+                "parse",
+                "parser",
+                "pdf",
+                "text"
+            ],
+            "time": "2017-01-03 14:32:29"
         },
         {
             "name": "stof/doctrine-extensions-bundle",
@@ -3174,20 +3205,20 @@
         },
         {
             "name": "symfony/monolog-bundle",
-            "version": "3.0.1",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/monolog-bundle.git",
-                "reference": "5f2d2d62530cd66be361216107869a3b061045db"
+                "reference": "804425dfceec0097bf3e5dea3a73d91e055686be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/monolog-bundle/zipball/5f2d2d62530cd66be361216107869a3b061045db",
-                "reference": "5f2d2d62530cd66be361216107869a3b061045db",
+                "url": "https://api.github.com/repos/symfony/monolog-bundle/zipball/804425dfceec0097bf3e5dea3a73d91e055686be",
+                "reference": "804425dfceec0097bf3e5dea3a73d91e055686be",
                 "shasum": ""
             },
             "require": {
-                "monolog/monolog": "~1.18",
+                "monolog/monolog": "~1.22",
                 "php": ">=5.3.2",
                 "symfony/config": "~2.7|~3.0",
                 "symfony/dependency-injection": "~2.7|~3.0",
@@ -3230,7 +3261,7 @@
                 "log",
                 "logging"
             ],
-            "time": "2016-11-15 15:54:07"
+            "time": "2017-01-03 12:32:45"
         },
         {
             "name": "symfony/polyfill-intl-icu",
@@ -3842,29 +3873,30 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.30.0",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "c6ff71094fde15d12398eaba029434b013dc5e59"
+                "reference": "2a86dde1288d7270169083d0e078dc7ebe0f48b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/c6ff71094fde15d12398eaba029434b013dc5e59",
-                "reference": "c6ff71094fde15d12398eaba029434b013dc5e59",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/2a86dde1288d7270169083d0e078dc7ebe0f48b6",
+                "reference": "2a86dde1288d7270169083d0e078dc7ebe0f48b6",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.7"
+                "php": "^7.0",
+                "symfony/polyfill-mbstring": "~1.0"
             },
             "require-dev": {
                 "symfony/debug": "~2.7",
-                "symfony/phpunit-bridge": "~3.2@dev"
+                "symfony/phpunit-bridge": "~3.2"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.30-dev"
+                    "dev-master": "2.0-dev"
                 }
             },
             "autoload": {
@@ -3899,7 +3931,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2016-12-23 11:06:22"
+            "time": "2017-01-05 17:12:02"
         },
         {
             "name": "willdurand/jsonp-callback-validator",

@@ -43,6 +43,7 @@ twig:
     globals:
         enable_analytics: "%analytics%"
         google_analytics: "%google.analytics%"
+        authorization_checker: "@security.authorization_checker"
 
 # Doctrine Configuration
 doctrine:
@@ -138,6 +139,11 @@ recursive_admin:
     default_permissions:
         entity: [ROLE_ADMIN]
         read: [ROLE_ADMIN]
-        write: [ROLE_SUPER_ADMIN]
-        create: [ROLE_SUPER_ADMIN]
-        destroy: [ROLE_SUPER_ADMIN]
+        write: [ROLE_ADMIN]
+        create: [ROLE_ADMIN]
+        destroy: [ROLE_ADMIN]
+    back_route: vote
+    global_actions:
+        -
+          service: vote.nationbuilder
+          method: getAdminGlobalActions

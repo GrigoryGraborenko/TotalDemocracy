@@ -43,7 +43,7 @@
         "adoy/oauth2": "*",
         "smalot/pdfparser": "*",
 
-        "grigorygraborenko/recursive-admin": "master"
+        "grigorygraborenko/recursive-admin": "dev-master"
 
     },
     "require-dev": {
@@ -74,7 +74,6 @@
         "platform": {
             "php": "7.0"
         }
-        ,"secure-http": false
     },
     "extra": {
         "symfony-app-dir": "app",

@@ -431,6 +431,80 @@ class NationBuilderService {
         return array($user, $volunteer);
     }
 
+    public function adminSync($container, $admin, $input) {
+
+        $dry_run = $input['dry'];
+        $mode = $input['mode'];
+
+        $people = $this->readFromCSV($input['file']->getPathName(), true);
+        if(!is_array($people)) {
+            return $people;
+        }
+        $report = "Loaded " . count($people) . " people from CSV\n";
+
+        // find all "registration.track" events and their child events, delete them if they don't show up in the list
+        if($mode === "delete") {
+            $user_emails = array();
+            $event_repo = $this->em->getRepository('VoteBundle:ServerEvent');
+            $track_events = $event_repo->findBy(array("name" => "registration.track"));
+            foreach($track_events as $track) {
+                $reg_events = $event_repo->findBy(array("name" => "registration", "parent" => $track));
+                foreach($reg_events as $registration) {
+                    $delete_user = $registration->getUser();
+                    $user_email = $delete_user->getEmail();
+                    $found = false;
+                    foreach($people as $person) {
+                        if($person['email'] === $user_email) {
+                            $found = true;
+                            break;
+                        }
+                    }
+                    if(!$found) {
+                        $user_emails[] = $user_email;
+                        $this->em->remove($delete_user);
+                        $this->em->remove($registration);
+                    }
+                }
+            }
+            $report .= "Deleted " . count($user_emails) . " people from database:\n";
+            $report .= implode("\n", $user_emails) . "\n";
+        }
+
+        if(!$dry_run) {
+            $this->em->flush();
+        } else {
+            $report .= "No records modified, dry run only";
+        }
+
+
+        return array("report" => $report);
+    }
+
+    /**
+     * @param $container
+     * @param $admin
+     * @return array
+     */
+    public function getAdminGlobalActions($container, $admin) {
+        return array("sync" =>
+            array(
+                "callback" => "adminSync"
+                ,"label" => "Sync with NB"
+                ,"classes" => "btn btn-xs btn-warning"
+                ,"description" => "Syncronizes nationbuilder with the database"
+                ,"permission" => "ROLE_ADMIN"
+                ,"visible" => array('VoteBundle\Entity\User')
+                ,"input" => array(
+                    "dry" => array("type" => "boolean", "label" => "Dry run?", "default" => true)
+                    ,"mode" => array("type" => "select", "label" => "What sync action should be taken?", "choices" => array(
+                        array("label" => "Delete test users", "value" => "delete")
+                    ))
+                    ,"file" => array("type" => "file", "label" => "NationBuilder CSV file", "required" => true)
+                )
+            )
+        );
+    }
+
     /**
      * NationBuilderService constructor.
      * @param $container

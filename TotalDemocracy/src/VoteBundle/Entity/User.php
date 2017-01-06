@@ -95,6 +95,11 @@ class User extends BaseUser {
     protected $votes;
 
     /**
+     * @ORM\OneToMany(targetEntity="VoteBundle\Entity\ServerEvent", mappedBy="user")
+     */
+    protected $events;
+
+    /**
      * @ORM\OneToOne(targetEntity="VoteBundle\Entity\Volunteer", inversedBy="user")
      */
     protected $volunteer;

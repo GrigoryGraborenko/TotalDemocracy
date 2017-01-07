@@ -471,7 +471,7 @@ class NationBuilderService {
                     $delete_user = $registration->getUser();
                     $user_email = $delete_user->getEmail();
 
-                    if(Carbon::parse($delete_user->getDateCreated()) > $ignore_time) {
+                    if(Carbon::instance($delete_user->getDateCreated()) > $ignore_time) {
                         continue;
                     }
 

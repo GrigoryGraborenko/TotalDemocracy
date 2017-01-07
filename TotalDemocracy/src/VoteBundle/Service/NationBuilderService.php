@@ -324,9 +324,10 @@ class NationBuilderService {
 
     /**
      * @param $person
-     * @return null
+     * @param bool $ignore_existing
+     * @return array
      */
-    public function createUserFromExport($person) {
+    public function createUserFromExport($person, $ignore_existing = false) {
 
         $volunteer = NULL;
         $header_diff = array_diff($this->required_fields, array_keys($person));
@@ -334,7 +335,7 @@ class NationBuilderService {
             return "Headers not found: " . implode(", ", $header_diff);
         }
 
-        $email = $person['email'];
+        $email = strtolower($person['email']);
 //        $this->logger->info("PERSON " . json_encode($person));
 //        $this->logger->info("tags " . json_encode($tags));
 
@@ -342,6 +343,8 @@ class NationBuilderService {
         $user = $user_manager->findUserByEmail($email);
         if($user === NULL) {
             $user = $user_manager->createUser();
+        } else if($ignore_existing) {
+            return array(NULL, NULL);
         }
 
         $token_gen = $this->container->get('fos_user.util.token_generator');
@@ -352,14 +355,20 @@ class NationBuilderService {
         $user->setConfirmationToken($token_gen->generateToken());
 
         $user->setWhenFromNationBuilder(Carbon::now("UTC"));
+        $user->setDateCreated(Carbon::createFromFormat("m/d/Y g:i a", $person['created_at']));
 
         $params = array(
             "last_name" => "setSurname"
             ,"primary_zip" => "setPostcode"
             ,"primary_city" => "setSuburb"
+            ,"sex" => "setGender"
+            ,"occupation" => "setOccupation"
+            ,"website" => "setWebsite"
+            ,"twitter_id" => "setTwitter"
+            ,"facebook_username" => "setFacebook"
             ,"nationbuilder_id" => "updateJson"
-            ,"twitter_id" => "updateJson"
-            ,"facebook_username" => "updateJson"
+//            ,"twitter_id" => "updateJson"
+//            ,"facebook_username" => "updateJson"
         );
         foreach($params as $param => $func) {
             $val = $person[$param];
@@ -431,6 +440,12 @@ class NationBuilderService {
         return array($user, $volunteer);
     }
 
+    /**
+     * @param $container
+     * @param $admin
+     * @param $input
+     * @return array|string
+     */
     public function adminSync($container, $admin, $input) {
 
         $dry_run = $input['dry'];
@@ -442,6 +457,9 @@ class NationBuilderService {
         }
         $report = "Loaded " . count($people) . " people from CSV\n";
 
+        $fname_date = implode("-", array_slice(explode('-', explode('.', $input['file']->getClientOriginalName())[0]), 4));
+        $ignore_time = Carbon::createFromFormat("Y-m-d", $fname_date);
+
         // find all "registration.track" events and their child events, delete them if they don't show up in the list
         if($mode === "delete") {
             $user_emails = array();
@@ -452,9 +470,14 @@ class NationBuilderService {
                 foreach($reg_events as $registration) {
                     $delete_user = $registration->getUser();
                     $user_email = $delete_user->getEmail();
+
+                    if(Carbon::parse($delete_user->getDateCreated()) > $ignore_time) {
+                        continue;
+                    }
+
                     $found = false;
                     foreach($people as $person) {
-                        if($person['email'] === $user_email) {
+                        if(strtolower($person['email']) === strtolower($user_email)) {
                             $found = true;
                             break;
                         }
@@ -468,6 +491,21 @@ class NationBuilderService {
             }
             $report .= "Deleted " . count($user_emails) . " people from database:\n";
             $report .= implode("\n", $user_emails) . "\n";
+        } else if($mode === "add") {
+
+            $user_emails = array();
+            foreach($people as $person) {
+                list($new_user, $new_volunteer) = $this->createUserFromExport($person, true);
+                if($new_user) {
+                    $this->em->persist($new_user);
+                    $user_emails[] = $new_user->getEmail();
+                    if($new_volunteer) {
+                        $this->em->persist($new_volunteer);
+                    }
+                }
+            }
+            $report .= "Imported " . count($user_emails) . " people into database\n";
+//            $report .= implode("\n", $user_emails) . "\n";
         }
 
         if(!$dry_run) {
@@ -475,7 +513,6 @@ class NationBuilderService {
         } else {
             $report .= "No records modified, dry run only";
         }
-
 
         return array("report" => $report);
     }
@@ -498,7 +535,9 @@ class NationBuilderService {
                     "dry" => array("type" => "boolean", "label" => "Dry run?", "default" => true)
                     ,"mode" => array("type" => "select", "label" => "What sync action should be taken?", "choices" => array(
                         array("label" => "Delete test users", "value" => "delete")
+                        ,array("label" => "Add missing users from NB", "value" => "add")
                     ))
+//                    ,"ignore_time" => array("type" => "datetime", "label" => "Ignore users after this date")
                     ,"file" => array("type" => "file", "label" => "NationBuilder CSV file", "required" => true)
                 )
             )

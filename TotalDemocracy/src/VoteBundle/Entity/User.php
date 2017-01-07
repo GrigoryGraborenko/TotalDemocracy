@@ -135,6 +135,31 @@ class User extends BaseUser {
     protected $whenSentToNationBuilder;
 
     /**
+     * @ORM\Column(type="string", length=1, nullable=true)
+     */
+    protected $gender;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $occupation;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $website;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $facebook;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $twitter;
+
+    /**
      * @ORM\Column(type="text", nullable=true)
      */
     protected $json;
@@ -170,6 +195,13 @@ class User extends BaseUser {
      */
     public function getDateCreated() {
         return $this->date_created;
+    }
+
+    /**
+     * @param mixed $date_created
+     */
+    public function setDateCreated($date_created) {
+        $this->date_created = $date_created;
     }
 
     /**
@@ -365,11 +397,12 @@ class User extends BaseUser {
     }
 
     /**
-     * @param mixed $votes
+     * @return mixed
      */
-    public function setVotes($votes) {
-        $this->votes = $votes;
+    public function getEvents() {
+        return $this->events;
     }
+
 
     /**
      * @return mixed
@@ -453,6 +486,90 @@ class User extends BaseUser {
      */
     public function setWhenSentToNationBuilder($whenSentToNationBuilder) {
         $this->whenSentToNationBuilder = $whenSentToNationBuilder;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmailOptOut() {
+        return $this->emailOptOut;
+    }
+
+    /**
+     * @param mixed $emailOptOut
+     */
+    public function setEmailOptOut($emailOptOut) {
+        $this->emailOptOut = $emailOptOut;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGender() {
+        return $this->gender;
+    }
+
+    /**
+     * @param mixed $gender
+     */
+    public function setGender($gender) {
+        $this->gender = $gender;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOccupation() {
+        return $this->occupation;
+    }
+
+    /**
+     * @param mixed $occupation
+     */
+    public function setOccupation($occupation) {
+        $this->occupation = $occupation;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWebsite() {
+        return $this->website;
+    }
+
+    /**
+     * @param mixed $website
+     */
+    public function setWebsite($website) {
+        $this->website = $website;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFacebook() {
+        return $this->facebook;
+    }
+
+    /**
+     * @param mixed $facebook
+     */
+    public function setFacebook($facebook) {
+        $this->facebook = $facebook;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTwitter() {
+        return $this->twitter;
+    }
+
+    /**
+     * @param mixed $twitter
+     */
+    public function setTwitter($twitter) {
+        $this->twitter = $twitter;
     }
 
     /**

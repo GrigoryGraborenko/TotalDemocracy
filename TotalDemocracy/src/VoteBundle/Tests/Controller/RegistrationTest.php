@@ -58,7 +58,7 @@ class RegistrationTest extends BaseFunctionalTestCase {
         $this->checkMenuNames(array("Register", "Vote", "Login"));
 
         $this->login("admin@test.com", "test", true);
-        $this->checkMenuNames(array("Verify", "Vote", "Settings", "Logout"));
+        $this->checkMenuNames(array("Verify", "Vote", "Settings", "Admin", "Logout"));
     }
 
     public function testTracking() {

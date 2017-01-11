@@ -43,7 +43,7 @@
         "adoy/oauth2": "*",
         "smalot/pdfparser": "*",
 
-        "grigorygraborenko/recursive-admin": "dev-master"
+        "grigorygraborenko/recursive-admin": "*"
 
     },
     "require-dev": {

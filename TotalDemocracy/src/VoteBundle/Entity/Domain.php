@@ -38,6 +38,12 @@ class Domain {
     protected $date_created;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
+     */
+    protected $date_updated;
+
+    /**
      * Can be federal, state or local
      *
      * @ORM\Column(type="string")
@@ -101,6 +107,13 @@ class Domain {
      */
     public function getDateCreated() {
         return $this->date_created;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateUpdated() {
+        return $this->date_updated;
     }
 
     /**

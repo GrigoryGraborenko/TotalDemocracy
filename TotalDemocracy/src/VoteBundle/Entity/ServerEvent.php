@@ -38,6 +38,12 @@ class ServerEvent {
     protected $date_created;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
+     */
+    protected $date_updated;
+
+    /**
      * @ORM\ManyToOne(targetEntity="VoteBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      */
@@ -96,14 +102,6 @@ class ServerEvent {
     }
 
     /**
-     * @param mixed $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return mixed
      */
     public function getDateCreated()
@@ -112,11 +110,10 @@ class ServerEvent {
     }
 
     /**
-     * @param mixed $date_created
+     * @return mixed
      */
-    public function setDateCreated($date_created)
-    {
-        $this->date_created = $date_created;
+    public function getDateUpdated() {
+        return $this->date_updated;
     }
 
     /**

@@ -35,6 +35,12 @@ class ElectoralRollImport {
     protected $date_created;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
+     */
+    protected $date_updated;
+
+    /**
      * @ORM\Column(type="datetime", nullable=false)
      */
     protected $valid_date;
@@ -126,6 +132,13 @@ class ElectoralRollImport {
      */
     public function getDateCreated() {
         return $this->date_created;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateUpdated() {
+        return $this->date_updated;
     }
 
     /**

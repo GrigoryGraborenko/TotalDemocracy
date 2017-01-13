@@ -36,6 +36,12 @@ class Task {
     protected $date_created;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
+     */
+    protected $date_updated;
+
+    /**
      * @ORM\ManyToOne(targetEntity="VoteBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      */
@@ -96,6 +102,13 @@ class Task {
      */
     public function getDateCreated() {
         return $this->date_created;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateUpdated() {
+        return $this->date_updated;
     }
 
     /**

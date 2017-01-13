@@ -37,6 +37,12 @@ class Volunteer {
     protected $date_created;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
+     */
+    protected $date_updated;
+
+    /**
      * @ORM\OneToOne(targetEntity="VoteBundle\Entity\User", mappedBy="volunteer")
      */
     protected $user;
@@ -144,6 +150,20 @@ class Volunteer {
      */
     public function getId() {
         return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateCreated() {
+        return $this->date_created;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateUpdated() {
+        return $this->date_updated;
     }
 
     /**

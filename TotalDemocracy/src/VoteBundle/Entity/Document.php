@@ -34,6 +34,12 @@ class Document {
     protected $whenCreated;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
+     */
+    protected $date_updated;
+
+    /**
      * The domain the document applies in
      *
      * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Domain", inversedBy="documents")
@@ -134,6 +140,13 @@ class Document {
      */
     public function getWhenCreated() {
         return $this->whenCreated;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateUpdated() {
+        return $this->date_updated;
     }
 
     /**

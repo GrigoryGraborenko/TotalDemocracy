@@ -18,8 +18,48 @@ use Grigorygraborenko\RecursiveAdmin\Annotations\Admin;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="user_record")
+ * @ORM\Table(name="user_record", indexes={@ORM\Index(name="names_idx", columns={"given_names", "surname"})}, uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_FE6684ACA0D96FBF", columns={"email_canonical"}), @ORM\UniqueConstraint(name="UNIQ_FE6684AC92FC23A8", columns={"username_canonical"})})
  * @ExclusionPolicy("all")
+ *
+ * @ORM\AttributeOverrides({
+ *      @ORM\AttributeOverride(name="username",
+ *          column=@ORM\Column(
+ *              name     = "username",
+ *              type     = "string", length = 255
+ *          )
+ *      )
+ *      ,@ORM\AttributeOverride(name="usernameCanonical",
+ *          column=@ORM\Column(
+ *              name     = "username_canonical",
+ *              type     = "string", length = 255
+ *          )
+ *      )
+ *      ,@ORM\AttributeOverride(name="email",
+ *          column=@ORM\Column(
+ *              name     = "email",
+ *              type     = "string", length = 255
+ *          )
+ *      )
+ *      ,@ORM\AttributeOverride(name="emailCanonical",
+ *          column=@ORM\Column(
+ *              name     = "email_canonical",
+ *              type     = "string", length = 255
+ *          )
+ *      )
+ *      ,@ORM\AttributeOverride(name="salt",
+ *          column=@ORM\Column(
+ *              name     = "salt",
+ *              type     = "string", length = 255
+ *          )
+ *      )
+ *      ,@ORM\AttributeOverride(name="confirmationToken",
+ *          column=@ORM\Column(
+ *              name     = "confirmation_token",
+ *              type     = "string", length = 255,
+ *              nullable = true
+ *          )
+ *      )
+ * })
  */
 class User extends BaseUser {
 
@@ -37,6 +77,12 @@ class User extends BaseUser {
      * @Expose
      */
     protected $date_created;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
+     */
+    protected $date_updated;
 
     /**
      * @ORM\Column(type="string", nullable=true)
@@ -175,6 +221,34 @@ class User extends BaseUser {
     protected $salt;
 
     /**
+     * @ORM\Column(type="boolean",nullable=false)
+     * @Admin(read="ROLE_SUPPORT", write="none")
+     */
+    protected $locked;
+
+    /**
+     * @ORM\Column(type="boolean",nullable=false)
+     * @Admin(read="ROLE_SUPPORT", write="none")
+     */
+    protected $expired;
+
+    /**
+     * @ORM\Column(type="boolean", name="credentials_expired", nullable=false)
+     * @Admin(read="ROLE_SUPPORT", write="none")
+     */
+    protected $credentialsExpired;
+
+    /**
+     * @ORM\Column(type="datetime", name="expires_at", nullable=true)
+     */
+    protected $expiresAt;
+
+    /**
+     * @ORM\Column(type="datetime", name="credentials_expire_at", nullable=true)
+     */
+    protected $credentialsExpireAt;
+
+    /**
      * User constructor.
      */
     public function __construct() {
@@ -182,6 +256,10 @@ class User extends BaseUser {
         $this->isVolunteer = false;
         $this->isMember = false;
         $this->emailOptOut = false;
+
+        $this->locked = false;
+        $this->expired = false;
+        $this->credentialsExpired = false;
     }
     /**
      * @return mixed
@@ -202,6 +280,13 @@ class User extends BaseUser {
      */
     public function setDateCreated($date_created) {
         $this->date_created = $date_created;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateUpdated() {
+        return $this->date_updated;
     }
 
     /**
@@ -626,6 +711,76 @@ class User extends BaseUser {
         }
         unset($json[$key]);
         $this->json = json_encode($json);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLocked() {
+        return $this->locked;
+    }
+
+    /**
+     * @param mixed $locked
+     */
+    public function setLocked($locked) {
+        $this->locked = $locked;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpired() {
+        return $this->expired;
+    }
+
+    /**
+     * @param mixed $expired
+     */
+    public function setExpired($expired) {
+        $this->expired = $expired;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCredentialsExpired() {
+        return $this->credentialsExpired;
+    }
+
+    /**
+     * @param mixed $credentialsExpired
+     */
+    public function setCredentialsExpired($credentialsExpired) {
+        $this->credentialsExpired = $credentialsExpired;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpiresAt() {
+        return $this->expiresAt;
+    }
+
+    /**
+     * @param mixed $expiresAt
+     */
+    public function setExpiresAt($expiresAt) {
+        $this->expiresAt = $expiresAt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCredentialsExpireAt() {
+        return $this->credentialsExpireAt;
+    }
+
+    /**
+     * @param mixed $credentialsExpireAt
+     */
+    public function setCredentialsExpireAt($credentialsExpireAt) {
+        $this->credentialsExpireAt = $credentialsExpireAt;
     }
 
 }

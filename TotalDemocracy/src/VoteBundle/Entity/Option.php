@@ -35,6 +35,12 @@ class Option {
     protected $date_created;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
+     */
+    protected $date_updated;
+
+    /**
      * @ORM\Column(type="string", unique=true)
      */
     protected $name;
@@ -66,20 +72,6 @@ class Option {
     }
 
     /**
-     * Set dateCreated
-     *
-     * @param \DateTime $dateCreated
-     *
-     * @return Option
-     */
-    public function setDateCreated($dateCreated)
-    {
-        $this->date_created = $dateCreated;
-
-        return $this;
-    }
-
-    /**
      * Get dateCreated
      *
      * @return \DateTime
@@ -87,6 +79,13 @@ class Option {
     public function getDateCreated()
     {
         return $this->date_created;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateUpdated() {
+        return $this->date_updated;
     }
 
     /**

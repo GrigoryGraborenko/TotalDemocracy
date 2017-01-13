@@ -38,6 +38,12 @@ class Electorate {
     protected $date_created;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
+     */
+    protected $date_updated;
+
+    /**
      * The domain the electorate elects representatives for
      *
      * @ORM\ManyToOne(targetEntity="\VoteBundle\Entity\Domain", inversedBy="electorates")
@@ -94,6 +100,13 @@ class Electorate {
      */
     public function getDateCreated() {
         return $this->date_created;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateUpdated() {
+        return $this->date_updated;
     }
 
     /**

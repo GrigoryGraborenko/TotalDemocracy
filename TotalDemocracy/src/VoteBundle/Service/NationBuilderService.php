@@ -324,12 +324,13 @@ class NationBuilderService {
     }
 
     /**
-     * @param $person
+     * @param $street
+     * @param $unit
      * @return array
      */
-    public function getAddressFromExport($person) {
+    public function getAddressFromExport($street, $unit) {
 
-        $address_chunks = explode(" ", $person['primary_address1']);
+        $address_chunks = explode(" ", $street);
         $number_chunks = array();
         $street_chunks = array();
         foreach($address_chunks as $chunk) {
@@ -345,12 +346,12 @@ class NationBuilderService {
         if(count($street_chunks) > 0) {
             $street = implode(" ", $street_chunks);
         }
-        if($person['primary_address2'] === "") {
+        if($unit === "") {
             $street_num = $number_chunks;
-        } else if(ctype_alpha($person['primary_address2'])) {
-            $street_num = $person['primary_address2'] . " " . $number_chunks;
+        } else if(ctype_alpha($unit)) {
+            $street_num = $unit . " " . $number_chunks;
         } else {
-            $street_num = $person['primary_address2'] . "/" . $number_chunks;
+            $street_num = $unit . "/" . $number_chunks;
         }
 
         return array("number" => $street_num, "name" => $street);
@@ -428,7 +429,7 @@ class NationBuilderService {
             $user->setDOB($dob);
         }
 
-        $address = $this->getAddressFromExport($person);
+        $address = $this->getAddressFromExport($person['primary_address1'], $person['primary_address2']);
         $user->setStreet($address['name']);
         $user->setStreetNumber($address['number']);
 
@@ -562,7 +563,7 @@ class NationBuilderService {
 //                    $num_users_synced++;
 
                     $nb_created = Carbon::createFromFormat("m/d/Y g:i a", $person['created_at']);
-                    $address = $this->getAddressFromExport($person);
+                    $address = $this->getAddressFromExport($person['primary_address1'], $person['primary_address2']);
 
                     $cutoff_time = Carbon::instance($nb_created)->addDays(2);
                     $updated = ($sync_user->getWhenVerified() !== NULL) && (Carbon::instance($sync_user->getWhenVerified()) > $cutoff_time);

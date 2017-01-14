@@ -317,4 +317,142 @@ class ElectoralRollService
             $this->logger->info("SUBURBS: " . json_encode($result['suburbs']));
         }
     }
+
+    /**
+     * @param $container
+     * @param $admin
+     * @param $input
+     * @return array|string
+     */
+    public function adminSync($container, $admin, $input) {
+
+        try {
+            $handle = fopen($input['file']->getPathName(), "r");
+            if (!$handle) {
+                return "Could not open file";
+            }
+        } catch(\Exception $e) {
+            return "Could not open file";
+        }
+
+        set_time_limit(0);
+
+        $dry_run = $input['dry'];
+        $headers = array("num", "surname", "names", "unit", "street", "suburb", "state", "country", "postcode", "gender", "dob", "errors");
+        $header_num = count($headers);
+
+        $errors = 0;
+        $items = array();
+        while(($line = fgets($handle)) !== false) {
+
+            $chunks = str_getcsv($line);
+            if(count($chunks) === $header_num) {
+                $item = array();
+                for($i = 0; $i < $header_num; $i++) {
+                    $item[$headers[$i]] = $chunks[$i];
+                }
+                if($item["errors"] !== "") {
+                    $errors++;
+                } else {
+                    $items[] = $item;
+                }
+            }
+        }
+
+        $report = "Found " . count($items) . " people, excluded $errors errors.\n";
+
+        $user_repo = $this->em->getRepository('VoteBundle:User');
+
+        $matches = 0;
+
+        $dob_changes = array();
+        $address_changes = array();
+        $multi_match = 0;
+        // find the peoples who match
+        foreach($items as $item) {
+            $users = $user_repo->findBy(array("surname" => $item['surname'], "givenNames" => $item['names']));
+            $num_users = count($users);
+            if($num_users <= 0) {
+                continue;
+            } else if($num_users > 1) {
+                $multi_match++;
+                continue;
+            }
+            $user = $users[0];
+            $matches++;
+
+            // unverify anyone you match whose dob is incorrect, and delete incorrect dob, if can’t find dob (ie on roll in another electorate) and they were added while door-knocking keep them verified; and
+            $e_dob = Carbon::createFromFormat("Y/m/d", $item["dob"])->setTime(0, 0, 0);
+            $user_dob = $user->getDOB();
+            $user_dob = ($user_dob === NULL) ? NULL : Carbon::instance($user_dob)->setTime(0, 0, 0);
+            if(($user->getDOB() === NULL) || (!$user_dob->eq($e_dob))) {
+                if($user->getWhenVerified() !== NULL) {
+                    $dob_changes[] = "Unverified " . $user->getEmail() . " due to incorrect DOB: $user_dob should be $e_dob";
+                    $user->setWhenVerified(NULL);
+                    $user->setDOB(NULL);
+                }
+            }
+
+            $unit_num = str_replace("Unit ", "", $item["unit"]);
+            $e_address = $this->container->get("vote.nationbuilder")->getAddressFromExport($item["street"], $unit_num);
+//            $this->logger->info("ADDRESS: " . json_encode($e_address));
+
+            $changes = array();
+            if(($user->getStreetNumber() === NULL) && ($e_address['number'] !== "")) {
+                $changes[] = "Street Number = " . $e_address['number'];
+                $user->setStreetNumber($e_address['number']);
+            }
+            if(($user->getStreet() === NULL) && ($e_address['name'] !== "")) {
+                $changes[] = "Street Name = " . $e_address['name'];
+                $user->setStreet($e_address['name']);
+            }
+            if(($user->getSuburb() === NULL) && ($item['suburb'] !== "")) {
+                $changes[] = "Suburb = " . $item['suburb'];
+                $user->setSuburb($item['suburb']);
+            }
+            if(($user->getPostcode() === NULL) && ($item['postcode'] !== "")) {
+                $changes[] = "Postcode = " . $item['postcode'];
+                $user->setPostcode($item['postcode']);
+            }
+            if(count($changes)) {
+                $address_changes[] = $user->getEmail() . ": " . implode(", ", $changes);
+            }
+        }
+
+        $report .= "Matched $matches people, excluded $multi_match multi-matches.\n";
+        $report .= "Changed DOB for " . count($dob_changes) . " people:\n";
+        $report .= implode("\n", $dob_changes) . "\n";
+        $report .= "Changed address for " . count($address_changes) . " people:\n";
+        $report .= implode("\n", $address_changes) . "\n";
+
+        if(!$dry_run) {
+            $this->em->flush();
+        } else {
+            $report .= "No records modified, dry run only";
+        }
+
+        return array("report" => $report);
+    }
+
+    /**
+     * @param $container
+     * @param $admin
+     * @return array
+     */
+    public function getAdminGlobalActions($container, $admin) {
+        return array("sync_ocr" =>
+            array(
+                "callback" => "adminSync"
+                ,"label" => "Sync Electoral OCR"
+                ,"classes" => "btn btn-xs btn-warning"
+                ,"description" => "Syncronizes the database with electoral roll data that was extracted by optical character recognition"
+                ,"permission" => "ROLE_ADMIN"
+                ,"input" => array(
+                    "dry" => array("type" => "boolean", "label" => "Dry run?", "default" => true)
+                    ,"file" => array("type" => "file", "label" => "Electoral roll CSV file", "required" => true)
+                )
+            )
+        );
+    }
+
 }

@@ -107,17 +107,17 @@ monolog:
     app_stream:
       type:  stream
       level: info
-      path:  %kernel.logs_dir%/%kernel.environment%_app.log
+      path:  "%kernel.logs_dir%/%kernel.environment%_app.log"
       channels: app
     debug_stream:
       type:  stream
       level: debug
-      path:  %kernel.logs_dir%/%kernel.environment%_debug.log
+      path:  "%kernel.logs_dir%/%kernel.environment%_debug.log"
       channels: app
     php_stream:
       type:  stream
       level: error
-      path:  %kernel.logs_dir%/%kernel.environment%_php.log
+      path:  "%kernel.logs_dir%/%kernel.environment%_php.log"
       channels: php
 
 assetic:
@@ -140,10 +140,13 @@ recursive_admin:
         entity: [ROLE_ADMIN]
         read: [ROLE_ADMIN]
         write: [ROLE_ADMIN]
-        create: [ROLE_ADMIN]
-        destroy: [ROLE_ADMIN]
+        create: [ROLE_SUPER_ADMIN]
+        destroy: [ROLE_SUPER_ADMIN]
     back_route: vote
     global_actions:
         -
           service: vote.nationbuilder
+          method: getAdminGlobalActions
+        -
+          service: vote.electoral_roll
           method: getAdminGlobalActions

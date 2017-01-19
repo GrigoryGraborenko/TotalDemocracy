@@ -51,7 +51,15 @@ class VoteController extends CommonController {
         $user = $this->getPotentialUser($this->em);
         if($user !== NULL) {
             if($user->getWhenVerified() === NULL) {
-                $output['cannot_vote_message'] = '<a href="' . $this->generateUrl("verify") . '">Verify</a> on the electoral role to vote';
+
+                $verify_error = $user->getKeyJson("verify.error");
+                $err_msg = "";
+                if($verify_error !== NULL) {
+                    $err_msg = $verify_error . " ";
+                }
+                $err_msg .= '<a href="' . $this->generateUrl("verify") . '">Verify</a> on the electoral role to vote.';
+
+                $output['cannot_vote_message'] = $err_msg;
             } else {
                 $output['is_verified'] = true;
                 if($user->isEnabled()) {

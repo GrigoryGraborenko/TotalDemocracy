@@ -540,7 +540,8 @@ class NationBuilderService {
             }
 
             $num_core_fields_updated = array(
-                "dob" => array()
+                //"dob" => array()
+                "dob" => 0
                 ,"address" => array()
                 ,"name" => array()
                 ,"phone" => array()
@@ -558,6 +559,14 @@ class NationBuilderService {
 
                 $tags = explode(", ", $person['tag_list']);
 
+                // people that have a different dob on the PD database compared to the dob on the NB database, UPDATE the dob on the PD database with the dob on the NB database, unless the person has later, 2 or more days AFTER NB creation date, updated the dob themselves on the PD database
+                if($person['born_at'] !== "") {
+                    $dob = Carbon::createFromFormat('m/d/Y', $person['born_at']);
+                    $num_core_fields_updated["dob"]++;
+//                    $num_core_fields_updated["dob"][] = $sync_user->getEmail() . ": $dob";
+                    $sync_user->setDOB($dob);
+                }
+
                 //if(strpos($person["tag_list"], "manual") !== false) {
                 if(in_array("manual", $tags)) {
 //                    $num_users_synced++;
@@ -568,6 +577,7 @@ class NationBuilderService {
                     $cutoff_time = Carbon::instance($nb_created)->addDays(2);
                     $updated = ($sync_user->getWhenVerified() !== NULL) && (Carbon::instance($sync_user->getWhenVerified()) > $cutoff_time);
 
+                    /*
                     // people that have a different dob on the PD database compared to the dob on the NB database, UPDATE the dob on the PD database with the dob on the NB database, unless the person has later, 2 or more days AFTER NB creation date, updated the dob themselves on the PD database
                     if($person['born_at'] !== "") {
                         $dob = Carbon::createFromFormat('m/d/Y', $person['born_at']);
@@ -582,6 +592,7 @@ class NationBuilderService {
                             }
                         }
                     }
+                    */
 
                     // people that have a different COMPLETE (not missing any fields) address on the PD database compared to the address on the NB database OR the address is COMPLETELY missing on the PD database, UPDATE the address on the PD database with the address on the NB database (**if updating missing address accept partially completed address), unless the person has later, 2 or more days AFTER NB creation date, updated the address themselves on the PD database;
                     if((!$updated) && ($address['name'] !== "") && ($address['number'] !== "") && ($person['primary_zip'] !== "") && ($person['primary_city'] !== "") &&
@@ -670,10 +681,14 @@ class NationBuilderService {
             }
             $report .= "\n";
             foreach($num_core_fields_updated as $name => $array) {
-                $amount = count($array);
-                $report .= "$name: $amount updates \n";
-                foreach($array as $msg) {
-                    $report .= $msg . "\n";
+                if(is_array($array)) {
+                    $amount = count($array);
+                    $report .= "$name: $amount updates \n";
+                    foreach ($array as $msg) {
+                        $report .= $msg . "\n";
+                    }
+                } else {
+                    $report .= "$name: $array updates \n";
                 }
             }
             //$report .= ""

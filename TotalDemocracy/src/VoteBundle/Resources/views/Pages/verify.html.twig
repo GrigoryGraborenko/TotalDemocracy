@@ -3,6 +3,9 @@
 {% block content %}
 
     <h1>Verify</h1>
+    {% if verify_error is defined %}
+        <p class="color-red">{{ verify_error | raw }}</p>
+    {% endif %}
 
     <div class="panel panel-default">
         <div class="panel-body">

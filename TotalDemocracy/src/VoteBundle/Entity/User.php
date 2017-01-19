@@ -705,12 +705,30 @@ class User extends BaseUser {
      * @param $key
      */
     public function removeKeyJson($key) {
+        if($this->json === NULL) {
+            return;
+        }
         $json = json_decode($this->json, true);
         if(!array_key_exists($key, $json)) {
             return;
         }
         unset($json[$key]);
         $this->json = json_encode($json);
+    }
+
+    /**
+     * @param $key
+     * @return null
+     */
+    public function getKeyJson($key) {
+        if($this->json === NULL) {
+            return NULL;
+        }
+        $json = json_decode($this->json, true);
+        if(!array_key_exists($key, $json)) {
+            return NULL;
+        }
+        return $json[$key];
     }
 
     /**

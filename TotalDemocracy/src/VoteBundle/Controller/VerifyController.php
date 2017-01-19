@@ -166,6 +166,11 @@ class VerifyController extends CommonController {
             $output["can_skip"] = true;
         }
 
+        $verify_error = $user->getKeyJson("verify.error");
+        if($verify_error !== NULL) {
+            $output["verify_error"] = $verify_error;
+        }
+
         return $this->render("VoteBundle:Pages:verify.html.twig", $output);
     }
 
@@ -367,6 +372,8 @@ class VerifyController extends CommonController {
             $state_abb = substr($input['suburb'], strpos($input['suburb'], "(") + 1, -1);
 
             $user->setWhenVerified(Carbon::now("UTC"));
+            $user->removeKeyJson("verify.error");
+
 
             $domain_repo = $this->em->getRepository('VoteBundle:Domain');
             $elect_repo = $this->em->getRepository('VoteBundle:Electorate');

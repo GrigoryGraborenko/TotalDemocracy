@@ -367,7 +367,7 @@ class ElectoralRollService
 
         $dob_changes = array();
         $address_changes = array();
-        $multi_match = 0;
+        $multi_match = array();
         // find the peoples who match
         foreach($items as $item) {
             $users = $user_repo->findBy(array("surname" => $item['surname'], "givenNames" => $item['names']));
@@ -375,7 +375,11 @@ class ElectoralRollService
             if($num_users <= 0) {
                 continue;
             } else if($num_users > 1) {
-                $multi_match++;
+                $msg = array();
+                foreach($users as $potential) {
+                    $msg[] = $potential->getEmail();
+                }
+                $multi_match[] = $item['names'] . " " . $item['surname'] . " matches " . implode(", ", $msg);
                 continue;
             }
             $user = $users[0];
@@ -390,6 +394,7 @@ class ElectoralRollService
                     $dob_changes[] = "Unverified " . $user->getEmail() . " due to incorrect DOB: $user_dob should be $e_dob";
                     $user->setWhenVerified(NULL);
                     $user->setDOB(NULL);
+                    $user->updateJson("verify.error", "We have detected anomalies with your voter registration. Please re-verify with correct details.");
                 }
             }
 
@@ -419,8 +424,9 @@ class ElectoralRollService
             }
         }
 
-        $report .= "Matched $matches people, excluded $multi_match multi-matches.\n";
-        $report .= "Changed DOB for " . count($dob_changes) . " people:\n";
+        $report .= "Matched $matches people, excluded " . count($multi_match) . " multi-matches.\n";
+        $report .= implode("\n", $multi_match) . "\n";
+        $report .= "Unverified DOB for " . count($dob_changes) . " people:\n";
         $report .= implode("\n", $dob_changes) . "\n";
         $report .= "Changed address for " . count($address_changes) . " people:\n";
         $report .= implode("\n", $address_changes) . "\n";

@@ -546,6 +546,7 @@ class NationBuilderService {
                 ,"name" => array()
                 ,"phone" => array()
                 ,"volunteer" => array()
+                ,"opt_out" => array()
             );
 
 //            $cutoff_time = Carbon::now("UTC")->subDays(2);
@@ -640,30 +641,40 @@ class NationBuilderService {
                     // people that have a different phone number or the phone is missing on the PD database compared to the phone number on the NB database, UPDATE the phone number on the PD database with the phone number on the NB database, unless the person has later, 2 or more days AFTER NB creation date, updated the phone number themselves on the PD database;
                     if((!$updated) && ($sync_user->getPhone() !== $person["phone_number"]) && ($sync_user->getPhone() !== $person["mobile_number"])) {
                         if($person["mobile_number"] !== "") {
-                            $num_core_fields_updated["name"][] = $sync_user->getEmail() . ": " . $sync_user->getPhone() . " => " . $person["mobile_number"];
+                            $num_core_fields_updated["phone"][] = $sync_user->getEmail() . ": " . $sync_user->getPhone() . " => " . $person["mobile_number"];
                             $sync_user->setPhone($person["mobile_number"]);
                         } else if($person["phone_number"] !== "") {
-                            $num_core_fields_updated["name"][] = $sync_user->getEmail() . ": " . $sync_user->getPhone() . " => " . $person["phone_number"];
+                            $num_core_fields_updated["phone"][] = $sync_user->getEmail() . ": " . $sync_user->getPhone() . " => " . $person["phone_number"];
                             $sync_user->setPhone($person["phone_number"]);
                         }
                     }
 
-                    if(($person['is_volunteer'] === "true") && ($sync_user->getVolunteer() === NULL)) {
-                        $sync_user->setIsVolunteer(true);
-                        if(($sync_user->getPostcode() !== NULL) && ($sync_user->getSuburb() !== NULL) && ($sync_user->getStreet() !== NULL) && ($sync_user->getStreetNumber() !== NULL)) {
-                            $volunteer = new Volunteer(
-                                $sync_user, $sync_user->getPostcode(), $sync_user->getSuburb(), $sync_user->getStreet(), $sync_user->getStreetNumber()
-                                ,in_array("how-to-vote volunteer", $tags) // poll booth
-                                ,in_array("doorknock volunteer", $tags) // door knock
-                                ,in_array("signage house", $tags) // signage
-                                ,in_array("callback volunteer", $tags) // call
-                                ,in_array("host house party", $tags) // house party
-                                ,in_array("office volunteer", $tags) // envelopes
-                            );
-                            $this->em->persist($volunteer);
-                            $sync_user->setVolunteer($volunteer);
+                    if($person['is_volunteer'] === "true") {
+                        if($sync_user->getVolunteer() === NULL) {
+                            $sync_user->setIsVolunteer(true);
+                            if(($sync_user->getPostcode() !== NULL) && ($sync_user->getSuburb() !== NULL) && ($sync_user->getStreet() !== NULL) && ($sync_user->getStreetNumber() !== NULL)) {
+                                $volunteer = new Volunteer(
+                                    $sync_user, $sync_user->getPostcode(), $sync_user->getSuburb(), $sync_user->getStreet(), $sync_user->getStreetNumber()
+                                    , in_array("how-to-vote volunteer", $tags) // poll booth
+                                    , in_array("doorknock volunteer", $tags) // door knock
+                                    , in_array("signage house", $tags) // signage
+                                    , in_array("callback volunteer", $tags) // call
+                                    , in_array("host house party", $tags) // house party
+                                    , in_array("office volunteer", $tags) // envelopes
+                                );
+                                $this->em->persist($volunteer);
+                                $sync_user->setVolunteer($volunteer);
+                                $num_core_fields_updated["volunteer"][] = $sync_user->getEmail();
+                            }
+                        } else if(($sync_user->getVolunteer()->getWillOther() === NULL) && in_array("other volunteer", $tags)) {
+                            $sync_user->getVolunteer()->setWillOther("Other");
                             $num_core_fields_updated["volunteer"][] = $sync_user->getEmail();
                         }
+                    }
+
+                    if(($person['email_opt_in'] === "false") && ($sync_user->getEmailOptOut() === false)) {
+                        $sync_user->setEmailOptOut(true);
+                        $num_core_fields_updated['opt_out'][] = $sync_user->getEmail();
                     }
                 }
 
@@ -683,7 +694,7 @@ class NationBuilderService {
             foreach($num_core_fields_updated as $name => $array) {
                 if(is_array($array)) {
                     $amount = count($array);
-                    $report .= "$name: $amount updates \n";
+                    $report .= "===> $name: $amount updates \n";
                     foreach ($array as $msg) {
                         $report .= $msg . "\n";
                     }

@@ -15,7 +15,7 @@ use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="VoteBundle\Repository\VolunteerRepository")
  * @ORM\Table(name="volunteer")
  * @ExclusionPolicy("all")
  */

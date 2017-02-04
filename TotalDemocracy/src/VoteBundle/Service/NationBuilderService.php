@@ -518,6 +518,7 @@ class NationBuilderService {
                     $user_emails[] = $new_user->getEmail();
                     if($new_volunteer) {
                         $this->em->persist($new_volunteer);
+                        $new_user->setVolunteer($new_volunteer);
                     }
                 }
             }
@@ -649,33 +650,37 @@ class NationBuilderService {
                         }
                     }
 
-                    if($person['is_volunteer'] === "true") {
-                        if($sync_user->getVolunteer() === NULL) {
-                            $sync_user->setIsVolunteer(true);
-                            if(($sync_user->getPostcode() !== NULL) && ($sync_user->getSuburb() !== NULL) && ($sync_user->getStreet() !== NULL) && ($sync_user->getStreetNumber() !== NULL)) {
-                                $volunteer = new Volunteer(
-                                    $sync_user, $sync_user->getPostcode(), $sync_user->getSuburb(), $sync_user->getStreet(), $sync_user->getStreetNumber()
-                                    , in_array("how-to-vote volunteer", $tags) // poll booth
-                                    , in_array("doorknock volunteer", $tags) // door knock
-                                    , in_array("signage house", $tags) // signage
-                                    , in_array("callback volunteer", $tags) // call
-                                    , in_array("host house party", $tags) // house party
-                                    , in_array("office volunteer", $tags) // envelopes
-                                );
-                                $this->em->persist($volunteer);
-                                $sync_user->setVolunteer($volunteer);
-                                $num_core_fields_updated["volunteer"][] = $sync_user->getEmail();
+                }
+
+                if($person['is_volunteer'] === "true") {
+                    if($sync_user->getVolunteer() === NULL) {
+                        $sync_user->setIsVolunteer(true);
+                        if(($sync_user->getPostcode() !== NULL) && ($sync_user->getSuburb() !== NULL) && ($sync_user->getStreet() !== NULL) && ($sync_user->getStreetNumber() !== NULL)) {
+                            $volunteer = new Volunteer(
+                                $sync_user, $sync_user->getPostcode(), $sync_user->getSuburb(), $sync_user->getStreet(), $sync_user->getStreetNumber()
+                                , in_array("how-to-vote volunteer", $tags) // poll booth
+                                , in_array("doorknock volunteer", $tags) // door knock
+                                , in_array("signage house", $tags) // signage
+                                , in_array("callback volunteer", $tags) // call
+                                , in_array("host house party", $tags) // house party
+                                , in_array("office volunteer", $tags) // envelopes
+                            );
+                            if(in_array("other volunteer", $tags)) {
+                                $volunteer->setWillOther("Other");
                             }
-                        } else if(($sync_user->getVolunteer()->getWillOther() === NULL) && in_array("other volunteer", $tags)) {
-                            $sync_user->getVolunteer()->setWillOther("Other");
+                            $this->em->persist($volunteer);
+                            $sync_user->setVolunteer($volunteer);
                             $num_core_fields_updated["volunteer"][] = $sync_user->getEmail();
                         }
+                    } else if(($sync_user->getVolunteer()->getWillOther() === NULL) && in_array("other volunteer", $tags)) {
+                        $sync_user->getVolunteer()->setWillOther("Other");
+                        $num_core_fields_updated["volunteer"][] = $sync_user->getEmail() . " (OTHER)";
                     }
+                }
 
-                    if(($person['email_opt_in'] === "false") && ($sync_user->getEmailOptOut() === false)) {
-                        $sync_user->setEmailOptOut(true);
-                        $num_core_fields_updated['opt_out'][] = $sync_user->getEmail();
-                    }
+                if(($person['email_opt_in'] === "false") && ($sync_user->getEmailOptOut() === false)) {
+                    $sync_user->setEmailOptOut(true);
+                    $num_core_fields_updated['opt_out'][] = $sync_user->getEmail();
                 }
 
                 // add gender, occupation, website, twitter and facebook fields
@@ -702,6 +707,17 @@ class NationBuilderService {
                     $report .= "$name: $array updates \n";
                 }
             }
+
+            $volunteer_repo = $this->em->getRepository('VoteBundle:Volunteer');
+            $null_volunteers = $volunteer_repo->findOrphanedVolunteers();
+            $num_volunteers_removed = 0;
+            foreach($null_volunteers as $null_volunteer) {
+                if($null_volunteer->getUser() === NULL) {
+                    $this->em->remove($null_volunteer);
+                    $num_volunteers_removed++;
+                }
+            }
+            $report .= "Removed $num_volunteers_removed orphaned volunteers\n";
             //$report .= ""
 
 //            return "Not implemented yet: | " . json_encode($num_fields_updated);

@@ -13,12 +13,14 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Gedmo\Mapping\Annotation as Gedmo;
 
+use Grigorygraborenko\RecursiveAdmin\Annotations\Admin;
+
 /**
  * Class Task
  * @package VoteBundle\Entity
  *
  * @ORM\Entity
- * @ORM\Table(name="tasks")
+ * @ORM\Table(name="task")
  */
 class Task {
 
@@ -68,6 +70,15 @@ class Task {
     /** @ORM\Column(type="datetime", nullable=true) */
     protected $whenProcessed;
 
+    /** @ORM\Column(type="boolean",nullable=false) */
+    protected $ready;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="VoteBundle\Entity\TaskGroup", inversedBy="tasks")
+     * @ORM\JoinColumn(name="task_group_id", referencedColumnName="id", nullable=true, onDelete="set null")
+     */
+    protected $group;
+
     /**
      * Task constructor.
      * @param $type
@@ -84,6 +95,7 @@ class Task {
         $this->minSeconds = $minSeconds;
         $this->jsonParams = $jsonParams;
         $this->user = $user;
+        $this->ready = true;
 
         if(is_array($this->jsonParams)) {
             $this->jsonParams = json_encode($this->jsonParams);
@@ -235,6 +247,34 @@ class Task {
      */
     public function setWhenProcessed($whenProcessed) {
         $this->whenProcessed = $whenProcessed;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getReady() {
+        return $this->ready;
+    }
+
+    /**
+     * @param mixed $ready
+     */
+    public function setReady($ready) {
+        $this->ready = $ready;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGroup() {
+        return $this->group;
+    }
+
+    /**
+     * @param mixed $group
+     */
+    public function setGroup($group) {
+        $this->group = $group;
     }
 
 }

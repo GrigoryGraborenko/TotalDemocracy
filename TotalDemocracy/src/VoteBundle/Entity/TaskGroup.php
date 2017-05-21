@@ -43,20 +43,35 @@ class TaskGroup {
      */
     protected $date_updated;
 
+    /** @ORM\Column(type="string", nullable=false) */
+    protected $type;
+
     /** @ORM\Column(type="boolean",nullable=false) */
     protected $ready;
 
     /**
-     * @ORM\OneToMany(targetEntity="VoteBundle\Entity\Task", mappedBy="task_group")
+     * @ORM\OneToMany(targetEntity="VoteBundle\Entity\Task", mappedBy="group")
      */
     protected $tasks;
 
+    /** @ORM\Column(type="text", nullable=false) */
+    protected $jsonParams;
+
     /**
      * TaskGroup constructor.
+     * @param $type
      * @param $ready
+     * @param $jsonParams
      */
-    public function __construct($ready) {
+    public function __construct($type, $ready, $jsonParams = array()) {
+        $this->type = $type;
         $this->ready = $ready;
+        $this->jsonParams = $jsonParams;
+
+        if(is_array($this->jsonParams)) {
+            $this->jsonParams = json_encode($this->jsonParams);
+        }
+
     }
 
     /**
@@ -83,6 +98,20 @@ class TaskGroup {
     /**
      * @return mixed
      */
+    public function getType() {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type) {
+        $this->type = $type;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getReady() {
         return $this->ready;
     }
@@ -92,6 +121,30 @@ class TaskGroup {
      */
     public function setReady($ready) {
         $this->ready = $ready;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJsonParams() {
+        return $this->jsonParams;
+    }
+
+    /**
+     * @return array
+     */
+    public function getJsonParamsArray() {
+        return json_decode($this->jsonParams, true);
+    }
+
+    /**
+     * @param mixed $jsonParams
+     */
+    public function setJsonParams($jsonParams) {
+        $this->jsonParams = $jsonParams;
+        if(is_array($this->jsonParams)) {
+            $this->jsonParams = json_encode($this->jsonParams);
+        }
     }
 
     /**

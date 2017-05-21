@@ -20,7 +20,7 @@ use Grigorygraborenko\RecursiveAdmin\Annotations\Admin;
  * @package VoteBundle\Entity
  *
  * @ORM\Entity
- * @ORM\Table(name="task")
+ * @ORM\Table(name="tasks")
  */
 class Task {
 
@@ -191,6 +191,9 @@ class Task {
      */
     public function setJsonParams($jsonParams) {
         $this->jsonParams = $jsonParams;
+        if(is_array($this->jsonParams)) {
+            $this->jsonParams = json_encode($this->jsonParams);
+        }
     }
 
     /**

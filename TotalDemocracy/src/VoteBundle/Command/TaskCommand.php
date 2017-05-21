@@ -72,6 +72,11 @@ class TaskCommand extends ContainerAwareCommand {
         // sort tasks into buckets by type
         $outstanding = array();
         foreach($all_tasks as $task) {
+
+            if((!$task->getReady()) || ($task->getGroup() && (!$task->getGroup()->getReady()))) {
+                continue;
+            }
+
             if(!array_key_exists($task->getType(), $outstanding)) {
                 $outstanding[$task->getType()] = array("pending" => array(), "done" => array(), "latest" => NULL);
 
@@ -144,9 +149,19 @@ class TaskCommand extends ContainerAwareCommand {
      * @param $task
      */
     private function runTask($task) {
+
+        if($task->getGroup()) {
+            $base_params = $task->getGroup()->getJsonParamsArray();
+            $group_type = $task->getGroup()->getType();
+        } else {
+            $base_params = array();
+            $group_type = NULL;
+        }
+
         try {
             $service = $this->container->get($task->getService());
-            $result = $service->{$task->getFunction()}($task->getJsonParamsArray(), $task->getUser());
+            $params = array_merge($base_params, $task->getJsonParamsArray());
+            $result = $service->{$task->getFunction()}($params, $task->getUser(), $group_type);
             if(!is_array($result)) {
                 $result = array("success" => false, "error" => $result);
             }

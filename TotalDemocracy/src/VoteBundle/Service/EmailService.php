@@ -116,4 +116,69 @@ class EmailService extends Mailer {
         ));
     }
 
+    /**
+     * @return array
+     */
+    public function getReplaceableParameters() {
+        return array(
+            '{{email}}' => "getEmail"
+            ,'{{names}}' => "getGivenNames"
+            ,'{{surname}}' => "getSurname"
+        );
+    }
+
+    /**
+     * @param $sections
+     * @param $user
+     * @return string
+     */
+    public function getNewsletterHTML($sections, $user) {
+
+        $replaceable = $this->getReplaceableParameters();
+
+        $html = "";
+        foreach($sections as $section) {
+            $text = $section["text"];
+            foreach($replaceable as $key => $replace) {
+                $text = str_replace("$key", $user->{$replace}(), $text);
+            }
+            switch($section["type"]) {
+                case "major":
+                    $text = "<h1>$text</h1>";
+                    break;
+                case "medium":
+                    $text = "<h3>$text</h3>";
+                    break;
+                case "minor":
+                    $text = "<h5>$text</h5>";
+                    break;
+                default:
+                    $text = "<p>$text</p>";
+                    break;
+            }
+            $html .= $text;
+        }
+
+        return $html;
+    }
+
+    /**
+     * @param $params
+     * @param $user
+     */
+    public function emailNewsletter($params, $user) {
+
+        /*
+        $em = $this->container->get('doctrine')->getEntityManager();
+        $newsletter = $em->getRepository('VoteBundle:Newsletter')->find($params["newsletter"]);
+        if(!$newsletter) {
+            return;
+        }
+        $sections = $newsletter->getJsonComponentsArray();
+        $html = $this->getNewsletterHTML($sections, $user);
+        */
+
+        $this->container->get("logger")->info("NEWSLETTER FOR " . $user->getEmail() . ": " . json_encode($params));
+    }
+
 }

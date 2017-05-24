@@ -4,7 +4,13 @@
     {% if header is defined %}
         <h2>{{ header }}</h2>
     {% endif %}
-    {% for paragraph in paragraphs %}
-        <p>{{ paragraph | raw }}</p>
-    {% endfor %}
+    {% if paragraphs is defined %}
+        {% for paragraph in paragraphs %}
+            <p>{{ paragraph | raw }}</p>
+        {% endfor %}
+    {% endif %}
+    {% if html is defined %}
+        {{ html | raw }}
+    {% endif %}
+
 {% endblock %}

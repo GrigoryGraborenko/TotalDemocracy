@@ -332,7 +332,8 @@ class RegisterController extends FOSRestController {
         $mailer = $this->container->get('mailer');
         $templating = $this->container->get('templating');
 
-        $message = \Swift_Message::newInstance()
+        $message = new \Swift_Message();
+        $message = $message
             ->setSubject('Registration Confirmation')
             ->setFrom('noreply@peopledecide.org')
             ->setTo($email)

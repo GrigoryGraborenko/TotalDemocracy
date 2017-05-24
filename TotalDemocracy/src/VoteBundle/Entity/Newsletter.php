@@ -241,12 +241,14 @@ class Newsletter {
      */
     public function adminTest($container, $admin, $input) {
 
-        $sections = $this->getJsonComponentsArray();
-        $html = $container->get("vote.email")->getNewsletterHTML($sections, $admin);
+//        $sections = $this->getJsonComponentsArray();
+//        $html = $container->get("vote.email")->getNewsletterHTML($sections, $admin);
 
         $email = $input["email"];
 
-        return array("report" => "Email succesfully sent to $email");
+        $container->get("vote.email")->sendNewsletterToEmail($this, $email, $admin);
+
+        return array("report" => "Email successfully sent to $email");
     }
 
     /**

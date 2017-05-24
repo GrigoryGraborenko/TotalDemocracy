@@ -22,6 +22,9 @@ class EmailService extends Mailer {
     /** @var Service Container container */
     private $container;
 
+    private $em;
+
+
     /**
      * EmailService constructor.
      * @param \Swift_Mailer $container
@@ -39,6 +42,8 @@ class EmailService extends Mailer {
             )
         ));
         $this->container = $container;
+        $this->em = $this->container->get('doctrine')->getEntityManager();
+
     }
 
     /**
@@ -79,18 +84,26 @@ class EmailService extends Mailer {
      * @param $subject
      * @param $header
      * @param $paragraphs
+     * @param null $html
      * @return bool
      */
-    public function sendSimpleEmail($email, $subject, $header, $paragraphs) {
+    public function sendSimpleEmail($email, $subject, $header, $paragraphs, $html = NULL) {
 
-        $params = array('paragraphs' => $paragraphs);
+        $params = array();
+        if($paragraphs !== NULL) {
+            $params['paragraphs'] = $paragraphs;
+        }
         if($header !== NULL) {
             $params['header'] = $header;
+        }
+        if($html !== NULL) {
+            $params['html'] = $html;
         }
 
         $mailer = $this->container->get('mailer');
         $templating = $this->container->get('templating');
-        $message = \Swift_Message::newInstance()
+        $message = new \Swift_Message();
+        $message = $message
             ->setSubject($subject)
             ->setFrom(array('noreply@peopledecide.org' => 'People Decide'))
             ->setTo($email)
@@ -139,8 +152,10 @@ class EmailService extends Mailer {
         $html = "";
         foreach($sections as $section) {
             $text = $section["text"];
-            foreach($replaceable as $key => $replace) {
-                $text = str_replace("$key", $user->{$replace}(), $text);
+            if($user) {
+                foreach($replaceable as $key => $replace) {
+                    $text = str_replace("$key", $user->{$replace}(), $text);
+                }
             }
             switch($section["type"]) {
                 case "major":
@@ -150,7 +165,7 @@ class EmailService extends Mailer {
                     $text = "<h3>$text</h3>";
                     break;
                 case "minor":
-                    $text = "<h5>$text</h5>";
+                    $text = "<h4>$text</h4>";
                     break;
                 default:
                     $text = "<p>$text</p>";
@@ -163,10 +178,31 @@ class EmailService extends Mailer {
     }
 
     /**
+     * @param $newsletter
+     * @param $email
+     * @param $user
+     */
+    public function sendNewsletterToEmail($newsletter, $email, $user) {
+
+        $sections = $newsletter->getJsonComponentsArray();
+        $html = $this->getNewsletterHTML($sections, $user);
+
+        $this->sendSimpleEmail($email, $newsletter->getSubject(), NULL, NULL, $html);
+    }
+
+    /**
      * @param $params
      * @param $user
      */
     public function emailNewsletter($params, $user) {
+
+        $this->container->get("logger")->info("NEWSLETTER FOR " . $user->getEmail() . ": " . json_encode($params));
+
+        $newsletter = $this->em->getRepository('VoteBundle:Newsletter')->find($params["newsletter"]);
+        if(!$newsletter) {
+            return;
+        }
+        $this->sendNewsletterToEmail($newsletter, $user->getEmail(), $user);
 
         /*
         $em = $this->container->get('doctrine')->getEntityManager();
@@ -178,7 +214,6 @@ class EmailService extends Mailer {
         $html = $this->getNewsletterHTML($sections, $user);
         */
 
-        $this->container->get("logger")->info("NEWSLETTER FOR " . $user->getEmail() . ": " . json_encode($params));
     }
 
 }

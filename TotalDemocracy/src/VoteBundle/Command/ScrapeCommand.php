@@ -282,6 +282,7 @@ class ScrapeCommand extends ContainerAwareCommand {
         }
         $crawler = new Crawler($response->getBody()->getContents());
 
+        // finds total number of bills to scrape
         $num_txt = $crawler->filter("#main_0_content_0_pTotalResults strong")->getNode(0)->textContent;
         $num_items = 0;
         foreach(explode(" ", $num_txt) as $section) {
@@ -397,6 +398,8 @@ class ScrapeCommand extends ContainerAwareCommand {
             if($page > $num_pages) {
                 break;
             }
+
+            // gets the next page ready
             $this->log("Downloading page $page...");
             $query['page'] = $page;
             $response = $client->request("GET", "http://www.aph.gov.au/Parliamentary_Business/Bills_Legislation/Bills_Search_Results", array("query" => $query));

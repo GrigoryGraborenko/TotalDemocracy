@@ -196,24 +196,15 @@ class EmailService extends Mailer {
      */
     public function emailNewsletter($params, $user) {
 
-        $this->container->get("logger")->info("NEWSLETTER FOR " . $user->getEmail() . ": " . json_encode($params));
+        $this->container->get("logger")->debug("Sending newsletter to " . $user->getEmail());
 
         $newsletter = $this->em->getRepository('VoteBundle:Newsletter')->find($params["newsletter"]);
         if(!$newsletter) {
             return;
         }
+
+//        $this->container->get("logger")->info("SENT");
         $this->sendNewsletterToEmail($newsletter, $user->getEmail(), $user);
-
-        /*
-        $em = $this->container->get('doctrine')->getEntityManager();
-        $newsletter = $em->getRepository('VoteBundle:Newsletter')->find($params["newsletter"]);
-        if(!$newsletter) {
-            return;
-        }
-        $sections = $newsletter->getJsonComponentsArray();
-        $html = $this->getNewsletterHTML($sections, $user);
-        */
-
     }
 
 }

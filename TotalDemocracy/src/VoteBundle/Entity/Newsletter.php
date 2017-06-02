@@ -274,12 +274,58 @@ class Newsletter {
      * @param $input
      * @return array
      */
+    public function adminAdd($container, $admin, $input) {
+
+        if(!array_key_exists("users", $input)) {
+            return "At least one user must be added";
+        }
+
+        $em = $container->get('doctrine')->getEntityManager();
+        $task_repo = $em->getRepository("VoteBundle:Task");
+        $rate_limit = $container->getParameter("mailer_rate_limit_seconds");
+//        $tasks = $task_repo->findBy(array("group" => $this->task_group));
+
+        $added = 0;
+        foreach($input["users"] as $user) {
+            $existing = $task_repo->findOneBy(array("group" => $this->task_group, "user" => $user));
+            if($existing) {
+                continue;
+            }
+            $task = new Task("email", "vote.email", "emailNewsletter", $rate_limit, array(), $user);
+            $task->setGroup($this->task_group);
+            $em->persist($task);
+            $em->flush();
+
+            $added++;
+        }
+
+
+//        $em->getRe
+//        $this->setJsonComponents($input["sections"]);
+//        $em->flush();
+
+//        $html = $container->get("vote.email")->getNewsletterHTML($input["sections"], $admin);
+
+        return array("affected_fields" => array("users"), "report" => "Added $added new users to this newsletter");
+    }
+
+    /**
+     * @param $container
+     * @param $admin
+     * @param $input
+     * @return array
+     */
     public function adminSend($container, $admin, $input) {
 
-        $html = $container->get("vote.email")->getNewsletterHTML($this->getJsonComponentsArray(), $admin);
-        $recipient = $input["email"];
+        $em = $container->get('doctrine')->getEntityManager();
+        $this->task_group->setReady(true);
+        $this->sent = true;
+        $em->flush();
 
-        return array("report" => "SENT");
+//        $html = $container->get("vote.email")->getNewsletterHTML($this->getJsonComponentsArray(), $admin);
+//        $recipient = $input["email"];
+
+        return array("affected_fields" => array("task_group"), "report" => "Emails flagged as ready to send. Task dispatcher will process them soon.");
     }
 
     /**
@@ -291,6 +337,13 @@ class Newsletter {
     public static function adminCreate($container, $admin, $input) {
 
         $em = $container->get('doctrine')->getEntityManager();
+
+        if(!array_key_exists("sections", $input)) {
+            $input["sections"] = array();
+        }
+        if(!array_key_exists("users", $input)) {
+            $input["users"] = array();
+        }
 
         $newsletter = new Newsletter("standard", $input["name"], $input["subject"], $input["sections"]);
         $em->persist($newsletter);
@@ -317,7 +370,7 @@ class Newsletter {
 
         $actions = array(
             "preview" => array(
-                "heading" => "Action"
+                "heading" => "Manage"
                 ,"callback" => "adminPreview"
                 ,"permission" => "ROLE_ADMIN"
                 ,"class" => "btn-success"
@@ -326,7 +379,7 @@ class Newsletter {
                 ,"description" => "View preview of newsletter"
             )
             ,"edit" => array(
-                "heading" => "Action"
+                "heading" => "Manage"
                 ,"callback" => "adminEdit"
                 ,"permission" => "ROLE_ADMIN"
                 ,"class" => "btn-primary"
@@ -335,7 +388,7 @@ class Newsletter {
                 ,"description" => "Edit this newsletter"
             )
             ,"test" => array(
-                "heading" => "Action"
+                "heading" => "Send"
                 ,"callback" => "adminTest"
                 ,"permission" => "ROLE_ADMIN"
                 ,"class" => "btn-warning"
@@ -346,8 +399,23 @@ class Newsletter {
         );
 
         if(!$this->sent) {
+            $actions["add"] = array(
+                "heading" => "Manage"
+                ,"callback" => "adminAdd"
+                ,"permission" => "ROLE_ADMIN"
+                ,"class" => "btn-warning"
+                ,"label" => "Add Users"
+                ,"input" => array("users" => array(
+                    "type" => "multientity"
+                    ,"label" => "Users"
+                    ,"entity" => 'VoteBundle\Entity\User'
+                    ,"required" => true
+                ))
+//                ,"input" => array("check" => array("type" => "boolean", "label" => "Are you sure?", "default" => false))
+                ,"description" => "Add users to the newsletter"
+            );
             $actions["send"] = array(
-                "heading" => "Action"
+                "heading" => "Send"
                 ,"callback" => "adminSend"
                 ,"permission" => "ROLE_ADMIN"
                 ,"class" => "btn-danger"
@@ -404,7 +472,8 @@ class Newsletter {
     public static function adminStatic($container, $admin) {
         return array(
             "headers" => array(
-                array("label" => "Action", "permission" => "ROLE_ADMIN", "priority" => 200)
+                array("label" => "Manage", "permission" => "ROLE_ADMIN", "priority" => 200)
+                ,array("label" => "Send", "permission" => "ROLE_ADMIN", "priority" => 190)
             )
             ,"create" => array("callback" => "adminCreate", "input" => array_merge(array(
                 "name" => array("type" => "string", "label" => "Newsletter name (Used internally only)", "required" => true)

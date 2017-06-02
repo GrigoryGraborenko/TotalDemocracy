@@ -85,6 +85,11 @@ class User extends BaseUser {
     protected $date_updated;
 
     /**
+     * @Admin(priority=100)
+     */
+    protected $email;
+
+    /**
      * @ORM\Column(type="string", nullable=true)
      */
     protected $givenNames;

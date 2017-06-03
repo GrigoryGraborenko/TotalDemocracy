@@ -193,18 +193,18 @@ class EmailService extends Mailer {
     /**
      * @param $params
      * @param $user
+     * @return string
      */
     public function emailNewsletter($params, $user) {
 
-        $this->container->get("logger")->debug("Sending newsletter to " . $user->getEmail());
-
         $newsletter = $this->em->getRepository('VoteBundle:Newsletter')->find($params["newsletter"]);
         if(!$newsletter) {
-            return;
+            return "Could not find newsletter # " . $params["newsletter"];
         }
+        $this->container->get("logger")->debug("Sending newsletter to " . $user->getEmail());
 
-//        $this->container->get("logger")->info("SENT");
         $this->sendNewsletterToEmail($newsletter, $user->getEmail(), $user);
+        return array("success" => true);
     }
 
 }

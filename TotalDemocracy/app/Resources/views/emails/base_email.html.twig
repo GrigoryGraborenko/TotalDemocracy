@@ -1,23 +1,111 @@
-<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="outerTable">
-    <tr>
-        <td align="center" valign="top">
-            <img width="550" src="http://d3n8a8pro7vhmx.cloudfront.net/themes/5718bc692213934f74000001/attachments/original/1464235174/PeopleDecide-Logo.png?1464235174">
+{#<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="outerTable">#}
+    {#<tr>#}
+        {#<td align="center" valign="top">#}
+            {#<img width="550" src="http://d3n8a8pro7vhmx.cloudfront.net/themes/5718bc692213934f74000001/attachments/original/1464235174/PeopleDecide-Logo.png?1464235174">#}
             {#<b style="font-size: 80px">#}
                 {#<span style="color: #0088ff">People</span><span style="color: #ff3333">Decide</span>#}
             {#</b>#}
-            <table border="0" cellpadding="20" cellspacing="0" width="550" id="emailContainer">
+            {#<table border="0" cellpadding="20" cellspacing="0" width="550" id="emailContainer">#}
+                {#<tr>#}
+                    {#<td align="left" valign="top" style="background-color:rgb(240,240,240);">#}
+
+                        {#{% block body %}#}
+                        {#{% endblock %}#}
+
+                        {#<p>#}
+                            {#<b>From the People Decide team</b>#}
+                        {#</p>#}
+                    {#</td>#}
+                {#</tr>#}
+            {#</table>#}
+        {#</td>#}
+    {#</tr>#}
+{#</table>#}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1.0"><!-- So that mobile webkit will display zoomed in -->
+    <meta name="format-detection" content="telephone=no"><!-- disable auto telephone linking in iOS -->
+    <title>People Decide | Press Release</title>
+    <style type="text/css">
+
+        /* Resets:see reset.css for details */
+        body{background-color:#f2f2f2;-webkit-text-size-adjust:none; -ms-text-size-adjust:none;}
+        body{color:#333333;font-family:'Open Sans',sans-serif;margin:0;padding:0;}
+        table{border-spacing:0;border-collapse:collapse;border-spacing:0;}
+        table td{border-collapse:collapse;}
+        p{margin-bottom:1em;}
+        img{max-width:100%;}
+
+        /* Constrain email width for small screens */
+        @media screen and (max-width:600px) {
+            table[class="container"] { width:100%!important; }
+        }
+
+        /* Give content more room on mobile */
+        @media screen and (max-width:480px) {
+            table[class="container"] { width:100%!important; }
+            div[class="body-content"]img { width:100%; }
+        }
+
+        /* Styles for forcing columns to rows */
+        @media only screen and (max-width:600px) {
+
+            /* force container columns to (horizontal) blocks */
+            table[class="container"] { width:100%!important; }
+        }
+
+    </style>
+</head>
+<body style="padding:0;" bgcolor="#f2f2f2" topmargin="50px">
+
+<!-- 100% wrapper -->
+<table border="0" width="100%" height="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td align="center" valign="top" style="background-color:#f2f2f2;">
+    </tr>
+    <tr>
+        <td>
+            <!-- ### START 600PX CONTAINER ### -->
+            <!--  Start Logo -->
+            <table width="600" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="margin-top:30px;margin-left:auto;margin-right:auto;" class="container">
+                <tr><td style="padding-top:20px; padding-bottom:15px; text-align:center;" class="body-content"><img style="width:400px;" src="http://d3n8a8pro7vhmx.cloudfront.net/peopledecide/mailings/29/attachments/original/PeopleDecide-Logo.png?1462950652"></td>
+                </tr>
+            </table>
+            <!-- /End Logo -->
+
+            <!-- Start Main -->
+            <table width="600" cellpadding="20" cellspacing="0" bgcolor="#ffffff" style="background-color:#ffffff;margin-top:1px;margin-left:auto;margin-right:auto;" class="container">
                 <tr>
-                    <td align="left" valign="top" style="background-color:rgb(240,240,240);">
+                    <td style="font-family:'Open Sans',sans-serif;font-size:16px;line-height:22px;padding-left:15px;padding-right:15px;padding-top:30px;padding-bottom:30px;text-align:left;" class="body-content">{% block body %}{% endblock %}</td>
+                </tr>
+            </table>
+            <!-- /End Main -->
 
-                        {% block body %}
-                        {% endblock %}
-
-                        <p>
-                            <b>From the People Decide team</b>
-                        </p>
+            <!-- Start Baseplate -->
+            <table width="600" cellpadding="20" cellspacing="0" bgcolor="#ffffff" style="background-color:#ffffff;margin-top:1px;margin-left:auto;margin-right:auto;" class="container">
+                <tr><td align="center" style="font-family:'Open Sans',sans-serif;font-size:16px;line-height:22px;padding-left:15px;padding-right:15px;padding-top:30px;text-align:center;">
+                        {#<a href="http://www.peopledecide.org.au"><img style="text-align:center;" src="http://d3n8a8pro7vhmx.cloudfront.net/peopledecide/mailings/29/attachments/original/weblink-button.jpg?1462954353"></a>#}
+                        <a href="http://www.peopledecide.org" style="text-align:center;padding: 10px 20px 10px 20px;background-color:#E94633;color:white;text-decoration: none;font-size:12px;">VISIT PEOPLEDECIDE.ORG</a>
+                        <br/>
+                        {#<br/><span style="text-align:center;font-size:11px;">This email was sent to <a style="color:#1488b9;" href="{{ recipient.email }}">{{ recipient.email }}</a>.  To stop receiving emails, <a style="color:#1488b9;" href="{{ settings.site.unsubscribe_url }}">click here</a>.</span>#}
+                        {#<br/><span style="text-align:center;font-size:9px;">Created with <a style="color:#1488b9;" href="http://nationbuilder.com">NationBuilder</a>, the essential toolkit for leaders.</span>#}
                     </td>
                 </tr>
             </table>
+            <!-- /End Baseplate -->
+
+            <!-- ### END 600PX CONTAINER ###  -->
+
+            <br />
+            <br />
         </td>
     </tr>
 </table>
+<!--/100% wrapper-->
+
+</body>
+</html>

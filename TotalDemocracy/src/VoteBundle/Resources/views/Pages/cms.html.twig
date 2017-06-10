@@ -2,6 +2,28 @@
 
 {% block content %}
 
-    <h1>CUSTOM</h1>
+    {% for section in sections %}
+
+        {% if section.type == "major" %}
+            <h1>
+                {{ section.text | raw }}
+            </h1>
+        {% elseif section.type == "medium" %}
+            <h3>
+                {{ section.text | raw }}
+            </h3>
+        {% elseif section.type == "minor" %}
+            <h4>
+                {{ section.text | raw }}
+            </h4>
+        {% elseif section.type == "paragraph" %}
+            <p>
+                {{ section.text | raw }}
+            </p>
+        {% else %}
+            {{ section.text | raw }}
+        {% endif %}
+
+    {% endfor %}
 
 {% endblock %}

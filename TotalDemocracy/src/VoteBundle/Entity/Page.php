@@ -53,10 +53,16 @@ class Page {
     /** @ORM\Column(type="string", nullable=false) */
     protected $name;
 
-    /** @ORM\Column(type="string", nullable=false) */
+    /**
+     * @ORM\Column(type="string", nullable=false)
+     * @Admin(read="ROLE_ADMIN", write="none")
+     */
     protected $url;
 
-    /** @ORM\Column(type="boolean", nullable=false) */
+    /**
+     * @ORM\Column(type="boolean", nullable=false)
+     * @Admin(read="ROLE_ADMIN", write="none")
+     */
     protected $visible;
 
     /** @ORM\Column(type="text", nullable=false) */
@@ -209,7 +215,11 @@ class Page {
      */
     public static function adminCreate($container, $admin, $input) {
 
-//        $em = $container->get('doctrine')->getEntityManager();
+        $em = $container->get('doctrine')->getEntityManager();
+        $prior = $em->getRepository('VoteBundle:Page')->findOneBy(array("url" => $input["url"]));
+        if($prior) {
+            return "Page already exists with this URL";
+        }
 
         $page = new Page("standard", $input["heading"], $input["name"], $input["url"]);
         if(!array_key_exists("sections", $input)) {
@@ -311,7 +321,6 @@ class Page {
 //            $subject["default"] = $current_newsletter->getSubject();
         }
 
-
         return array(
 //            "subject" => $subject
             "sections" => $sections
@@ -325,8 +334,6 @@ class Page {
      */
     public function adminActions($container, $admin) {
 
-        // edit, clone, enable/disable
-
         $send_verb = ($this->visible ? "Disable" : "Enable");
 
         $actions = array(
@@ -336,11 +343,11 @@ class Page {
                 ,"permission" => "ROLE_ADMIN"
                 ,"class" => "btn-success"
                 ,"label" => "Clone"
-                ,"input" => array(
+                ,"input" => array_merge(array(
                     "heading" => array("type" => "string", "label" => "Menu heading name", "required" => true, "default" => $this->heading)
                     ,"name" => array("type" => "string", "label" => "Menu name", "required" => true, "default" => $this->name)
                     ,"url" => array("type" => "string", "label" => "URL string", "required" => true, "default" => $this->url)
-                )
+                ), Page::getStructureInput($container, $this))
                 ,"description" => "Clone this page"
             )
             ,"edit" => array(

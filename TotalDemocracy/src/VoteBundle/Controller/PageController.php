@@ -38,15 +38,16 @@ class PageController extends CommonController {
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws ErrorRedirectException
      */
-    public function profileAction(Request $request, $url) {
+    public function pageAction(Request $request, $url) {
 
         $page = $this->em->getRepository('VoteBundle:Page')->findOneBy(array("visible" => true, "url" => $url));
         if(!$page) {
             throw new ErrorRedirectException("error_page", "Page does not exist");
         }
+        $params = $page->getJsonParamsArray();
 
         return $this->render("VoteBundle:Pages:cms.html.twig", array(
-//            'menus' => $menus
+            'sections' => $params["sections"]
         ));
     }
 

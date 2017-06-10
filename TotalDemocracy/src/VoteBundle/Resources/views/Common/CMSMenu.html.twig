@@ -1,0 +1,17 @@
+{% for heading, pages in menus %}
+    {% if pages|length == 1 %}
+        <li {% if pages[0].active %}class="active"{% endif %}><a href="{{ pages[0].url }}">{{ pages[0].name }}</a></li>
+    {% else %}
+        <li class="dropdown">
+            <a id="{{ heading }}-menu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                {{ heading }}
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="{{ heading }}-menu">
+                {% for page in pages %}
+                    <li><a href="{{ page.url }}">{{ page.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endif %}
+{% endfor %}

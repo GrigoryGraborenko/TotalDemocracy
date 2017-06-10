@@ -108,18 +108,39 @@ class CoreController extends FOSRestController {
 
         $user = $this->getUser();
         if($user === NULL) { // if logged out
-//            return $this->getExternalJSOutputAction($request);
             $js_out->output("user", "-");
         } else {
             $js_out->output("user", $user->getUsername());
         }
-
-//        $js_out->output("user", NULL);
 
         return $this->render("VoteBundle:Common:JSOutput.html.twig", array(
             'js_output_data' => $js_out->getParameters()
         ));
     }
 
+    /**
+     * This is called by base twig on every page. It's responsible for creating custom menus
+     */
+    public function getCMSMenuAction(Request $request) {
+
+        $pages = $this->em->getRepository('VoteBundle:Page')->findBy(array("visible" => true));
+
+        $router = $this->get("router");
+
+        $menus = array();
+        foreach($pages as $page) {
+            $heading = $page->getHeading();
+            $url = $router->generate('cms-page', array("url" => $page->getUrl()));
+            if(!array_key_exists($heading, $menus)) {
+                $menus[$heading] = array();
+            }
+            $active = $request->getPathInfo() === $url;
+            $menus[$heading][] = array("name" => $page->getName(), "url" => $url, "active" => $active);
+        }
+
+        return $this->render("VoteBundle:Common:CMSMenu.html.twig", array(
+            'menus' => $menus
+        ));
+    }
 
 }

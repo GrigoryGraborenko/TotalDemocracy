@@ -51,6 +51,13 @@ html, body {
 .nav.navbar-nav li a {
 	color: #fff;
 }
+.nav.navbar-nav .dropdown-menu li a {
+	color: #000;
+}
+/*.dropdown-menu a {*/
+	/*color: #000;*/
+/*}*/
+
 .nav.navbar-nav li a:hover {
 	background-color: #0080C8;
 }
@@ -93,7 +100,6 @@ h6 {
 	text-decoration: none;
 	color: #fff;
 }
-
 
 /* Responsive Structure 
 ----------------------------------------------- */

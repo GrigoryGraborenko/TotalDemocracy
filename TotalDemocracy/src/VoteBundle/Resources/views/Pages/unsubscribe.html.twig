@@ -1,0 +1,13 @@
+{% extends "::base.html.twig" %}
+
+{% block content %}
+
+    {% if user is not null %}
+        <h1>Newsletter Unsubscription</h1>
+        <p>You have been successfully unsubscribed from the People Decide Newsletter. </p>
+    {% else %}
+        <h1>Unsubscription Error</h1>
+        <p>Token not found. </p>
+    {% endif %}
+
+{% endblock %}

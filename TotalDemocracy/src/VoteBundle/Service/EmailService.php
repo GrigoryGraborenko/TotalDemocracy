@@ -85,11 +85,12 @@ class EmailService extends Mailer {
      * @param $header
      * @param $paragraphs
      * @param null $html
+     * @param null $unsubscribe_link
      * @return bool
      */
-    public function sendSimpleEmail($email, $subject, $header, $paragraphs, $html = NULL) {
+    public function sendSimpleEmail($email, $subject, $header, $paragraphs, $html = NULL, $unsubscribe_link = NULL) {
 
-        $params = array();
+        $params = array("email" => $email);
         if($paragraphs !== NULL) {
             $params['paragraphs'] = $paragraphs;
         }
@@ -98,6 +99,9 @@ class EmailService extends Mailer {
         }
         if($html !== NULL) {
             $params['html'] = $html;
+        }
+        if($unsubscribe_link !== NULL) {
+            $params['unsubscribe'] = $unsubscribe_link;
         }
 
         $mailer = $this->container->get('mailer');
@@ -187,7 +191,14 @@ class EmailService extends Mailer {
         $sections = $newsletter->getJsonComponentsArray();
         $html = $this->getNewsletterHTML($sections, $user);
 
-        $this->sendSimpleEmail($email, $newsletter->getSubject(), NULL, NULL, $html);
+        if(!$user->getEmailOptOutToken()) {
+            $token_gen = $this->container->get('fos_user.util.token_generator');
+            $user->setEmailOptOutToken($token_gen->generateToken());
+            $this->em->flush();
+        }
+        $url = $this->container->getParameter("url_base") . $this->container->get("router")->generate('unsubscribe', array("token" => $user->getEmailOptOutToken()));
+
+        $this->sendSimpleEmail($email, $newsletter->getSubject(), NULL, NULL, $html, $url);
     }
 
     /**
@@ -201,6 +212,10 @@ class EmailService extends Mailer {
         if(!$newsletter) {
             return "Could not find newsletter # " . $params["newsletter"];
         }
+        if($user->getEmailOptOut()) {
+            return "User is opted out";
+        }
+
         $this->container->get("logger")->debug("Sending newsletter to " . $user->getEmail());
 
         $this->sendNewsletterToEmail($newsletter, $user->getEmail(), $user);

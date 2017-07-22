@@ -123,7 +123,7 @@ class CoreController extends FOSRestController {
      */
     public function getCMSMenuAction(Request $request) {
 
-        $pages = $this->em->getRepository('VoteBundle:Page')->findBy(array("visible" => true));
+        $pages = $this->em->getRepository('VoteBundle:Page')->findBy(array("visible" => true), array("priority" => "DESC", "heading" => "ASC", "name" => "ASC"));
 
         $router = $this->get("router");
 

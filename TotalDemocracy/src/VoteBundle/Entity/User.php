@@ -173,6 +173,11 @@ class User extends BaseUser {
     /**
      * @ORM\Column(type="string", nullable=true)
      */
+    protected $emailOptOutToken;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
     protected $permanentLoginToken;
 
     /**
@@ -590,6 +595,20 @@ class User extends BaseUser {
      */
     public function setEmailOptOut($emailOptOut) {
         $this->emailOptOut = $emailOptOut;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmailOptOutToken() {
+        return $this->emailOptOutToken;
+    }
+
+    /**
+     * @param mixed $emailOptOutToken
+     */
+    public function setEmailOptOutToken($emailOptOutToken) {
+        $this->emailOptOutToken = $emailOptOutToken;
     }
 
     /**

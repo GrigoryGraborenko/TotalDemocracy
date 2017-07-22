@@ -54,6 +54,11 @@ class Page {
     protected $name;
 
     /**
+     * @ORM\Column(type="integer", nullable=false, options={"default" = 0})
+     */
+    protected $priority;
+
+    /**
      * @ORM\Column(type="string", nullable=false)
      * @Admin(read="ROLE_ADMIN", write="none")
      */
@@ -174,6 +179,20 @@ class Page {
      */
     public function setVisible($visible) {
         $this->visible = $visible;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPriority() {
+        return $this->priority;
+    }
+
+    /**
+     * @param mixed $priority
+     */
+    public function setPriority($priority) {
+        $this->priority = $priority;
     }
 
     /**

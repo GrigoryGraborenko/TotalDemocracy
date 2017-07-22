@@ -91,6 +91,9 @@
                         {#<a href="http://www.peopledecide.org.au"><img style="text-align:center;" src="http://d3n8a8pro7vhmx.cloudfront.net/peopledecide/mailings/29/attachments/original/weblink-button.jpg?1462954353"></a>#}
                         <a href="http://www.peopledecide.org" style="text-align:center;padding: 10px 20px 10px 20px;background-color:#E94633;color:white;text-decoration: none;font-size:12px;">VISIT PEOPLEDECIDE.ORG</a>
                         <br/>
+                        {% if unsubscribe is defined %}
+                            <br/><span style="text-align:center;font-size:11px;">This email was sent to <a style="color:#1488b9;" href="{{ email }}">{{ email }}</a>.  To stop receiving emails, <a style="color:#1488b9;" href="{{ unsubscribe }}">click here</a>.</span>
+                        {% endif %}
                         {#<br/><span style="text-align:center;font-size:11px;">This email was sent to <a style="color:#1488b9;" href="{{ recipient.email }}">{{ recipient.email }}</a>.  To stop receiving emails, <a style="color:#1488b9;" href="{{ settings.site.unsubscribe_url }}">click here</a>.</span>#}
                         {#<br/><span style="text-align:center;font-size:9px;">Created with <a style="color:#1488b9;" href="http://nationbuilder.com">NationBuilder</a>, the essential toolkit for leaders.</span>#}
                     </td>

@@ -98,6 +98,25 @@ class ProfileController extends CommonController {
     }
 
     /**
+     * @Route("/unsubscribe/{token}", name="unsubscribe")
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws ErrorRedirectException
+     */
+    public function unsubscribeAction(Request $request, $token) {
+
+        $user = $this->em->getRepository('VoteBundle:User')->findOneBy(array("emailOptOutToken" => $token));
+        if($user) {
+            $user->setEmailOptOut(true);
+            $this->em->flush();
+        }
+        $response = $this->render('VoteBundle:Pages:unsubscribe.html.twig', array("user" => $user));
+        return $response;
+    }
+
+
+    /**
      * @Route("/settings/update", name="profile_update", defaults={"via_profile"=true})
      * @Route("/volunteer", name="post_verify_volunteer", defaults={"via_profile"=false})
      * @Method("POST")

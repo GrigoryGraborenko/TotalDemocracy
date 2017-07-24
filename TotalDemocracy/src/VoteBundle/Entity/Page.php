@@ -85,6 +85,7 @@ class Page {
         $this->heading = $heading;
         $this->name = $name;
         $this->url = $url;
+        $this->priority = 0;
 
         $this->visible = false;
         $this->jsonParams = json_encode(array());

@@ -39,3 +39,6 @@ services:
     vote.electoral_roll:
         class: VoteBundle\Service\ElectoralRollService
         arguments: ["@doctrine.orm.entity_manager", "@service_container", "@logger"]
+    vote.file:
+        class: VoteBundle\Service\FileService
+        arguments: ["@doctrine.orm.entity_manager", "@service_container", "@logger"]

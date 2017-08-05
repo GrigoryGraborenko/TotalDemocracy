@@ -150,3 +150,6 @@ recursive_admin:
         -
           service: vote.electoral_roll
           method: getAdminGlobalActions
+        -
+          service: vote.file
+          method: getAdminGlobalActions

@@ -46,8 +46,32 @@ class PageController extends CommonController {
         }
         $params = $page->getJsonParamsArray();
 
+        $indices_needed = false;
+        $indices = array();
+        foreach($params["sections"] as &$param) {
+            if($param["type"] === "index") {
+                $indices_needed = true;
+            } else if(!$indices_needed) {
+                continue;
+            }
+            if(($param["type"] === "major") || ($param["type"] === "medium") || ($param["type"] === "minor")) {
+                $element_id = str_replace(" ", "-", strtolower(substr($param["text"], 0, 12)));
+                $param["id"] = $element_id;
+//                if($param["type"] === "medium") {
+//                    $param["index_style"] = "margin-left: 20px";
+//                } else if($param["type"] === "minor") {
+//                    $param["index_style"] = "margin-left: 40px";
+//                }
+                if($param["type"] === "minor") {
+                    $param["index_style"] = "margin-left: 20px";
+                }
+                $indices[] = $param;
+            }
+        }
+
         return $this->render("VoteBundle:Pages:cms.html.twig", array(
             'sections' => $params["sections"]
+            ,'indices' => $indices
         ));
     }
 

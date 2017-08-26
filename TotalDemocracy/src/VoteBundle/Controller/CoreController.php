@@ -130,7 +130,11 @@ class CoreController extends FOSRestController {
         $menus = array();
         foreach($pages as $page) {
             $heading = $page->getHeading();
-            $url = $router->generate('cms-page', array("url" => $page->getUrl()));
+            $url = $page->getUrl();
+            $this->get("logger")->info($url . " ====== " . strpos($url, "www"));
+            if(strpos($url, "http") !== 0) {
+                $url = $router->generate('cms-page', array("url" => $url));
+            }
             if(!array_key_exists($heading, $menus)) {
                 $menus[$heading] = array();
             }

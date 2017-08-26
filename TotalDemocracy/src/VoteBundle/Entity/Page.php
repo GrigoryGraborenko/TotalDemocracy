@@ -58,10 +58,7 @@ class Page {
      */
     protected $priority;
 
-    /**
-     * @ORM\Column(type="string", nullable=false)
-     * @Admin(read="ROLE_ADMIN", write="none")
-     */
+    /** @ORM\Column(type="string", nullable=false) */
     protected $url;
 
     /**
@@ -330,6 +327,7 @@ class Page {
                     ,array("value" => "minor", "label" => "Minor heading")
                     ,array("value" => "medium", "label" => "Medium heading")
                     ,array("value" => "major", "label" => "Major heading")
+                    ,array("value" => "index", "label" => "Index panel")
                 ))
             ));
 //        $subject = array("type" => "string", "label" => "Subject", "required" => true);

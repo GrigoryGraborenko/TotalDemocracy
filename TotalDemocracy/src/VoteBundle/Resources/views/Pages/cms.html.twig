@@ -5,21 +5,34 @@
     {% for section in sections %}
 
         {% if section.type == "major" %}
-            <h1>
+            <h1 {% if section.id is defined %}id="{{ section.id }}"{% endif %} >
                 {{ section.text | raw }}
             </h1>
         {% elseif section.type == "medium" %}
-            <h3>
+            <h3 {% if section.id is defined %}id="{{ section.id }}"{% endif %} >
                 {{ section.text | raw }}
             </h3>
         {% elseif section.type == "minor" %}
-            <h4>
+            <h4 {% if section.id is defined %}id="{{ section.id }}"{% endif %} >
                 {{ section.text | raw }}
             </h4>
         {% elseif section.type == "paragraph" %}
             <p>
                 {{ section.text | raw }}
             </p>
+        {% elseif section.type == "index" %}
+            <div class="well">
+                <div>
+                    <h4>{{ section.text | raw }}</h4>
+                    {% for index in indices %}
+                        <div>
+                            <a href="#{{ index.id }}" {% if index.index_style is defined %}style="{{ index.index_style }}"{% endif %} >
+                                {{ index.text | raw }}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         {% else %}
             {{ section.text | raw }}
         {% endif %}

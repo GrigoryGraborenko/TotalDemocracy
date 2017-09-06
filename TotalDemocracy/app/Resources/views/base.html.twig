@@ -82,12 +82,13 @@
         </div>
         <div class="footer">
             <div style="padding-top:25px;" class="container">
-                <p>
-                    <a href="http://www.karelboele.com/terms-conditions">Terms & Conditions
-                    </a> &nbsp; | &nbsp; <a href="http://www.karelboele.com/privacy-policy">Privacy Policy
-                    </a> &nbsp; | &nbsp; <a href="http://www.karelboele.com/rules">Rules</a>
-                    </a> &nbsp; | &nbsp; <a href="https://github.com/GrigoryGraborenko/TotalDemocracy">Github</a>
-                </p>
+                {{ render(controller('VoteBundle:Core:getCMSFooter', { 'request': app.request })) }}
+                {#<p>#}
+                    {#<a href="http://www.karelboele.com/terms-conditions">Terms & Conditions#}
+                    {#</a> &nbsp; | &nbsp; <a href="http://www.karelboele.com/privacy-policy">Privacy Policy#}
+                    {#</a> &nbsp; | &nbsp; <a href="http://www.karelboele.com/rules">Rules</a>#}
+                    {#</a> &nbsp; | &nbsp; <a href="https://github.com/GrigoryGraborenko/TotalDemocracy">Github</a>#}
+                {#</p>#}
             </div>
         </div>
 

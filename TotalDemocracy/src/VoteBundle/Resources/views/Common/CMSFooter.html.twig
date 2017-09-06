@@ -1,0 +1,10 @@
+
+<p>
+{% for page in footers %}
+    {% if not loop.first %} &nbsp; | &nbsp; {% endif %}
+    <a href={{ page.url }}>{{ page.name }}</a>
+{% endfor %}
+</p>
+<p>
+    {{ footer_text }}
+</p>

@@ -46,7 +46,7 @@ class OptionService
         ,"verify.enable"                                         => array("default" => "true", "type" => "boolean", "label" => "Allows verification. ")
         ,"password.length.min"                                   => array("default" => "8", "type" => "int", "label" => "Minimum password length. ")
         ,"phone.length.min"                                      => array("default" => "6", "type" => "int", "label" => "Minimum phone number length. ")
-
+        ,"footer.text"                                           => array("default" => "© 2017 PeopleDecide. All rights reserved", "type" => "string", "label" => "The text in the footer ")
         );
     }
 
@@ -62,6 +62,39 @@ class OptionService
         $this->logger = $logger;
 
         $this->initDefaultParams();
+    }
+
+    /**
+     * Gets value for a string option
+     *
+     * @param $name
+     * @return mixed
+     */
+    public function getString($name)
+    {
+        $value = $this->getValue($name, 'string');
+        if($value === NULL) {
+            return false;
+        }
+        return $value;
+    }
+
+    /**
+     * Changes the value for a string option
+     *
+     * @param $name
+     * @param $value
+     * @throws \Exception
+     */
+    public function setString($name, $value) {
+
+        $option = $this->getOption($name, "string");
+        if ($option === NULL) {
+            throw new \Exception("Could not find $name option of type boolean");
+        }
+
+        $option->setValue($value);
+        $this->em->flush();
     }
 
     /**

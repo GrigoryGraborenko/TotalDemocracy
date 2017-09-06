@@ -130,8 +130,10 @@ class CoreController extends FOSRestController {
         $menus = array();
         foreach($pages as $page) {
             $heading = $page->getHeading();
+            if(strtolower($heading) === "footer") {
+                continue;
+            }
             $url = $page->getUrl();
-            $this->get("logger")->info($url . " ====== " . strpos($url, "www"));
             if(strpos($url, "http") !== 0) {
                 $url = $router->generate('cms-page', array("url" => $url));
             }
@@ -144,6 +146,37 @@ class CoreController extends FOSRestController {
 
         return $this->render("VoteBundle:Common:CMSMenu.html.twig", array(
             'menus' => $menus
+        ));
+    }
+
+    /**
+     * This is called by base twig on every page. It's responsible for creating custom menus
+     */
+    public function getCMSFooterAction(Request $request) {
+
+        $pages = $this->em->getRepository('VoteBundle:Page')->findBy(array("visible" => true), array("priority" => "DESC", "heading" => "ASC", "name" => "ASC"));
+
+        $footer_text = $this->get("vote.option")->getString("footer.text");
+
+        $router = $this->get("router");
+
+        $footers = array();
+        foreach($pages as $page) {
+            $heading = $page->getHeading();
+            if(strtolower($heading) !== "footer") {
+                continue;
+            }
+            $url = $page->getUrl();
+            if(strpos($url, "http") !== 0) {
+                $url = $router->generate('cms-page', array("url" => $url));
+            }
+            $active = $request->getPathInfo() === $url;
+            $footers[] = array("name" => $page->getName(), "url" => $url, "active" => $active);
+        }
+
+        return $this->render("VoteBundle:Common:CMSFooter.html.twig", array(
+            'footers' => $footers
+            ,'footer_text' => $footer_text
         ));
     }
 

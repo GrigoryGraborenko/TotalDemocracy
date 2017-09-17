@@ -225,7 +225,7 @@ class VerifyController extends CommonController {
 
         $track_event = $this->nb_service->getTrackingEvent($request);
         if($track_event) {
-            $this->nb_service->syncPerson($user);
+//            $this->nb_service->syncPerson($user);
         }
 
 /*
@@ -425,12 +425,13 @@ class VerifyController extends CommonController {
 
             if($tracking_event !== NULL) {
                 $json = $tracking_event->getJsonArray();
-                if(array_key_exists("nationbuilder.api_token", $json)) {
-                    $nationbuilder = $this->get("vote.nationbuilder");
-                    $nationbuilder->setToken($json["nationbuilder.api_token"]);
-                    $nationbuilder->syncPerson($user);
-                }
+//                if(array_key_exists("nationbuilder.api_token", $json)) {
+//                    $nationbuilder = $this->get("vote.nationbuilder");
+//                    $nationbuilder->setToken($json["nationbuilder.api_token"]);
+//                    $nationbuilder->syncPerson($user);
+//                }
             }
+
             // don't remove after verification so that new users can see all the domains they can vote in
 //            if($session->has("new_user_id")) {
 //                $session->remove("new_user_id");

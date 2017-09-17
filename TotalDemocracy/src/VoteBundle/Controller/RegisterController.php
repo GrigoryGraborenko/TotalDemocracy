@@ -172,11 +172,11 @@ class RegisterController extends FOSRestController {
 
         if($track_event) {
             $json = $track_event->getJsonArray();
-            if(array_key_exists("nationbuilder.api_token", $json)) {
-                $nationbuilder = $this->get("vote.nationbuilder");
-                $nationbuilder->setToken($json["nationbuilder.api_token"]);
-                $nationbuilder->syncPerson($user);
-            }
+//            if(array_key_exists("nationbuilder.api_token", $json)) {
+//                $nationbuilder = $this->get("vote.nationbuilder");
+//                $nationbuilder->setToken($json["nationbuilder.api_token"]);
+//                $nationbuilder->syncPerson($user);
+//            }
         }
 
         $this->em->flush();

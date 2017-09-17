@@ -200,11 +200,11 @@ class ProfileController extends CommonController {
                 $events = $this->em->getRepository('VoteBundle:ServerEvent')->findByJson("registration.track", $cookies['tracking_token'], false);
                 if(count($events) > 0) {
                     $json = $events[0]->getJsonArray();
-                    if(array_key_exists("nationbuilder.api_token", $json)) {
-                        $nationbuilder = $this->get("vote.nationbuilder");
-                        $nationbuilder->setToken($json["nationbuilder.api_token"]);
-                        $nationbuilder->syncPerson($user);
-                    }
+//                    if(array_key_exists("nationbuilder.api_token", $json)) {
+//                        $nationbuilder = $this->get("vote.nationbuilder");
+//                        $nationbuilder->setToken($json["nationbuilder.api_token"]);
+//                        $nationbuilder->syncPerson($user);
+//                    }
                 }
             }
         }
@@ -349,6 +349,8 @@ class ProfileController extends CommonController {
      */
     public function oauthAction(Request $request) {
 
+        throw new ErrorRedirectException("error_page", "Feature removed");
+
         $user = $this->getUser();
         if($user === NULL) {
             throw new ErrorRedirectException("error_page", "Access denied");
@@ -388,6 +390,8 @@ class ProfileController extends CommonController {
      */
     public function oauthCallbackAction(Request $request) {
 
+        throw new ErrorRedirectException("error_page", "Feature removed");
+
         $this->get('logger')->debug("oauth redirected successfully");
         $user = $this->getUser();
         if($user === NULL) {
@@ -419,6 +423,8 @@ class ProfileController extends CommonController {
      * @Route("/oauth/nationbuilder/cancel", name="oauth_nationbuilder_cancel")
      */
     public function oauthCancelAction(Request $request) {
+
+        throw new ErrorRedirectException("error_page", "Feature removed");
 
         $user = $this->getUser();
         if($user === NULL) {

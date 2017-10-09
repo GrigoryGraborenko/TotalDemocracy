@@ -246,7 +246,13 @@ class Newsletter {
 
         $email = $input["email"];
 
-        $container->get("vote.email")->sendNewsletterToEmail($this, $email, $admin);
+        $em = $container->get('doctrine')->getEntityManager();
+        $user = $em->getRepository('VoteBundle:User')->findOneBy(array("emailCanonical" => $email));
+        if($user === NULL) {
+            $user = $admin;
+        }
+
+        $container->get("vote.email")->sendNewsletterToEmail($this, $email, $user);
 
         return array("report" => "Email successfully sent to $email");
     }

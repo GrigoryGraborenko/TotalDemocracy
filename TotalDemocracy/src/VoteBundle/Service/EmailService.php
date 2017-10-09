@@ -140,6 +140,7 @@ class EmailService extends Mailer {
         return array(
             '{{email}}' => "getEmail"
             ,'{{names}}' => "getGivenNames"
+            ,'{{first_name}}' => "getFirstName"
             ,'{{surname}}' => "getSurname"
         );
     }

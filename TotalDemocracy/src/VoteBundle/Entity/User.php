@@ -330,6 +330,22 @@ class User extends BaseUser {
     /**
      * @return mixed
      */
+    public function getFirstName() {
+
+        if($this->givenNames === NULL) {
+            return NULL;
+        }
+
+        $result = array_slice(explode(" ", $this->givenNames), 0, 1);
+        if(count($result) <= 0) {
+            return NULL;
+        }
+        return $result[0];
+    }
+
+    /**
+     * @return mixed
+     */
     public function getPostcode() {
         return $this->postcode;
     }

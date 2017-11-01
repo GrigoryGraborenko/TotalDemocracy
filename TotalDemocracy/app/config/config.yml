@@ -144,9 +144,9 @@ recursive_admin:
         destroy: [ROLE_SUPER_ADMIN]
     back_route: vote
     global_actions:
-#        -
-#          service: vote.nationbuilder
-#          method: getAdminGlobalActions
+        -
+          service: vote.nationbuilder
+          method: getAdminGlobalActions
         -
           service: vote.electoral_roll
           method: getAdminGlobalActions
